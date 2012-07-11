@@ -1,0 +1,47 @@
+diff -up Singular-3-1-3/Singular/misc_ip.cc.orig Singular-3-1-3/Singular/misc_ip.cc
+--- Singular-3-1-3/Singular/misc_ip.cc.orig	2012-05-09 00:58:45.370543834 -0300
++++ Singular-3-1-3/Singular/misc_ip.cc	2012-05-09 01:00:18.559547404 -0300
+@@ -1147,7 +1147,6 @@ void siInit(char *name)
+   errorreported = 0;
+ }
+ 
+-#ifdef LIBSINGULAR
+ #ifdef HAVE_FACTORY
+ // the init routines of factory need mmInit
+ int mmInit( void )
+@@ -1155,4 +1154,3 @@ int mmInit( void )
+   return 1;
+ }
+ #endif
+-#endif
+diff -up Singular-3-1-3/Singular/tesths.cc.orig Singular-3-1-3/Singular/tesths.cc
+--- Singular-3-1-3/Singular/tesths.cc.orig	2012-05-09 00:58:34.713543427 -0300
++++ Singular-3-1-3/Singular/tesths.cc	2012-05-09 00:59:39.263545898 -0300
+@@ -48,27 +48,6 @@
+ extern int siInit(char *);
+ 
+ #if ! defined(LIBSINGULAR)
+-int mmInit2( void )
+-{
+-#if defined(OMALLOC_USES_MALLOC) || defined(X_OMALLOC)
+-    /* in mmstd.c, for some architectures freeSize() unconditionally uses the *system* free() */
+-    /* sage ticket 5344: http://trac.sagemath.org/sage_trac/ticket/5344 */
+-    /* do not rely on the default in Singular as libsingular may be different */
+-    mp_set_memory_functions(omMallocFunc,omReallocSizeFunc,omFreeSizeFunc);
+-#else
+-    mp_set_memory_functions(malloc,reallocSize,freeSize);
+-#endif
+-  return 1;
+-}
+-int mmInit( void )
+-{
+-#ifndef SI_THREADS
+-  return mmInit2();
+-#else
+-  return 1;
+-#endif
+-}
+-
+ /*0 implementation*/
+ int main(          /* main entry to Singular */
+     int argc,      /* number of parameter */

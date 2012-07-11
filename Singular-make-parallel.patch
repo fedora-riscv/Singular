@@ -1,0 +1,45 @@
+diff -up Singular-3-1-3/kernel/Makefile.in.orig Singular-3-1-3/kernel/Makefile.in
+--- Singular-3-1-3/kernel/Makefile.in.orig	2012-05-05 14:14:28.055966942 -0300
++++ Singular-3-1-3/kernel/Makefile.in	2012-05-05 14:14:40.293967976 -0300
+@@ -243,7 +243,7 @@ p_Procs_Lib.o: p_Procs_Lib.inc
+ 
+ # Hmm compiling with -fomit-frame-pointer resulted in access violation
+ # under cygwin
+-prCopy.o: prCopy.inc
++prCopy.o prCopy.og prCopy.op: prCopy.inc
+ 
+ prCopy.inc : prCopyMacros.h prCopyTemplate.cc prCopy.pl
+ 	$(PERL) prCopy.pl > prCopy.xx && mv prCopy.xx prCopy.inc
+diff -up Singular-3-1-3/Makefile.in.orig Singular-3-1-3/Makefile.in
+--- Singular-3-1-3/Makefile.in.orig	2012-05-05 14:13:29.999964494 -0300
++++ Singular-3-1-3/Makefile.in	2012-05-05 14:13:41.293963889 -0300
+@@ -146,14 +146,14 @@ local-maintainer-clean: local-distclean
+ 	rm -rf configure
+ 
+ clean mostlyclean: local-clean
+-	$(recurse)
++	+$(recurse)
+ 
+ distclean: local-distclean
+-	$(recurse)
++	+$(recurse)
+ 	rm -rf build
+ 
+ maintainer-clean: uninstall local-maintainer-clean
+-	$(recurse)
++	+$(recurse)
+ 
+ ##############################################################
+ # some extra targets for the specific packages
+diff -up Singular-3-1-3/Singular/Makefile.in.orig Singular-3-1-3/Singular/Makefile.in
+--- Singular-3-1-3/Singular/Makefile.in.orig	2012-05-05 14:13:57.799964872 -0300
++++ Singular-3-1-3/Singular/Makefile.in	2012-05-05 14:14:14.685966006 -0300
+@@ -413,7 +413,7 @@ iparith.o mpsr_Tok.o : iparith.inc mpsr_
+ 
+ cntrlc.o cntrlc.og : feOptES.inc feOptTS.inc feOpt.inc version.h
+ 
+-misc_ip.o emacs.o tesths.o: version.h
++misc_ip.o emacs.o tesths.o: feOpt.inc version.h
+ 
+ claptmpl.o: claptmpl.cc mod2.h
+ 	${CXX} ${CXXFLAGS}  ${CPPFLAGS} ${DEFS} -c $<

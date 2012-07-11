@@ -1,0 +1,134 @@
+diff -up Singular-3-1-3/doc/Makefile.in.orig Singular-3-1-3/doc/Makefile.in
+--- Singular-3-1-3/doc/Makefile.in.orig	2012-05-05 19:44:47.214725583 -0300
++++ Singular-3-1-3/doc/Makefile.in	2012-05-05 19:44:55.751725909 -0300
+@@ -62,13 +62,13 @@ SINGULAR_LIB_DIR= ../Singular/LIB
+ ifeq ($(SINGUNAME),"ix86-Win")
+ LIBPARSE        = ${bindir}/libparse.exe
+ else
+-LIBPARSE        = ${bindir}/libparse
++LIBPARSE        = $(DESTDIR)${bindir}/libparse
+ endif
+ DOC_SUBDIR      = ./d2t_singular
+ EX_SUBDIR       = ./examples
+ CHKSUM_DB       = ${DOC_SUBDIR}/chksum
+ DOC2TEX         = ${PERL} ./doc2tex.pl -docdir ${DOC_SUBDIR} \
+-                  -Singular $(DESTDIR)${SINGULAR} -verbose ${VERBOSE} -make ${MAKE} \
++                  -Singular /bin/true -verbose ${VERBOSE} -make ${MAKE} \
+ 		  -exdir ${EX_SUBDIR} @DOC2TEX_EXAMPLE_EXCLUSIONS@
+ PL2DOC		= ${PERL} ./pl2doc.pl -db ${CHKSUM_DB}
+ 
+@@ -320,7 +320,6 @@ install-sharedist: singular.hlp html sin
+ 	${MKINSTALLDIRS} ${install_htmldir}
+ 	cp ${HTML_SUBDIR}/*.htm ${install_htmldir}
+ 	cp ${HTML_SUBDIR}/*.gif ${install_htmldir}
+-	-cp ${HTML_SUBDIR}/*.png ${install_htmldir}
+ 	cp ${HTML_SUBDIR}/*.jpg ${install_htmldir}
+ 	chmod -R +rX ${install_htmldir}
+ 	${MKINSTALLDIRS} ${install_docdir}
+diff -up Singular-3-1-3/emacs/Makefile.in.orig Singular-3-1-3/emacs/Makefile.in
+--- Singular-3-1-3/emacs/Makefile.in.orig	2012-05-05 19:44:52.566725787 -0300
++++ Singular-3-1-3/emacs/Makefile.in	2012-05-05 19:45:07.460726353 -0300
+@@ -6,11 +6,12 @@
+ SHELL=/bin/sh
+ 
+ prefix		= @prefix@
+-docdir		= ${prefix}/doc
+-examplesdir	= ${prefix}/examples
++libdir		= @libdir@
++datadir		= @datadir@
+ SINGULAR	= @SINGULAR@
+-singulardir	= ${prefix}/Singular 
+-emacsdir	= ${install_prefix}/emacs
++singulardir	= ${libdir}/Singular
++examplesdir	= ${singulardir}/examples
++emacsdir	= ${datadir}/emacs/site-lisp/singular
+ 
+ 
+ PERL		= @PERL@
+@@ -18,42 +19,42 @@ INSTALL		= ../install-sh -c
+ INSTALL_DATA	= ${INSTALL} -m 644
+ MKINSTALLDIRS   = ../mkinstalldirs
+ 
+-SINGULAR_HLP	= ${docdir}/singular.hlp
++SINGULAR_HLP	= ${singulardir}/info/singular.hlp
+ 
+ all install: cmd-cmpl.el hlp-cmpl.el lib-cmpl.el ex-cmpl.el
+ 
+ install_all: install
+ 
+-cmd-cmpl.el: ${SINGULAR} cmpl.pl
+-	${PERL} cmpl.pl -Singular ${SINGULAR} -cmpl cmd > cmd-cmpl.el
++cmd-cmpl.el: cmpl.pl
++	${PERL} cmpl.pl -Singular $(DESTDIR)${SINGULAR} -cmpl cmd > cmd-cmpl.el
+ 
+-hlp-cmpl.el: ${SINGULAR_HLP} cmpl.pl
+-	${PERL} cmpl.pl -hlp ${SINGULAR_HLP} -cmpl hlp > hlp-cmpl.el
++hlp-cmpl.el: cmpl.pl
++	${PERL} cmpl.pl -hlp $(DESTDIR)${SINGULAR_HLP} -cmpl hlp > hlp-cmpl.el
+ 
+-ex-cmpl.el: cmpl.pl ${examplesdir}
+-		${PERL} cmpl.pl -cmpl ex -ex_dir ${examplesdir} > ex-cmpl.el
++ex-cmpl.el: cmpl.pl
++	${PERL} cmpl.pl -cmpl ex -ex_dir $(DESTDIR)${examplesdir} > ex-cmpl.el
+ 
+-lib-cmpl-old.el: ${prefix}/Singular/Makefile cmpl.pl
+-	${MAKE} --no-print-directory -s -f ${prefix}/Singular/Makefile echoLIBS > lib-temp
++lib-cmpl-old.el: cmpl.pl
++	${MAKE} --no-print-directory -s -f ../Singular/Makefile echoLIBS > lib-temp
+ 	cat lib-temp | ${PERL} cmpl.pl -cmpl lib > lib-cmpl-old.el
+ 	rm lib-temp
+ 
+-lib-cmpl.el: ${prefix}/Singular/Makefile lib.pl
+-	(cd ${prefix}/Singular;${MAKE} --no-print-directory -s -f Makefile echoLIBS) > lib-temp
+-	${PERL} lib.pl -s ${singulardir} `cat lib-temp` > lib-cmpl.el
++lib-cmpl.el: lib.pl
++	(cd ../Singular;${MAKE} --no-print-directory -s -f Makefile echoLIBS) > lib-temp
++	${PERL} lib.pl -s $(DESTDIR)${singulardir} `cat lib-temp` > lib-cmpl.el
+ 
+ clean mostlyclean distclean:
+ 	rm -f cmd-cmpl.el hlp-cmpl.el lib-cmpl.el ex-cmpl.el
+ 
+ install-sharedist: all
+-	${MKINSTALLDIRS} ${emacsdir}
+-	${INSTALL_DATA} cmd-cmpl.el ${emacsdir}
+-	${INSTALL_DATA} lib-cmpl.el ${emacsdir}
+-	${INSTALL_DATA} hlp-cmpl.el ${emacsdir}
+-	${INSTALL_DATA} ex-cmpl.el ${emacsdir}
+-	${INSTALL_DATA} singular.el ${emacsdir}
+-	${INSTALL_DATA} .emacs-singular ${emacsdir}
+-	${INSTALL_DATA} .emacs-general ${emacsdir}
++	${MKINSTALLDIRS} $(DESTDIR)${emacsdir}
++	${INSTALL_DATA} cmd-cmpl.el $(DESTDIR)${emacsdir}
++	${INSTALL_DATA} lib-cmpl.el $(DESTDIR)${emacsdir}
++	${INSTALL_DATA} hlp-cmpl.el $(DESTDIR)${emacsdir}
++	${INSTALL_DATA} ex-cmpl.el $(DESTDIR)${emacsdir}
++	${INSTALL_DATA} singular.el $(DESTDIR)${emacsdir}
++	${INSTALL_DATA} .emacs-singular $(DESTDIR)${emacsdir}
++	${INSTALL_DATA} .emacs-general $(DESTDIR)${emacsdir}
+ 
+ depend:
+-	@echo "No make depend available!"
+\ No newline at end of file
++	@echo "No make depend available!"
+--- Singular-3-1-3/emacs/.emacs-singular.orig	2012-05-05 20:00:42.103762148 -0300
++++ Singular-3-1-3/emacs/.emacs-singular	2012-05-05 20:01:17.852763517 -0300
+@@ -57,13 +57,12 @@
+ ;;; ;; add Singular toolbar for XEmacs
+ ;;; <... insert the code below if you are running XEmacs ...>
+ ;;;
+-;;; ;; add Singular Emacs home directory to `load-path'
+-;;; (setq load-path (cons "<your-singular-emacs-home-directory>" load-path))
+-;;; (autoload 'singular "singular"
+-;;;   "Start Singular using default values." t)
+-;;; (autoload 'singular-other "singular"
+-;;;   "Ask for arguments and start Singular." t)
+-;;;
++;; add Singular Emacs home directory to `load-path'
++(setq load-path (cons "<your-singular-emacs-home-directory>" load-path))
++(autoload 'singular "singular"
++  "Start Singular using default values." t)
++(autoload 'singular-other "singular"
++  "Ask for arguments and start Singular." t)
+ 
+ ;; extra key bindings
+ (add-hook 'singular-interactive-mode-hook
