@@ -2,7 +2,7 @@
 
 Name:		Singular
 Version:	3.1.3
-Release:	6%{?dist}
+Release:	7%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 Group:		Applications/Engineering
 License:	BSD and LGPLv2+ and GPLv2+
@@ -396,6 +396,9 @@ popd
 %{_emacs_sitestartdir}/singular-init.el
 
 %changelog
+* Wed Jul 18 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.1.3-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
+
 * Sun Jul 8 2012 pcpa <paulo.cesar.pereira.de.andrade@gmail.com> - 3.1.3-6
 - Update license field to match valid values.
 - Provide newer libfac-devel matching Singular version (#819264).
