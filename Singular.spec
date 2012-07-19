@@ -2,7 +2,7 @@
 
 Name:		Singular
 Version:	3.1.3
-Release:	7%{?dist}
+Release:	8%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 Group:		Applications/Engineering
 License:	BSD and LGPLv2+ and GPLv2+
@@ -44,6 +44,11 @@ Patch7:		Singular-builddid.patch
 # a shared library.
 Patch8:		Singular-undefined.patch
 
+## Macaulay2 patches
+Patch20: Singular-M2_factory.patch
+Patch21: Singular-M2_memutil_debuggging.patch
+Patch22: Singular-M2_libfac.patch
+
 %description
 Singular is a computer algebra system for polynomial computations, with
 special emphasis on commutative and non-commutative algebra, algebraic
@@ -56,9 +61,6 @@ Group:		Development/Libraries
 Requires:	factory-devel
 Requires:	libfac-devel
 Requires:	%{name}%{?_isa} = %{version}-%{release}
-
-%description	devel
-This package contains the Singular development files.
 
 %description	devel
 This package contains the Singular development files.
@@ -95,16 +97,10 @@ Requires:	%{name}%{?_isa} = %{version}-%{release}
 %description	examples
 This package contains the Singular example files.
 
-%description	examples
-This package contains the Singular example files.
-
 %package	doc
 Summary:	Singular documentation files
 Group:		Applications/Engineering
 Requires:	%{name}%{?_isa} = %{version}-%{release}
-
-%description	doc
-This package contains the Singular documentation files.
 
 %description	doc
 This package contains the Singular documentation files.
@@ -114,9 +110,6 @@ Summary:	Singular java interface
 Group:		Applications/Engineering
 Requires:	java
 Requires:	%{name}%{?_isa} = %{version}-%{release}
-
-%description	surfex
-This package contains the Singular java interface.
 
 %description	surfex
 This package contains the Singular java interface.
@@ -141,6 +134,14 @@ Emacs mode for Singular.
 %patch6 -p1
 %patch7 -p1
 %patch8 -p1
+
+pushd factory
+%patch20 -p1 -b .M2_factory
+%patch21 -p0 -b .M2_memutil_debuggging
+popd
+pushd libfac
+%patch22 -p1 -b .M2_libfac
+popd
 
 sed -i -e "s|gftabledir=.*|gftabledir='%{singulardir}/LIB/gftables'|"	\
     -e "s|explicit_gftabledir=.*|explicit_gftabledir='%{singulardir}/LIB/gftables'|" \
@@ -396,6 +397,10 @@ popd
 %{_emacs_sitestartdir}/singular-init.el
 
 %changelog
+* Thu Jul 19 2012 Rex Dieter <rdieter@fedoraproject.org> - 3.1.3-8
+- macaulay2 patches for libfac/factory
+- omit duplicate %%description sections
+
 * Wed Jul 18 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.1.3-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
 
