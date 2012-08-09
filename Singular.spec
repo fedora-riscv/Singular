@@ -1,12 +1,12 @@
 %global singulardir	%{_libdir}/Singular
 
 Name:		Singular
-Version:	3.1.3
-Release:	8%{?dist}
+Version:	3.1.5
+Release:	2%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 Group:		Applications/Engineering
 License:	BSD and LGPLv2+ and GPLv2+
-Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/3-1-3/Singular-3-1-3-3.tar.gz
+Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/3-1-5/Singular-3-1-5.tar.gz
 URL:		http://www.singular.uni-kl.de/
 BuildRequires:	emacs
 BuildRequires:	flex
@@ -18,31 +18,32 @@ BuildRequires:	readline-devel
 BuildRequires:	sharutils
 BuildRequires:	texinfo
 BuildRequires:	tex(latex)
-# Requires:	surf
+# Requires:	Singular-surf
 
-# Adapted from sagemath Singular.configure.patch
-Patch0:		Singular-python.patch
-# Adapted from sagemath make_parallel.patch
-Patch1:		Singular-make-parallel.patch
-# Adapted from sagemath Singular.Makefile.in.shared.patch
-Patch2:		Singular-shared.patch
 # Use destdir in install targets
-Patch3:		Singular-destdir.patch
+Patch1:		Singular-destdir.patch
 # Find headers in source tree
-Patch4:		Singular-headers.patch
+Patch2:		Singular-headers.patch
 # Find and link to generated libraries
-Patch5:		Singular-link.patch
+Patch3:		Singular-link.patch
 # Do not attempt to load non existing modules, do not even run
 # the binary in DESTDIR when building the documentation
-Patch6:		Singular-doc.patch
+Patch4:		Singular-doc.patch
 # Correct koji error:
 # ** ERROR: No build ID note found in /builddir/build/BUILDROOT/Singular-3.1.3-1.fc16.x86_64/usr/lib64/Singular/dbmsr.so
-Patch7:		Singular-builddid.patch
+Patch5:		Singular-builddid.patch
 # Correct undefined symbol in libsingular
 # This patch removes a hack to avoid duplicated symbols in tesths.cc
 # when calling mp_set_memory_functions, what is a really a bad idea on
 # a shared library.
-Patch8:		Singular-undefined.patch
+Patch6:		Singular-undefined.patch
+
+# From sagemath singular-3-1-5.p0.spkg in "Upgrade Singular" trac
+# at http://trac.sagemath.org/sage_trac/ticket/13237
+Patch7:		NTL_negate.patch
+Patch8:		singular_trac_439.patch
+Patch9:		singular_trac_440.patch
+Patch10:	singular_trac_441.patch
 
 ## Macaulay2 patches
 Patch20: Singular-M2_factory.patch
@@ -124,24 +125,22 @@ Requires:	%{name}%{?_isa} = %{version}-%{release}
 Emacs mode for Singular.
 
 %prep
-%setup -q -n %{name}-3-1-3
-%patch0 -p1
+%setup -q -n %{name}-3-1-5
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
 %patch6 -p1
+
 %patch7 -p1
 %patch8 -p1
+%patch9 -p1
+%patch10 -p1
 
-pushd factory
 %patch20 -p1 -b .M2_factory
-%patch21 -p0 -b .M2_memutil_debuggging
-popd
-pushd libfac
+%patch21 -p1 -b .M2_memutil_debuggging
 %patch22 -p1 -b .M2_libfac
-popd
 
 sed -i -e "s|gftabledir=.*|gftabledir='%{singulardir}/LIB/gftables'|"	\
     -e "s|explicit_gftabledir=.*|explicit_gftabledir='%{singulardir}/LIB/gftables'|" \
@@ -173,6 +172,10 @@ export CXXFLAGS=$CFLAGS
 	--enable-IntegerProgramming \
 	--disable-doc \
 	--with-malloc=system
+# remove bogus -L/usr/kernel from linker command line and
+# do not put standard library in linker command line to avoid
+# linking with a system wide libsingcf or libfacf
+sed -i 's|-L%{_prefix}/kernel||g;s|-L%{_libdir}||g' Singular/Makefile
 make %{?_smp_mflags} Singular
 # factory needs omalloc built
 make %{?_smp_mflags} -C omalloc
@@ -217,6 +220,7 @@ make %{?_smp_mflags} -C Singular libparse
 make \
 	DESTDIR=$RPM_BUILD_ROOT \
 	install_prefix=$RPM_BUILD_ROOT%{singulardir} \
+	slibdir=%{singulardir}/LIB \
 	install \
 	install-libsingular \
 	install-sharedist
@@ -224,9 +228,6 @@ make \
 # does not need to be in top directory
 mv $RPM_BUILD_ROOT%{_includedir}/{my,om}limits.h \
     $RPM_BUILD_ROOT%{_includedir}/singular
-
-# symlink to builddir
-rm $RPM_BUILD_ROOT%{_prefix}/LIB
 
 # also installed in libdir
 rm -f $RPM_BUILD_ROOT%{_bindir}/*.so
@@ -247,7 +248,7 @@ mkdir -p $RPM_BUILD_ROOT%{_bindir}
 cat > $RPM_BUILD_ROOT%{_bindir}/Singular << EOF
 #!/bin/sh
 
-SINGULARPATH=%{singulardir} %{singulardir}/Singular-3-1-3 "\$@"
+SINGULARPATH=%{singulardir} %{singulardir}/Singular-3-1-5 "\$@"
 EOF
 chmod +x $RPM_BUILD_ROOT%{_bindir}/Singular
 
@@ -397,6 +398,15 @@ popd
 %{_emacs_sitestartdir}/singular-init.el
 
 %changelog
+* Tue Aug 7 2012 pcpa <paulo.cesar.pereira.de.andrade@gmail.com> - 3.1.5-2
+- Do not build conflicts with factory-devel neither libfac-devel (#842407)
+
+* Sat Aug 4 2012 pcpa <paulo.cesar.pereira.de.andrade@gmail.com> - 3.1.5-1
+- Update to Singular 3.1.5, based on sagemath trac ticket #13237
+- Remove already applied patches from sagemath Singular spkg
+- Rediff Fedora rpm build patches
+- Rediff factory and libfac patches for Macaulay2
+
 * Thu Jul 19 2012 Rex Dieter <rdieter@fedoraproject.org> - 3.1.3-8
 - macaulay2 patches for libfac/factory
 - omit duplicate %%description sections

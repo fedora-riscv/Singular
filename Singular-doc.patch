@@ -1,7 +1,7 @@
-diff -up Singular-3-1-3/doc/Makefile.in.orig Singular-3-1-3/doc/Makefile.in
---- Singular-3-1-3/doc/Makefile.in.orig	2012-05-05 19:44:47.214725583 -0300
-+++ Singular-3-1-3/doc/Makefile.in	2012-05-05 19:44:55.751725909 -0300
-@@ -62,13 +62,13 @@ SINGULAR_LIB_DIR= ../Singular/LIB
+diff -up Singular-3-1-5/doc/Makefile.in.orig Singular-3-1-5/doc/Makefile.in
+--- Singular-3-1-5/doc/Makefile.in.orig	2012-08-04 17:58:04.824209703 -0400
++++ Singular-3-1-5/doc/Makefile.in	2012-08-04 17:59:02.478211895 -0400
+@@ -62,14 +62,14 @@ SINGULAR_LIB_DIR= ../Singular/LIB
  ifeq ($(SINGUNAME),"ix86-Win")
  LIBPARSE        = ${bindir}/libparse.exe
  else
@@ -11,13 +11,14 @@ diff -up Singular-3-1-3/doc/Makefile.in.orig Singular-3-1-3/doc/Makefile.in
  DOC_SUBDIR      = ./d2t_singular
  EX_SUBDIR       = ./examples
  CHKSUM_DB       = ${DOC_SUBDIR}/chksum
+ DOC2TEX_EXAMPLE_EXCLUSIONS = @DOC2TEX_EXAMPLE_EXCLUSIONS@
  DOC2TEX         = ${PERL} ./doc2tex.pl -docdir ${DOC_SUBDIR} \
 -                  -Singular $(DESTDIR)${SINGULAR} -verbose ${VERBOSE} -make ${MAKE} \
 +                  -Singular /bin/true -verbose ${VERBOSE} -make ${MAKE} \
- 		  -exdir ${EX_SUBDIR} @DOC2TEX_EXAMPLE_EXCLUSIONS@
- PL2DOC		= ${PERL} ./pl2doc.pl -db ${CHKSUM_DB}
- 
-@@ -320,7 +320,6 @@ install-sharedist: singular.hlp html sin
+ 		  -exdir ${EX_SUBDIR} ${DOC2TEX_EXAMPLE_EXCLUSIONS}
+ TAG		=
+ PL2DOC		= ${PERL} ./pl2doc.pl ${TAG} -db ${CHKSUM_DB}
+@@ -322,7 +322,6 @@ install-sharedist: singular.hlp html sin
  	${MKINSTALLDIRS} ${install_htmldir}
  	cp ${HTML_SUBDIR}/*.htm ${install_htmldir}
  	cp ${HTML_SUBDIR}/*.gif ${install_htmldir}
@@ -25,9 +26,9 @@ diff -up Singular-3-1-3/doc/Makefile.in.orig Singular-3-1-3/doc/Makefile.in
  	cp ${HTML_SUBDIR}/*.jpg ${install_htmldir}
  	chmod -R +rX ${install_htmldir}
  	${MKINSTALLDIRS} ${install_docdir}
-diff -up Singular-3-1-3/emacs/Makefile.in.orig Singular-3-1-3/emacs/Makefile.in
---- Singular-3-1-3/emacs/Makefile.in.orig	2012-05-05 19:44:52.566725787 -0300
-+++ Singular-3-1-3/emacs/Makefile.in	2012-05-05 19:45:07.460726353 -0300
+diff -up Singular-3-1-5/emacs/Makefile.in.orig Singular-3-1-5/emacs/Makefile.in
+--- Singular-3-1-5/emacs/Makefile.in.orig	2012-08-04 17:59:10.208212218 -0400
++++ Singular-3-1-5/emacs/Makefile.in	2012-08-04 18:01:33.510217756 -0400
 @@ -6,11 +6,12 @@
  SHELL=/bin/sh
  
@@ -110,25 +111,3 @@ diff -up Singular-3-1-3/emacs/Makefile.in.orig Singular-3-1-3/emacs/Makefile.in
 -	@echo "No make depend available!"
 \ No newline at end of file
 +	@echo "No make depend available!"
---- Singular-3-1-3/emacs/.emacs-singular.orig	2012-05-05 20:00:42.103762148 -0300
-+++ Singular-3-1-3/emacs/.emacs-singular	2012-05-05 20:01:17.852763517 -0300
-@@ -57,13 +57,12 @@
- ;;; ;; add Singular toolbar for XEmacs
- ;;; <... insert the code below if you are running XEmacs ...>
- ;;;
--;;; ;; add Singular Emacs home directory to `load-path'
--;;; (setq load-path (cons "<your-singular-emacs-home-directory>" load-path))
--;;; (autoload 'singular "singular"
--;;;   "Start Singular using default values." t)
--;;; (autoload 'singular-other "singular"
--;;;   "Ask for arguments and start Singular." t)
--;;;
-+;; add Singular Emacs home directory to `load-path'
-+(setq load-path (cons "<your-singular-emacs-home-directory>" load-path))
-+(autoload 'singular "singular"
-+  "Start Singular using default values." t)
-+(autoload 'singular-other "singular"
-+  "Ask for arguments and start Singular." t)
- 
- ;; extra key bindings
- (add-hook 'singular-interactive-mode-hook

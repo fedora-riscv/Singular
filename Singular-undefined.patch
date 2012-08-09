@@ -1,7 +1,7 @@
-diff -up Singular-3-1-3/Singular/misc_ip.cc.orig Singular-3-1-3/Singular/misc_ip.cc
---- Singular-3-1-3/Singular/misc_ip.cc.orig	2012-05-09 00:58:45.370543834 -0300
-+++ Singular-3-1-3/Singular/misc_ip.cc	2012-05-09 01:00:18.559547404 -0300
-@@ -1147,7 +1147,6 @@ void siInit(char *name)
+diff -up Singular-3-1-5/Singular/misc_ip.cc.orig Singular-3-1-5/Singular/misc_ip.cc
+--- Singular-3-1-5/Singular/misc_ip.cc.orig	2012-08-04 18:05:32.560226865 -0400
++++ Singular-3-1-5/Singular/misc_ip.cc	2012-08-04 18:05:53.430227597 -0400
+@@ -1169,7 +1169,6 @@ void siInit(char *name)
    errorreported = 0;
  }
  
@@ -9,15 +9,15 @@ diff -up Singular-3-1-3/Singular/misc_ip.cc.orig Singular-3-1-3/Singular/misc_ip
  #ifdef HAVE_FACTORY
  // the init routines of factory need mmInit
  int mmInit( void )
-@@ -1155,4 +1154,3 @@ int mmInit( void )
+@@ -1177,4 +1176,3 @@ int mmInit( void )
    return 1;
  }
  #endif
 -#endif
-diff -up Singular-3-1-3/Singular/tesths.cc.orig Singular-3-1-3/Singular/tesths.cc
---- Singular-3-1-3/Singular/tesths.cc.orig	2012-05-09 00:58:34.713543427 -0300
-+++ Singular-3-1-3/Singular/tesths.cc	2012-05-09 00:59:39.263545898 -0300
-@@ -48,27 +48,6 @@
+diff -up Singular-3-1-5/Singular/tesths.cc.orig Singular-3-1-5/Singular/tesths.cc
+--- Singular-3-1-5/Singular/tesths.cc.orig	2012-08-04 18:06:02.832228022 -0400
++++ Singular-3-1-5/Singular/tesths.cc	2012-08-04 18:06:38.582229344 -0400
+@@ -52,27 +52,6 @@
  extern int siInit(char *);
  
  #if ! defined(LIBSINGULAR)

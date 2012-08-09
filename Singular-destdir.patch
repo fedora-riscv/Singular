@@ -1,8 +1,20 @@
-diff -up Singular-3-1-3/factory/GNUmakefile.in.orig Singular-3-1-3/factory/GNUmakefile.in
---- Singular-3-1-3/factory/GNUmakefile.in.orig	2012-05-05 16:41:35.218304727 -0300
-+++ Singular-3-1-3/factory/GNUmakefile.in	2012-05-05 16:41:40.043304855 -0300
-@@ -635,45 +635,45 @@ installtest:	test_install
- install install-libsingular:	$(installtargets)
+diff -up Singular-3-1-5/doc/Makefile.in.orig Singular-3-1-5/doc/Makefile.in
+--- Singular-3-1-5/doc/Makefile.in.orig	2012-08-04 17:53:14.240198555 -0400
++++ Singular-3-1-5/doc/Makefile.in	2012-08-04 17:53:40.830199591 -0400
+@@ -69,7 +69,7 @@ EX_SUBDIR       = ./examples
+ CHKSUM_DB       = ${DOC_SUBDIR}/chksum
+ DOC2TEX_EXAMPLE_EXCLUSIONS = @DOC2TEX_EXAMPLE_EXCLUSIONS@
+ DOC2TEX         = ${PERL} ./doc2tex.pl -docdir ${DOC_SUBDIR} \
+-                  -Singular ${SINGULAR} -verbose ${VERBOSE} -make ${MAKE} \
++                  -Singular $(DESTDIR)${SINGULAR} -verbose ${VERBOSE} -make ${MAKE} \
+ 		  -exdir ${EX_SUBDIR} ${DOC2TEX_EXAMPLE_EXCLUSIONS}
+ TAG		=
+ PL2DOC		= ${PERL} ./pl2doc.pl ${TAG} -db ${CHKSUM_DB}
+diff -up Singular-3-1-5/factory/GNUmakefile.in.orig Singular-3-1-5/factory/GNUmakefile.in
+--- Singular-3-1-5/factory/GNUmakefile.in.orig	2012-08-04 17:44:00.336177355 -0400
++++ Singular-3-1-5/factory/GNUmakefile.in	2012-08-04 17:45:36.070180901 -0400
+@@ -538,45 +538,45 @@ installtest:	test_install
+ install install-libsingular:	$(installtargets) cf_gmp.h
  
  install_all:    install libsingcf_p.a 
 -		-$(INSTALL_DATA) libsingcf_p.a $(libdir)/libsingcf_p.a 
@@ -67,10 +79,10 @@ diff -up Singular-3-1-3/factory/GNUmakefile.in.orig Singular-3-1-3/factory/GNUma
  		  done \
  		else \
  		  echo "Run 'make gftables' before installing them"; \
-diff -up Singular-3-1-3/IntegerProgramming/Makefile.in.orig Singular-3-1-3/IntegerProgramming/Makefile.in
---- Singular-3-1-3/IntegerProgramming/Makefile.in.orig	2012-05-05 16:41:35.220304700 -0300
-+++ Singular-3-1-3/IntegerProgramming/Makefile.in	2012-05-05 16:41:40.043304855 -0300
-@@ -57,12 +57,12 @@ install-nolns: install
+diff -up Singular-3-1-5/IntegerProgramming/Makefile.in.orig Singular-3-1-5/IntegerProgramming/Makefile.in
+--- Singular-3-1-5/IntegerProgramming/Makefile.in.orig	2012-08-04 17:45:51.672181624 -0400
++++ Singular-3-1-5/IntegerProgramming/Makefile.in	2012-08-04 17:46:23.150182791 -0400
+@@ -63,12 +63,12 @@ install-nolns: install
  install_all: install
  
  install install-libsingular: $(MAIN1) $(MAIN2) $(MAIN3) $(MAIN4) $(LLL)
@@ -89,10 +101,10 @@ diff -up Singular-3-1-3/IntegerProgramming/Makefile.in.orig Singular-3-1-3/Integ
  
  install-bindist: $(MAIN1) $(MAIN2) $(MAIN3) $(MAIN4)
  	${MKINSTALLDIRS} ${install_bindir}
-diff -up Singular-3-1-3/kernel/Makefile.in.orig Singular-3-1-3/kernel/Makefile.in
---- Singular-3-1-3/kernel/Makefile.in.orig	2012-05-05 16:41:35.223304674 -0300
-+++ Singular-3-1-3/kernel/Makefile.in	2012-05-05 16:41:40.044304854 -0300
-@@ -275,9 +275,9 @@ p_Procs_%.so: p_Procs_Lib_%.dl_o
+diff -up Singular-3-1-5/kernel/Makefile.in.orig Singular-3-1-5/kernel/Makefile.in
+--- Singular-3-1-5/kernel/Makefile.in.orig	2012-08-04 17:46:35.296183272 -0400
++++ Singular-3-1-5/kernel/Makefile.in	2012-08-04 17:47:29.206185420 -0400
+@@ -272,9 +272,9 @@ p_Procs_%.so: p_Procs_Lib_%.dl_o
  install-nolns: install
  
  install-libsingular: install
@@ -105,7 +117,7 @@ diff -up Singular-3-1-3/kernel/Makefile.in.orig Singular-3-1-3/kernel/Makefile.i
  
  install: all installbin
  
-@@ -293,12 +293,12 @@ endif
+@@ -290,12 +290,12 @@ endif
  
  
  installbin: ${DL_LIBS} ${DL_LIBSG} libkernel.a libkernel_g.a
@@ -120,7 +132,7 @@ diff -up Singular-3-1-3/kernel/Makefile.in.orig Singular-3-1-3/kernel/Makefile.i
  ifeq (,${DL_LIBSG})
  else
  	-for file in ${DL_LIBS} ${DL_LIBSG}; do ${INSTALL_PROGRAM} $$file ../Singular; done
-@@ -307,10 +307,10 @@ endif
+@@ -304,10 +304,10 @@ endif
  
  
  install-bindist: ${DL_LIBS} libkernel.a
@@ -133,10 +145,10 @@ diff -up Singular-3-1-3/kernel/Makefile.in.orig Singular-3-1-3/kernel/Makefile.i
  endif
  
  ##
-diff -up Singular-3-1-3/libfac/Makefile.in.orig Singular-3-1-3/libfac/Makefile.in
---- Singular-3-1-3/libfac/Makefile.in.orig	2012-05-05 16:41:35.225304662 -0300
-+++ Singular-3-1-3/libfac/Makefile.in	2012-05-05 16:41:40.045304851 -0300
-@@ -147,17 +147,17 @@ libsingfac_p.a:	$(PROFOBJ)
+diff -up Singular-3-1-5/libfac/Makefile.in.orig Singular-3-1-5/libfac/Makefile.in
+--- Singular-3-1-5/libfac/Makefile.in.orig	2012-08-04 17:47:48.648185997 -0400
++++ Singular-3-1-5/libfac/Makefile.in	2012-08-04 17:48:21.678187215 -0400
+@@ -146,17 +146,17 @@ libsingfac_p.a:	$(PROFOBJ)
  install-nolns: install
  
  install install-libsingular:	all
@@ -163,9 +175,9 @@ diff -up Singular-3-1-3/libfac/Makefile.in.orig Singular-3-1-3/libfac/Makefile.i
  
  uninstall: 
  	$(RM) ${includedir}/${LIBFACINCLUDE}
-diff -up Singular-3-1-3/omalloc/Makefile.in.orig Singular-3-1-3/omalloc/Makefile.in
---- Singular-3-1-3/omalloc/Makefile.in.orig	2012-05-05 16:41:35.227304656 -0300
-+++ Singular-3-1-3/omalloc/Makefile.in	2012-05-05 16:41:40.045304851 -0300
+diff -up Singular-3-1-5/omalloc/Makefile.in.orig Singular-3-1-5/omalloc/Makefile.in
+--- Singular-3-1-5/omalloc/Makefile.in.orig	2012-08-04 17:48:32.312187774 -0400
++++ Singular-3-1-5/omalloc/Makefile.in	2012-08-04 17:49:24.342189747 -0400
 @@ -181,35 +181,35 @@ configure: configure.in
  install-nolns: install
  
@@ -225,10 +237,10 @@ diff -up Singular-3-1-3/omalloc/Makefile.in.orig Singular-3-1-3/omalloc/Makefile
  
  uninstall:
  	rm -f $(includedir)/omalloc.h
-diff -up Singular-3-1-3/Singular/Makefile.in.orig Singular-3-1-3/Singular/Makefile.in
---- Singular-3-1-3/Singular/Makefile.in.orig	2012-05-05 16:41:35.230304661 -0300
-+++ Singular-3-1-3/Singular/Makefile.in	2012-05-05 16:42:11.280306046 -0300
-@@ -560,51 +560,51 @@ install_all: install
+diff -up Singular-3-1-5/Singular/Makefile.in.orig Singular-3-1-5/Singular/Makefile.in
+--- Singular-3-1-5/Singular/Makefile.in.orig	2012-08-04 17:49:36.816190217 -0400
++++ Singular-3-1-5/Singular/Makefile.in	2012-08-04 17:53:01.190198060 -0400
+@@ -556,51 +556,51 @@ install_all: install
  install-nolns: all installbin-nolns installslib-nolns
  
  installbin: ${SING_EXEC} libparse ESingular TSingular ${RUN_SINGULARS}
@@ -275,7 +287,7 @@ diff -up Singular-3-1-3/Singular/Makefile.in.orig Singular-3-1-3/Singular/Makefi
  
  installslib: LIB
 -	test -r ${slibdir} || ${LN_S} `pwd`/LIB ${slibdir}
-+	test -r $(DESTDIR)${slibdir} || ${LN_S} `pwd`/LIB $(DESTDIR)${slibdir}
++	:
  
  installslib-nolns: LIB
 -	${MKINSTALLDIRS} ${slibdir}
@@ -291,7 +303,7 @@ diff -up Singular-3-1-3/Singular/Makefile.in.orig Singular-3-1-3/Singular/Makefi
 +	  ${INSTALL_DATA}  $$file $(DESTDIR)${slibdir}/gftables/; \
  	done
  
- install-libsingular: libsingular
+ install-libsingular: libsingular installslib-nolns
 -	${MKINSTALLDIRS} ${includedir}/singular
 +	${MKINSTALLDIRS} $(DESTDIR)${includedir}/singular
  	for file in *.$(SO_SUFFIX); do \
@@ -306,15 +318,3 @@ diff -up Singular-3-1-3/Singular/Makefile.in.orig Singular-3-1-3/Singular/Makefi
  	done
  
  uninstall: uninstallbin
-diff -up Singular-3-1-3/doc/Makefile.in.orig Singular-3-1-3/doc/Makefile.in
---- Singular-3-1-3/doc/Makefile.in.orig	2012-05-05 17:30:31.843417102 -0300
-+++ Singular-3-1-3/doc/Makefile.in	2012-05-05 17:30:41.009417470 -0300
-@@ -68,7 +68,7 @@ DOC_SUBDIR      = ./d2t_singular
- EX_SUBDIR       = ./examples
- CHKSUM_DB       = ${DOC_SUBDIR}/chksum
- DOC2TEX         = ${PERL} ./doc2tex.pl -docdir ${DOC_SUBDIR} \
--                  -Singular ${SINGULAR} -verbose ${VERBOSE} -make ${MAKE} \
-+                  -Singular $(DESTDIR)${SINGULAR} -verbose ${VERBOSE} -make ${MAKE} \
- 		  -exdir ${EX_SUBDIR} @DOC2TEX_EXAMPLE_EXCLUSIONS@
- PL2DOC		= ${PERL} ./pl2doc.pl -db ${CHKSUM_DB}
- 
