@@ -351,7 +351,6 @@ popd
 %{singulardir}/LLL
 %{singulardir}/Singular*
 %{singulardir}/solve_IP
-%{singulardir}/surfex
 %{singulardir}/toric_ideal
 %{singulardir}/TSingular
 %{singulardir}/*.so
