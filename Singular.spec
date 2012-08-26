@@ -329,6 +329,10 @@ pushd factory
 	-i $RPM_BUILD_ROOT%{_includedir}/factory/templates/ftmpl_inst.cc
 popd
 
+# incorrect factory includedir
+sed -e 's|<\(cf_gmp.h>\)|<factory/\1|' \
+    -i $RPM_BUILD_ROOT%{_includedir}/singular/si_gmp.h
+
 %files
 %{_bindir}/Singular
 %{_bindir}/TSingular
