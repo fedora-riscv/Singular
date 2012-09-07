@@ -18,7 +18,7 @@ BuildRequires:	readline-devel
 BuildRequires:	sharutils
 BuildRequires:	texinfo
 BuildRequires:	tex(latex)
-# Requires:	Singular-surf
+Requires:	surf-geometry
 
 # Use destdir in install targets
 Patch1:		Singular-destdir.patch
@@ -248,6 +248,7 @@ mkdir -p $RPM_BUILD_ROOT%{_bindir}
 cat > $RPM_BUILD_ROOT%{_bindir}/Singular << EOF
 #!/bin/sh
 
+module load surf-geometry-%{_arch}
 SINGULARPATH=%{singulardir} %{singulardir}/Singular-3-1-5 "\$@"
 EOF
 chmod +x $RPM_BUILD_ROOT%{_bindir}/Singular
@@ -256,6 +257,7 @@ chmod +x $RPM_BUILD_ROOT%{_bindir}/Singular
 cat > $RPM_BUILD_ROOT%{_bindir}/TSingular << EOF
 #!/bin/sh
 
+module load surf-geometry-%{_arch}
 %{singulardir}/TSingular --singular %{_bindir}/Singular "\$@"
 EOF
 chmod +x $RPM_BUILD_ROOT%{_bindir}/TSingular
@@ -267,6 +269,7 @@ chmod 644 $RPM_BUILD_ROOT%{singulardir}/LIB/*.lib
 cat > $RPM_BUILD_ROOT%{_bindir}/surfex << EOF
 #!/bin/sh
 
+module load surf-geometry-%{_arch}
 %{singulardir}/surfex %{singulardir}/LIB/surfex "\$@"
 EOF
 chmod +x $RPM_BUILD_ROOT%{_bindir}/surfex
@@ -291,6 +294,7 @@ mv $RPM_BUILD_ROOT%{_emacs_sitelispdir}/singular/.emacs-singular \
 cat > $RPM_BUILD_ROOT%{_bindir}/ESingular << EOF
 #!/bin/sh
 
+module load surf-geometry-%{_arch}
 export ESINGULAR_EMACS_LOAD=%{_emacs_sitestartdir}/singular-init.el
 export ESINGULAR_EMACS_DIR=%{_emacs_sitelispdir}/singular
 %{singulardir}/ESingular --singular %{_bindir}/Singular "\$@"
