@@ -2,7 +2,7 @@
 
 Name:		Singular
 Version:	3.1.5
-Release:	2%{?dist}
+Release:	3%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 Group:		Applications/Engineering
 License:	BSD and LGPLv2+ and GPLv2+
@@ -405,6 +405,9 @@ sed -e 's|<\(cf_gmp.h>\)|<factory/\1|' \
 %{_emacs_sitestartdir}/singular-init.el
 
 %changelog
+* Sun Nov 11 2012 pcpa <paulo.cesar.pereira.de.andrade@gmail.com> - 3.1.5-3
+- Rebuild to have factory include path patch in rawhide package
+
 * Tue Aug 7 2012 pcpa <paulo.cesar.pereira.de.andrade@gmail.com> - 3.1.5-2
 - Do not build conflicts with factory-devel neither libfac-devel (#842407)
 
