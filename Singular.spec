@@ -1,12 +1,13 @@
 %global singulardir	%{_libdir}/Singular
+%global upstreamver	3-1-5
 
 Name:		Singular
-Version:	3.1.5
-Release:	4%{?dist}
+Version:	%(tr - . <<<%{upstreamver})
+Release:	5%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 Group:		Applications/Engineering
 License:	BSD and LGPLv2+ and GPLv2+
-Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/3-1-5/Singular-3-1-5.tar.gz
+Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/%{upstreamver}/%{name}-%{upstreamver}.tar.gz
 URL:		http://www.singular.uni-kl.de/
 BuildRequires:	emacs
 BuildRequires:	flex
@@ -44,6 +45,11 @@ Patch7:		NTL_negate.patch
 Patch8:		singular_trac_439.patch
 Patch9:		singular_trac_440.patch
 Patch10:	singular_trac_441.patch
+
+# Add missing #include directives in the semaphore code
+Patch11:	Singular-semaphore.patch
+# Adapt to new template code in NTL 6
+Patch12:	Singular-ntl6.patch
 
 ## Macaulay2 patches
 Patch20: Singular-M2_factory.patch
@@ -125,7 +131,7 @@ Requires:	%{name}%{?_isa} = %{version}-%{release}
 Emacs mode for Singular.
 
 %prep
-%setup -q -n %{name}-3-1-5
+%setup -q -n %{name}-%{upstreamver}
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
@@ -138,6 +144,9 @@ Emacs mode for Singular.
 %patch9 -p1
 %patch10 -p1
 
+%patch11 -p1
+%patch12 -p1
+
 %patch20 -p1 -b .M2_factory
 %patch21 -p1 -b .M2_memutil_debuggging
 %patch22 -p1 -b .M2_libfac
@@ -146,12 +155,18 @@ sed -i -e "s|gftabledir=.*|gftabledir='%{singulardir}/LIB/gftables'|"	\
     -e "s|explicit_gftabledir=.*|explicit_gftabledir='%{singulardir}/LIB/gftables'|" \
     factory/configure.in
 
+# Build the debug libfactory with the right CFLAGS
+sed -i 's/\($(CPPFLAGS)\) \($(FLINT_CFLAGS)\)/\1 $(CFLAGS) \2/' \
+    factory/GNUmakefile.in
+
 # Force use of system ntl
 rm -fr ntl
 
 %build
 export CFLAGS="%{optflags} -fPIC"
 export CXXFLAGS=$CFLAGS
+export LDFLAGS="$RPM_LD_FLAGS -Wl,--as-needed"
+export LIBS="-lpthread -ldl"
 
 # build components in specific order to not need to build & install
 # in a single make command
@@ -249,7 +264,7 @@ cat > $RPM_BUILD_ROOT%{_bindir}/Singular << EOF
 #!/bin/sh
 
 module load surf-geometry-%{_arch}
-SINGULARPATH=%{singulardir} %{singulardir}/Singular-3-1-5 "\$@"
+SINGULARPATH=%{singulardir} %{singulardir}/Singular-%{upstreamver} "\$@"
 EOF
 chmod +x $RPM_BUILD_ROOT%{_bindir}/Singular
 
@@ -405,6 +420,11 @@ sed -e 's|<\(cf_gmp.h>\)|<factory/\1|' \
 %{_emacs_sitestartdir}/singular-init.el
 
 %changelog
+* Mon May  6 2013 Jerry James <loganjerry@gmail.com> - 3.1.5-5
+- Rebuild for ntl 6.0.0
+- Fix semaphore code
+- Fix underlinked library
+
 * Wed Feb 13 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.1.5-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
 
