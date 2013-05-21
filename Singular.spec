@@ -3,7 +3,7 @@
 
 Name:		Singular
 Version:	%(tr - . <<<%{upstreamver})
-Release:	5%{?dist}
+Release:	6%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 Group:		Applications/Engineering
 License:	BSD and LGPLv2+ and GPLv2+
@@ -19,6 +19,7 @@ BuildRequires:	readline-devel
 BuildRequires:	sharutils
 BuildRequires:	texinfo
 BuildRequires:	tex(latex)
+Requires:	factory-gftables = %{version}-%{release}
 Requires:	surf-geometry
 
 # Use destdir in install targets
@@ -82,6 +83,15 @@ Provides:	factory-static = %{version}-%{release}
 %description	-n factory-devel 
 Factory is a C++ class library that implements a recursive representation
 of multivariate polynomial data.
+
+%package	-n factory-gftables
+Summary: 	Factory addition tables
+Group:		Applications/Engineering
+BuildArch: noarch
+
+%description -n	factory-gftables
+Factory uses addition tables to calculate in GF(p^n) in an efficient way.
+
 
 %package	-n libfac-devel
 Summary:	An extension to Singular-factory
@@ -240,6 +250,21 @@ make \
 	install-libsingular \
 	install-sharedist
 
+# dup gftables data
+GF_DIR=%{_datadir}/factory/gftables
+mkdir -p $RPM_BUILD_ROOT${GF_DIR}
+pushd $RPM_BUILD_ROOT%{singulardir}/LIB/gftables
+for file in * ; do
+ new_file="gftable.$(head -2 ${file} | tail -1 | cut -d' ' -f1,2 | sed -e 's| |.|')"
+ ## absolute
+ #mv ${file} $RPM_BUILD_ROOT${GF_DIR}/${new_file}
+ #ln -s ${GF_DIR}/${new_file} ${file}
+ ## relative
+ mv ${file} ../../../../share/factory/gftables/${new_file}
+ ln -s ../../../../share/factory/gftables/${new_file} ${file}
+done
+popd
+
 # does not need to be in top directory
 mv $RPM_BUILD_ROOT%{_includedir}/{my,om}limits.h \
     $RPM_BUILD_ROOT%{_includedir}/singular
@@ -384,6 +409,10 @@ sed -e 's|<\(cf_gmp.h>\)|<factory/\1|' \
 %{_includedir}/omalloc.h
 %{_includedir}/singular
 
+%files		-n factory-gftables
+%dir %{_datadir}/factory/
+%{_datadir}/factory/gftables/
+
 %files		-n factory-devel
 %doc factory/ChangeLog
 %doc factory/NEWS
@@ -420,6 +449,9 @@ sed -e 's|<\(cf_gmp.h>\)|<factory/\1|' \
 %{_emacs_sitestartdir}/singular-init.el
 
 %changelog
+* Tue May 21 2013 Rex Dieter <rdieter@fedoraproject.org> - 3.1.5-6
+- factory-gftables.noarch subpkg (#965655)
+
 * Mon May  6 2013 Jerry James <loganjerry@gmail.com> - 3.1.5-5
 - Rebuild for ntl 6.0.0
 - Fix semaphore code
