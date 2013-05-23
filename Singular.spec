@@ -13,7 +13,8 @@ BuildRequires:	emacs
 BuildRequires:	flex
 BuildRequires:	gmp-devel
 BuildRequires:	ncurses-devel
-BuildRequires:	ntl-devel
+# patch12 means we need ntl v6 now
+BuildRequires:	ntl-devel >= 6.0
 BuildRequires:	readline-devel
 # Need uudecode for documentation images in tarball
 BuildRequires:	sharutils
