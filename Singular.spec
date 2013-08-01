@@ -3,7 +3,7 @@
 
 Name:		Singular
 Version:	%(tr - . <<<%{upstreamver})
-Release:	6%{?dist}
+Release:	7%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 Group:		Applications/Engineering
 License:	BSD and LGPLv2+ and GPLv2+
@@ -450,6 +450,9 @@ sed -e 's|<\(cf_gmp.h>\)|<factory/\1|' \
 %{_emacs_sitestartdir}/singular-init.el
 
 %changelog
+* Thu Aug 01 2013 Rex Dieter <rdieter@fedoraproject.org> - 3.1.5-7
+- rebuild
+
 * Tue May 21 2013 Rex Dieter <rdieter@fedoraproject.org> - 3.1.5-6
 - factory-gftables.noarch subpkg (#965655)
 
