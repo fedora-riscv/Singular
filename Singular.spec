@@ -7,7 +7,7 @@
 
 Name:		Singular
 Version:	%(tr - . <<<%{upstreamver})
-Release:	8%{?dist}
+Release:	9%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 Group:		Applications/Engineering
 License:	BSD and LGPLv2+ and GPLv2+
@@ -25,6 +25,9 @@ BuildRequires:	texinfo
 BuildRequires:	tex(latex)
 Requires:	factory-gftables = %{version}-%{release}
 Requires:	surf-geometry
+
+## currently FTBFS elsewhere, TODO: add Arch bug trackers
+ExclusiveArch: %{ix86} x86_64
 
 # Use destdir in install targets
 Patch1:		Singular-destdir.patch
@@ -455,6 +458,9 @@ sed -e 's|<\(cf_gmp.h>\)|<factory/\1|' \
 %{_emacs_sitestartdir}/singular-init.el
 
 %changelog
+* Mon Nov 25 2013 Rex Dieter <rdieter@fedoraproject.org> - 3.1.5-9
+- ExclusiveArch: %%ix86 x86_64
+
 * Fri Aug 16 2013 pcpa <paulo.cesar.pereira.de.andrade@gmail.com> - 3.1.5-8
 - Correct underlink problem (#991920#c1)
 
