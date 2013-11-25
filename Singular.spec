@@ -1,6 +1,10 @@
 %global singulardir	%{_libdir}/Singular
 %global upstreamver	3-1-5
 
+%if 0%{?fedora} > 19
+%define ntl6 1
+%endif
+
 Name:		Singular
 Version:	%(tr - . <<<%{upstreamver})
 Release:	8%{?dist}
@@ -13,8 +17,7 @@ BuildRequires:	emacs
 BuildRequires:	flex
 BuildRequires:	gmp-devel
 BuildRequires:	ncurses-devel
-# patch12 means we need ntl v6 now
-BuildRequires:	ntl-devel >= 6.0
+BuildRequires:	ntl-devel%{?ntl6: >= 6.0}
 BuildRequires:	readline-devel
 # Need uudecode for documentation images in tarball
 BuildRequires:	sharutils
@@ -156,7 +159,9 @@ Emacs mode for Singular.
 %patch10 -p1
 
 %patch11 -p1
+%if 0%{?ntl6:1}
 %patch12 -p1
+%endif
 
 %patch20 -p1 -b .M2_factory
 %patch21 -p1 -b .M2_memutil_debuggging
