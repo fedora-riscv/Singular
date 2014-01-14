@@ -7,11 +7,13 @@
 
 Name:		Singular
 Version:	%(tr - . <<<%{upstreamver})
-Release:	9%{?dist}
+Release:	10%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 Group:		Applications/Engineering
 License:	BSD and LGPLv2+ and GPLv2+
 Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/%{upstreamver}/%{name}-%{upstreamver}.tar.gz
+# TEMPORARY: Remove this once Singular ships an updated version
+Source1:	normaliz.lib
 URL:		http://www.singular.uni-kl.de/
 BuildRequires:	emacs
 BuildRequires:	flex
@@ -180,6 +182,9 @@ sed -i 's/\($(CPPFLAGS)\) \($(FLINT_CFLAGS)\)/\1 $(CFLAGS) \2/' \
 
 # Force use of system ntl
 rm -fr ntl
+
+# TEMPORARY: Remove this once Singular ships an updated version
+cp -p %{SOURCE1} Singular/LIB
 
 %build
 export CFLAGS="%{optflags} -fPIC"
@@ -458,6 +463,9 @@ sed -e 's|<\(cf_gmp.h>\)|<factory/\1|' \
 %{_emacs_sitestartdir}/singular-init.el
 
 %changelog
+* Tue Jan 14 2014 Jerry James <loganjerry@gmail.com> - 3.1.5-10
+- Update normaliz interface for normaliz 2.8 and later
+
 * Mon Nov 25 2013 Rex Dieter <rdieter@fedoraproject.org> - 3.1.5-9
 - ExclusiveArch: %%ix86 x86_64
 
