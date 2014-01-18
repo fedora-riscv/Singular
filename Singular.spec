@@ -183,8 +183,10 @@ sed -i 's/\($(CPPFLAGS)\) \($(FLINT_CFLAGS)\)/\1 $(CFLAGS) \2/' \
 # Force use of system ntl
 rm -fr ntl
 
+%if 0%{?fedora} > 20
 # TEMPORARY: Remove this once Singular ships an updated version
 cp -p %{SOURCE1} Singular/LIB
+%endif
 
 %build
 export CFLAGS="%{optflags} -fPIC"
