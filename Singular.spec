@@ -1,7 +1,7 @@
 %global singulardir	%{_libdir}/Singular
 %global upstreamver	3-1-5
 
-%if 0%{?fedora} > 19
+%if 0%{?fedora} > 18
 %define ntl6 1
 %endif
 
