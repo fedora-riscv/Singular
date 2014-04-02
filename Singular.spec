@@ -5,9 +5,15 @@
 %define ntl6 1
 %endif
 
+# If a library used by both polymake and Singular is updated, neither can be
+# rebuilt, because each BRs the other and both are linked against the old
+# version of the library.  Use this to rebuild Singular without polymake
+# support, rebuild polymake, then build Singular again with polymake support.
+%bcond_without polymake
+
 Name:		Singular
 Version:	%(tr - . <<<%{upstreamver})
-Release:	11%{?dist}
+Release:	12%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 Group:		Applications/Engineering
 License:	BSD and LGPLv2+ and GPLv2+
@@ -23,7 +29,9 @@ BuildRequires:	gmp-devel
 BuildRequires:	libxml2-devel
 BuildRequires:	ncurses-devel
 BuildRequires:	ntl-devel%{?ntl6: >= 6.0}
+%if %{with polymake}
 BuildRequires:	polymake-devel
+%endif
 BuildRequires:	readline-devel
 # Need uudecode for documentation images in tarball
 BuildRequires:	sharutils
@@ -211,6 +219,14 @@ sed -i '/^install:/iinstall-libsingular:\n' \
 sed -ri 's/@(prefix|exec_prefix|libdir|includedir)@/$(DESTDIR)&/g' \
     gfanlib/Makefile.in
 
+# Fix the default paths
+sed -e 's/"S_UNAME"/Singular/' \
+    -e 's/"S_UNAME/Singular"/' \
+    -e 's,%b/\.\.,%b,' \
+    -e 's,S_ROOT_DIR,"%{_libdir}",' \
+    -i.orig kernel/feResource.cc
+touch -r kernel/feResource.cc.orig kernel/feResource.cc
+
 %if 0%{?fedora} > 20
 # TEMPORARY: Remove this once Singular ships an updated version
 cp -p %{SOURCE1} Singular/LIB
@@ -241,7 +257,9 @@ export LIBS="-lpthread -ldl"
 	--enable-libfac \
 	--enable-IntegerProgramming \
 	--enable-gfanlib \
+%if %{with polymake}
 	--enable-polymake \
+%endif
 	--disable-doc \
 	--with-malloc=system
 # remove bogus -L/usr/kernel from linker command line and
@@ -251,8 +269,10 @@ sed -i 's|-L%{_prefix}/kernel||g;s|-L%{_libdir}||g' Singular/Makefile
 make %{?_smp_mflags} Singular
 # factory needs omalloc built
 make %{?_smp_mflags} -C omalloc
+%if %{with polymake}
 # polymake interface needs gfanlib built
 make %{?_smp_mflags} -C gfanlib
+%endif
 
 pushd factory
 %configure \
@@ -459,7 +479,9 @@ sed -e 's|<\(cf_gmp.h>\)|<factory/\1|' \
 %{singulardir}/TSingular
 %{singulardir}/*.so
 %{_libdir}/libsingular.so
+%if %{with polymake}
 %{_libdir}/polymake.so
+%endif
 
 %files		devel
 %{_includedir}/gfanlib
@@ -507,6 +529,11 @@ sed -e 's|<\(cf_gmp.h>\)|<factory/\1|' \
 %{_emacs_sitestartdir}/singular-init.el
 
 %changelog
+* Wed Apr  2 2014 Jerry James <loganjerry@gmail.com> - 3.1.5-12
+- Rebuild for NTL 6.1.0
+- Fix default paths
+- Add ability to rebuild without polymake
+
 * Mon Mar 10 2014 Rex Dieter <rdieter@fedoraproject.org> - 3.1.5-11
 - fix/workaround char=unsigned char assumptions
 - (more) consistently use RPM_OPT_FLAGS
