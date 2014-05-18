@@ -1,6 +1,6 @@
-diff -up Singular-3-1-5/kernel/mod2.h.cmake.in.orig Singular-3-1-5/kernel/mod2.h.cmake.in
---- Singular-3-1-5/kernel/mod2.h.cmake.in.orig	2012-07-12 08:24:57.000000000 -0600
-+++ Singular-3-1-5/kernel/mod2.h.cmake.in	2014-03-04 12:30:00.000000000 -0700
+diff -up Singular-3-1-6/kernel/mod2.h.cmake.in.orig Singular-3-1-6/kernel/mod2.h.cmake.in
+--- Singular-3-1-6/kernel/mod2.h.cmake.in.orig	2014-05-18 17:01:47.989286256 -0300
++++ Singular-3-1-6/kernel/mod2.h.cmake.in	2014-05-18 17:02:07.654287009 -0300
 @@ -157,6 +157,10 @@
  #cmakedefine SI_CPU_IA64 1
  /* CPU type: x86_64: */
@@ -12,13 +12,13 @@ diff -up Singular-3-1-5/kernel/mod2.h.cmake.in.orig Singular-3-1-5/kernel/mod2.h
  
  /*******************************************************************
   * Defines which are not set by configure
-diff -up Singular-3-1-5/kernel/structs.h.orig Singular-3-1-5/kernel/structs.h
---- Singular-3-1-5/kernel/structs.h.orig	2012-07-12 08:24:57.000000000 -0600
-+++ Singular-3-1-5/kernel/structs.h	2014-03-04 12:30:00.000000000 -0700
-@@ -61,6 +61,20 @@ typedef void * ADDRESS;
-   // #ifdef HAVE_MULT_MOD
-   // #define HAVE_DIV_MOD
-   // #endif
+diff -up Singular-3-1-6/kernel/structs.h.orig Singular-3-1-6/kernel/structs.h
+--- Singular-3-1-6/kernel/structs.h.orig	2014-05-18 17:02:16.196287336 -0300
++++ Singular-3-1-6/kernel/structs.h	2014-05-18 17:03:31.573290223 -0300
+@@ -69,6 +69,20 @@ typedef void * ADDRESS;
+   #ifdef HAVE_MULT_MOD
+   #define HAVE_DIV_MOD
+   #endif
 +#elif defined(SI_CPU_ARM)
 +  // FIXME: need to run some tests
 +  #define HAVE_MULT_MOD
@@ -36,9 +36,100 @@ diff -up Singular-3-1-5/kernel/structs.h.orig Singular-3-1-5/kernel/structs.h
  #endif
  
  #if SIZEOF_LONG == 4
-diff -up Singular-3-1-5/Singular/mod2.h.in.orig Singular-3-1-5/Singular/mod2.h.in
---- Singular-3-1-5/Singular/mod2.h.in.orig	2012-07-12 08:24:57.000000000 -0600
-+++ Singular-3-1-5/Singular/mod2.h.in	2014-03-04 12:30:00.000000000 -0700
+diff -up Singular-3-1-6/Singular/configure.in.orig Singular-3-1-6/Singular/configure.in
+--- Singular-3-1-6/Singular/configure.in.orig	2014-05-18 17:06:01.562295966 -0300
++++ Singular-3-1-6/Singular/configure.in	2014-05-18 17:06:49.062297785 -0300
+@@ -447,6 +447,16 @@ if test "$ac_cv_singuname" = ppcMac-darw
+   AC_SUBST(SI_CPU_PPC)
+   AC_MSG_RESULT(SI_CPU_PPC)
+ fi
++if test "$ac_cv_singuname" = arm-Linux; then
++  AC_DEFINE(SI_CPU_ARM)
++  AC_SUBST(SI_CPU_ARM)
++  AC_MSG_RESULT(SI_CPU_ARM)
++fi
++if test "$ac_cv_singuname" = s390-Linux; then
++  AC_DEFINE(SI_CPU_S390)
++  AC_SUBST(SI_CPU_S390)
++  AC_MSG_RESULT(SI_CPU_S390)
++fi
+ # test again with CPU names
+ if test "$ac_cv_singcpuname" = i386; then
+   AC_DEFINE(SI_CPU_I386)
+@@ -483,6 +493,16 @@ if test "$ac_cv_singcpuname" = armv6l; t
+   AC_SUBST(SI_CPU_ARM6L)
+   AC_MSG_RESULT(SI_CPU_ARM6L)
+ fi
++if test "$ac_cv_singcpuname" = arm; then
++  AC_DEFINE(SI_CPU_ARM)
++  AC_SUBST(SI_CPU_ARM)
++  AC_MSG_RESULT(SI_CPU_ARM)
++fi
++if test "$ac_cv_singcpuname" = s390; then
++  AC_DEFINE(SI_CPU_S390)
++  AC_SUBST(SI_CPU_S390)
++  AC_MSG_RESULT(SI_CPU_S390)
++fi
+ 
+ SING_UNAME=`echo $SINGUNAME | tr '-' '_' `
+ AC_SUBST(SING_UNAME)
+diff -up Singular-3-1-6/Singular/configure.orig Singular-3-1-6/Singular/configure
+--- Singular-3-1-6/Singular/configure.orig	2014-05-18 17:07:00.581298226 -0300
++++ Singular-3-1-6/Singular/configure	2014-05-18 17:09:04.256302962 -0300
+@@ -666,6 +666,8 @@ SINGULAR_MAJOR_VERSION
+ VERSION_DATE
+ SINGULAR_VERSION
+ SING_UNAME
++SI_CPU_ARM
++SI_CPU_S390
+ SI_CPU_SPARC
+ SI_CPU_PPC
+ SI_CPU_IA64
+@@ -2689,6 +2691,20 @@ if test "$ac_cv_singuname" = ppcMac-darw
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: SI_CPU_PPC" >&5
+ $as_echo "SI_CPU_PPC" >&6; }
+ fi
++if test "$ac_cv_singuname" = arm-Linux; then
++  $as_echo "#define SI_CPU_ARM 1" >>confdefs.h
++
++
++  { $as_echo "$as_me:${as_lineno-$LINENO}: result: SI_CPU_ARM" >&5
++$as_echo "SI_CPU_ARM" >&6; }
++fi
++if test "$ac_cv_singuname" = s390-Linux; then
++  $as_echo "#define SI_CPU_S390 1" >>confdefs.h
++
++
++  { $as_echo "$as_me:${as_lineno-$LINENO}: result: SI_CPU_S390" >&5
++$as_echo "SI_CPU_S390" >&6; }
++fi
+ # test again with CPU names
+ if test "$ac_cv_singcpuname" = i386; then
+   $as_echo "#define SI_CPU_I386 1" >>confdefs.h
+@@ -2732,6 +2748,20 @@ if test "$ac_cv_singcpuname" = ppc; then
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: SI_CPU_PPC" >&5
+ $as_echo "SI_CPU_PPC" >&6; }
+ fi
++if test "$ac_cv_singcpuname" = arm; then
++  $as_echo "#define SI_CPU_ARM 1" >>confdefs.h
++
++
++  { $as_echo "$as_me:${as_lineno-$LINENO}: result: SI_CPU_ARM" >&5
++$as_echo "SI_CPU_ARM" >&6; }
++fi
++if test "$ac_cv_singcpuname" = s390; then
++  $as_echo "#define SI_CPU_S390 1" >>confdefs.h
++
++
++  { $as_echo "$as_me:${as_lineno-$LINENO}: result: SI_CPU_S390" >&5
++$as_echo "SI_CPU_S390" >&6; }
++fi
+ if test "$ac_cv_singcpuname" = arm6l; then
+   $as_echo "#define SI_CPU_ARM6L 1" >>confdefs.h
+ 
+diff -up Singular-3-1-6/Singular/mod2.h.in.orig Singular-3-1-6/Singular/mod2.h.in
+--- Singular-3-1-6/Singular/mod2.h.in.orig	2014-05-18 17:03:50.683290954 -0300
++++ Singular-3-1-6/Singular/mod2.h.in	2014-05-18 17:04:18.694292027 -0300
 @@ -162,6 +162,10 @@
  #undef SI_CPU_IA64
  /* CPU type: x86_64: */
@@ -47,12 +138,12 @@ diff -up Singular-3-1-5/Singular/mod2.h.in.orig Singular-3-1-5/Singular/mod2.h.i
 +#undef SI_CPU_ARM
 +/* CPU type: s390 / s390x: */
 +#undef SI_CPU_S390
+ /* Autoload reference counted types like reference and shared */
+ #undef SI_COUNTEDREF_AUTOLOAD
  /* whether development version of python is available */
- #undef HAVE_PYTHON
- /* whether static development version of python is available */
-diff -up singuname.sh.orig singuname.sh
---- Singular-3-1-5/singuname.sh.orig	2012-07-12 08:24:57.000000000 -0600
-+++ Singular-3-1-5/singuname.sh	2014-03-04 12:30:00.000000000 -0700
+diff -up Singular-3-1-6/singuname.sh.orig Singular-3-1-6/singuname.sh
+--- Singular-3-1-6/singuname.sh.orig	2014-05-18 17:04:28.393292398 -0300
++++ Singular-3-1-6/singuname.sh	2014-05-18 17:05:50.102295527 -0300
 @@ -202,7 +202,7 @@ then
  elif (echo $uname_m | $egrep "Power Macintosh" > $devnull)
  then
@@ -93,94 +184,3 @@ diff -up singuname.sh.orig singuname.sh
          exit 0
      else
          echo ${prefix}-Unknown
-diff -dup Singular-3-1-5/Singular/configure.in.orig Singular-3-1-5/Singular/configure.in
---- Singular-3-1-5/Singular/configure.in.orig	2012-07-12 08:24:57.000000000 -0600
-+++ Singular-3-1-5/Singular/configure.in	2014-03-04 12:30:00.000000000 -0700
-@@ -436,6 +436,16 @@ if test "$ac_cv_singuname" = ppcMac-darw
-   AC_SUBST(SI_CPU_PPC)
-   AC_MSG_RESULT(SI_CPU_PPC)
- fi
-+if test "$ac_cv_singuname" = arm-Linux; then
-+  AC_DEFINE(SI_CPU_ARM)
-+  AC_SUBST(SI_CPU_ARM)
-+  AC_MSG_RESULT(SI_CPU_ARM)
-+fi
-+if test "$ac_cv_singuname" = s390-Linux; then
-+  AC_DEFINE(SI_CPU_S390)
-+  AC_SUBST(SI_CPU_S390)
-+  AC_MSG_RESULT(SI_CPU_S390)
-+fi
- # test again with CPU names
- if test "$ac_cv_singcpuname" = i386; then
-   AC_DEFINE(SI_CPU_I386)
-@@ -467,6 +477,16 @@ if test "$ac_cv_singcpuname" = ppc; then
-   AC_SUBST(SI_CPU_PPC)
-   AC_MSG_RESULT(SI_CPU_PPC)
- fi
-+if test "$ac_cv_singcpuname" = arm; then
-+  AC_DEFINE(SI_CPU_ARM)
-+  AC_SUBST(SI_CPU_ARM)
-+  AC_MSG_RESULT(SI_CPU_ARM)
-+fi
-+if test "$ac_cv_singcpuname" = s390; then
-+  AC_DEFINE(SI_CPU_S390)
-+  AC_SUBST(SI_CPU_S390)
-+  AC_MSG_RESULT(SI_CPU_S390)
-+fi
- 
- SING_UNAME=`echo $SINGUNAME | tr '-' '_' `
- AC_SUBST(SING_UNAME)
-diff -up Singular-3-1-5/Singular/configure.orig Singular-3-1-5/Singular/configure
---- Singular-3-1-5/Singular/configure.orig	2012-07-12 08:24:57.000000000 -0600
-+++ Singular-3-1-5/Singular/configure	2014-03-04 12:30:00.000000000 -0700
-@@ -665,6 +665,8 @@ SINGULAR_MAJOR_VERSION
- VERSION_DATE
- SINGULAR_VERSION
- SING_UNAME
-+SI_CPU_ARM
-+SI_CPU_S390
- SI_CPU_SPARC
- SI_CPU_PPC
- SI_CPU_IA64
-@@ -2685,6 +2687,20 @@ if test "$ac_cv_singuname" = ppcMac-darw
-   { $as_echo "$as_me:${as_lineno-$LINENO}: result: SI_CPU_PPC" >&5
- $as_echo "SI_CPU_PPC" >&6; }
- fi
-+if test "$ac_cv_singuname" = arm-Linux; then
-+  $as_echo "#define SI_CPU_ARM 1" >>confdefs.h
-+
-+
-+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: SI_CPU_ARM" >&5
-+$as_echo "SI_CPU_ARM" >&6; }
-+fi
-+if test "$ac_cv_singuname" = s390-Linux; then
-+  $as_echo "#define SI_CPU_S390 1" >>confdefs.h
-+
-+
-+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: SI_CPU_S390" >&5
-+$as_echo "SI_CPU_S390" >&6; }
-+fi
- # test again with CPU names
- if test "$ac_cv_singcpuname" = i386; then
-   $as_echo "#define SI_CPU_I386 1" >>confdefs.h
-@@ -2728,6 +2744,20 @@ if test "$ac_cv_singcpuname" = ppc; then
-   { $as_echo "$as_me:${as_lineno-$LINENO}: result: SI_CPU_PPC" >&5
- $as_echo "SI_CPU_PPC" >&6; }
- fi
-+if test "$ac_cv_singcpuname" = arm; then
-+  $as_echo "#define SI_CPU_ARM 1" >>confdefs.h
-+
-+
-+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: SI_CPU_ARM" >&5
-+$as_echo "SI_CPU_ARM" >&6; }
-+fi
-+if test "$ac_cv_singcpuname" = s390; then
-+  $as_echo "#define SI_CPU_S390 1" >>confdefs.h
-+
-+
-+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: SI_CPU_S390" >&5
-+$as_echo "SI_CPU_S390" >&6; }
-+fi
- 
- SING_UNAME=`echo $SINGUNAME | tr '-' '_' `
- 

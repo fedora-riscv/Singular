@@ -1,5 +1,5 @@
 %global singulardir	%{_libdir}/Singular
-%global upstreamver	3-1-5
+%global upstreamver	3-1-6
 
 %if 0%{?fedora} > 18
 %define ntl6 1
@@ -9,11 +9,11 @@
 # rebuilt, because each BRs the other and both are linked against the old
 # version of the library.  Use this to rebuild Singular without polymake
 # support, rebuild polymake, then build Singular again with polymake support.
-%bcond_without polymake
+%bcond_with polymake
 
 Name:		Singular
 Version:	%(tr - . <<<%{upstreamver})
-Release:	14%{?dist}
+Release:	2%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 Group:		Applications/Engineering
 License:	BSD and LGPLv2+ and GPLv2+
@@ -59,13 +59,6 @@ Patch5:		Singular-builddid.patch
 # when calling mp_set_memory_functions, what is a really a bad idea on
 # a shared library.
 Patch6:		Singular-undefined.patch
-
-# From sagemath singular-3-1-5.p0.spkg in "Upgrade Singular" trac
-# at http://trac.sagemath.org/sage_trac/ticket/13237
-Patch7:		NTL_negate.patch
-Patch8:		singular_trac_439.patch
-Patch9:		singular_trac_440.patch
-Patch10:	singular_trac_441.patch
 
 # Add missing #include directives in the semaphore code
 Patch11:	Singular-semaphore.patch
@@ -173,11 +166,6 @@ Emacs mode for Singular.
 %patch5 -p1 -b .builddid
 %patch6 -p1 -b .undefined
 
-%patch7 -p1
-%patch8 -p1
-%patch9 -p1
-%patch10 -p1
-
 %patch11 -p1
 %if 0%{?ntl6:1}
 %patch12 -p1
@@ -185,9 +173,9 @@ Emacs mode for Singular.
 %patch13 -p1
 %patch14 -p1 -b .flint24
 
-%patch20 -p1 -b .M2_factory
-%patch21 -p1 -b .M2_memutil_debuggging
-%patch22 -p1 -b .M2_libfac
+#patch20 -p1 -b .M2_factory
+#patch21 -p1 -b .M2_memutil_debuggging
+#patch22 -p1 -b .M2_libfac
 
 sed -i -e "s|gftabledir=.*|gftabledir='%{singulardir}/LIB/gftables'|"	\
     -e "s|explicit_gftabledir=.*|explicit_gftabledir='%{singulardir}/LIB/gftables'|" \
@@ -443,10 +431,6 @@ pushd factory
     # do not run make install again, just install non singular factory files
     install -m 644 libcf.a $RPM_BUILD_ROOT%{_libdir}
     install -m 644 libcfmem.a $RPM_BUILD_ROOT%{_libdir}
-    # automatically generated file at install time ignores includedir
-    sed	-e 's|<factory|<factory/factory|' \
-	-e 's|<templates/|<factory/templates/|' \
-	-i $RPM_BUILD_ROOT%{_includedir}/factory/templates/ftmpl_inst.cc
 popd
 
 # incorrect factory includedir
@@ -529,6 +513,11 @@ sed -e 's|<\(cf_gmp.h>\)|<factory/\1|' \
 %{_emacs_sitestartdir}/singular-init.el
 
 %changelog
+* Sun May 18 2014 pcpa <paulo.cesar.pereira.de.andrade@gmail.com> - 3.1.6-2
+- Merge with RFE 3.1.6 update (#1074590)
+- Remove patches applied upstream
+- Disable polymake to allow interface rebootstrap
+
 * Tue Apr 29 2014 Jerry James <loganjerry@gmail.com> - 3.1.5-14
 - Rebuild for polymake-2.13
 
@@ -539,6 +528,9 @@ sed -e 's|<\(cf_gmp.h>\)|<factory/\1|' \
 - Rebuild for NTL 6.1.0
 - Fix default paths
 - Add ability to rebuild without polymake
+
+* Mon Mar 10 2014 Rex Dieter <rdieter@fedoraproject.org> - 3.1.6-1
+- 3.1.6
 
 * Mon Mar 10 2014 Rex Dieter <rdieter@fedoraproject.org> - 3.1.5-11
 - fix/workaround char=unsigned char assumptions
