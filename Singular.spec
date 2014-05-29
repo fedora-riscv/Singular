@@ -9,11 +9,11 @@
 # rebuilt, because each BRs the other and both are linked against the old
 # version of the library.  Use this to rebuild Singular without polymake
 # support, rebuild polymake, then build Singular again with polymake support.
-%bcond_with polymake
+%bcond_without polymake
 
 Name:		Singular
 Version:	%(tr - . <<<%{upstreamver})
-Release:	2%{?dist}
+Release:	3%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 Group:		Applications/Engineering
 License:	BSD and LGPLv2+ and GPLv2+
@@ -192,6 +192,10 @@ sed -ri 's/(C(XX)?FLAGS)(.*= )-g/\1\3$(\1)/' kernel/Makefile.in
 sed -r 's/(\$\{CXX\})[[:blank:]]+(-O2[[:blank:]]+)?(\$\{CPPFLAGS\})/\1 $\{CXXFLAGS\} \3/' \
     -i Singular/Makefile.in
 
+# Fix permissions
+sed -i 's,${INSTALL_PROGRAM} libsingular.h,${INSTALL_DATA} libsingular.h,' \
+    Singular/Makefile.in
+
 # Force use of system ntl
 rm -fr ntl
 
@@ -201,9 +205,12 @@ ln -s %{_includedir}/flint flint/include
 ln -s %{_libdir} flint/lib
 sed -i 's/lmpir/lgmp/' factory/configure Singular/configure
 
-# Unbreak the (call)gfanlib install
+# Unbreak the (call)gfanlib/callpolymake installs
 sed -i '/^install:/iinstall-libsingular:\n' \
-    gfanlib/Makefile.in callgfanlib/Makefile.in callpolymake/Makefile.in
+    gfanlib/Makefile.in callgfanlib/Makefile.in
+sed -e '/^install /iinstall-libsingular:\n' \
+    -e 's/mkdir/mkdir -p/' \
+    -i callpolymake/Makefile.in
 sed -ri 's/@(prefix|exec_prefix|libdir|includedir)@/$(DESTDIR)&/g' \
     gfanlib/Makefile.in
 
@@ -464,7 +471,7 @@ sed -e 's|<\(cf_gmp.h>\)|<factory/\1|' \
 %{singulardir}/*.so
 %{_libdir}/libsingular.so
 %if %{with polymake}
-%{_libdir}/polymake.so
+%{singulardir}/MOD/
 %endif
 
 %files		devel
@@ -513,6 +520,10 @@ sed -e 's|<\(cf_gmp.h>\)|<factory/\1|' \
 %{_emacs_sitestartdir}/singular-init.el
 
 %changelog
+* Thu May 29 2014 Jerry James <loganjerry@gmail.com> - 3.1.6-3
+- Rebuild with polymake support
+- Fix libsingular.h permissions
+
 * Sun May 18 2014 pcpa <paulo.cesar.pereira.de.andrade@gmail.com> - 3.1.6-2
 - Merge with RFE 3.1.6 update (#1074590)
 - Remove patches applied upstream
