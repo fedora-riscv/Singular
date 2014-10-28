@@ -13,7 +13,7 @@
 
 Name:		Singular
 Version:	%(tr - . <<<%{upstreamver})
-Release:	7%{?dist}
+Release:	8%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 Group:		Applications/Engineering
 License:	BSD and LGPLv2+ and GPLv2+
@@ -200,8 +200,8 @@ sed -i 's,${INSTALL_PROGRAM} libsingular.h,${INSTALL_DATA} libsingular.h,' \
 rm -fr ntl
 
 # Adapt to the Fedora flint package
-mkdir flint
-ln -s %{_includedir}/flint flint/include
+mkdir -p flint/include
+ln -s %{_includedir}/flint flint/include/flint
 ln -s %{_libdir} flint/lib
 sed -i 's/lmpir/lgmp/' factory/configure Singular/configure
 
@@ -520,6 +520,9 @@ sed -e 's|<\(cf_gmp.h>\)|<factory/\1|' \
 %{_emacs_sitestartdir}/singular-init.el
 
 %changelog
+* Tue Oct 28 2014 Jerry James <loganjerry@gmail.com> - 3.1.6-8
+- Rebuild for ntl 6.2.1
+
 * Thu Sep 11 2014 Jerry James <loganjerry@gmail.com> - 3.1.6-7
 - Rebuild for polymake -2.13-8.git20140811
 

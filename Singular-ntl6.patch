@@ -1,6 +1,6 @@
 --- Singular-3-1-6/factory/NTLconvert.cc.orig	2012-12-19 14:01:16.000000000 -0700
 +++ Singular-3-1-6/factory/NTLconvert.cc	2014-06-17 12:30:00.000000000 -0600
-@@ -55,6 +55,23 @@
+@@ -55,6 +55,43 @@
  NTL_CLIENT
  #endif
  
@@ -20,6 +20,26 @@
 +
 +template long operator==<zz_p>(const vec_zz_p&, const vec_zz_p&);
 +template Vec<zz_p>::~Vec();
++
++template void BlockConstructFromVec<Pair<GF2X, long> >(Pair<GF2X, long>* p, long n, const Pair<GF2X, long>* q);
++template void BlockConstructFromVec<Pair<GF2EX, long> >(Pair<GF2EX, long>* p, long n, const Pair<GF2EX, long>* q);
++template void BlockConstructFromVec<Pair<zz_pX, long> >(Pair<zz_pX, long>* p, long n, const Pair<zz_pX, long>* q);
++template void BlockConstructFromVec<Pair<zz_pEX, long> >(Pair<zz_pEX, long>* p, long n, const Pair<zz_pEX, long>* q);
++template void BlockConstructFromVec<Pair<ZZ_pX, long> >(Pair<ZZ_pX, long>* p, long n, const Pair<ZZ_pX, long>* q);
++template void BlockConstructFromVec<Pair<ZZ_pEX, long> >(Pair<ZZ_pEX, long>* p, long n, const Pair<ZZ_pEX, long>* q);
++template void BlockConstructFromVec<Pair<ZZX, long> >(Pair<ZZX, long>* p, long n, const Pair<ZZX, long>* q);
++template void BlockConstructFromVec<Vec<zz_p> >(Vec<zz_p>* p, long n, const Vec<zz_p>* q);
++template void BlockConstructFromVec<Vec<zz_pE> >(Vec<zz_pE>* p, long n, const Vec<zz_pE>* q);
++template void BlockConstructFromVec<zz_p>(zz_p* p, long n, const zz_p* q);
++template void BlockConstructFromVec<zz_pE>(zz_pE* p, long n, const zz_pE* q);
++
++template void BlockConstructFromObj<Pair<GF2X, long> >(Pair<GF2X, long>* p, long n, const Pair<GF2X, long>& q);
++template void BlockConstructFromObj<Pair<GF2EX, long> >(Pair<GF2EX, long>* p, long n, const Pair<GF2EX, long>& q);
++template void BlockConstructFromObj<Pair<zz_pX, long> >(Pair<zz_pX, long>* p, long n, const Pair<zz_pX, long>& q);
++template void BlockConstructFromObj<Pair<zz_pEX, long> >(Pair<zz_pEX, long>* p, long n, const Pair<zz_pEX, long>& q);
++template void BlockConstructFromObj<Pair<ZZ_pX, long> >(Pair<ZZ_pX, long>* p, long n, const Pair<ZZ_pX, long>& q);
++template void BlockConstructFromObj<Pair<ZZ_pEX, long> >(Pair<ZZ_pEX, long>* p, long n, const Pair<ZZ_pEX, long>& q);
++template void BlockConstructFromObj<Pair<ZZX, long> >(Pair<ZZX, long>* p, long n, const Pair<ZZX, long>& q);
 +
  ////////////////////////////////////////////////////////////////////////////////
  // NAME: convertFacCF2NTLZZpX                                                 //
