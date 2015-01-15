@@ -1,8 +1,12 @@
 %global singulardir	%{_libdir}/Singular
 %global upstreamver	3-1-6
 
-%if 0%{?fedora} > 18
-%define ntl6 1
+%if 0%{?fedora} > 20
+%global ntl8 1
+%else
+%if 0%{?fedora}
+%global ntl6 1
+%endif
 %endif
 
 # If a library used by both polymake and Singular is updated, neither can be
@@ -13,7 +17,7 @@
 
 Name:		Singular
 Version:	%(tr - . <<<%{upstreamver})
-Release:	8%{?dist}
+Release:	9%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 Group:		Applications/Engineering
 License:	BSD and LGPLv2+ and GPLv2+
@@ -28,7 +32,7 @@ BuildRequires:	flint-devel
 BuildRequires:	gmp-devel
 BuildRequires:	libxml2-devel
 BuildRequires:	ncurses-devel
-BuildRequires:	ntl-devel%{?ntl6: >= 6.0}
+BuildRequires:	ntl-devel%{?ntl8: >= 8.0}%{?ntl6: >= 6.0}
 %if %{with polymake}
 BuildRequires:	polymake-devel
 %endif
@@ -68,6 +72,8 @@ Patch12:	Singular-ntl6.patch
 Patch13:	Singular-arches.patch
 # Adapt to changes in flint 2.4
 Patch14:	Singular-flint24.patch
+# Adapt to new template code in NTL 8
+Patch15:	Singular-ntl8.patch
 
 ## Macaulay2 patches
 Patch20: Singular-M2_factory.patch
@@ -172,6 +178,9 @@ Emacs mode for Singular.
 %endif
 %patch13 -p1
 %patch14 -p1 -b .flint24
+%if 0%{?ntl8:1}
+%patch15 -p1
+%endif
 
 #patch20 -p1 -b .M2_factory
 #patch21 -p1 -b .M2_memutil_debuggging
@@ -270,6 +279,11 @@ make %{?_smp_mflags} -C gfanlib
 %endif
 
 pushd factory
+CFLAGS="%{optflags} -fPIC -fsigned-char -I%{_includedir}/cddlib -I%{_includedir}/flint"
+CXXFLAGS=$CFLAGS
+LDFLAGS="$RPM_LD_FLAGS -Wl,--as-needed -L$PWD/gfanlib"
+LIBS="-lpthread -ldl"
+
 %configure \
 	--bindir=%{singulardir} \
 	--includedir=%{_includedir}/factory \
@@ -421,6 +435,11 @@ pushd factory
     make DESTDIR=$RPM_BUILD_ROOT install
 # make a version without singular defined
     make clean
+    CFLAGS="%{optflags} -fPIC -fsigned-char -I%{_includedir}/cddlib -I%{_includedir}/flint"
+    CXXFLAGS=$CFLAGS
+    LDFLAGS="$RPM_LD_FLAGS -Wl,--as-needed -L$PWD/gfanlib"
+    LIBS="-lpthread -ldl"
+
 %configure \
 	--bindir=%{singulardir} \
 	--includedir=%{_includedir}/factory \
@@ -520,6 +539,10 @@ sed -e 's|<\(cf_gmp.h>\)|<factory/\1|' \
 %{_emacs_sitestartdir}/singular-init.el
 
 %changelog
+* Thu Jan 15 2015 Jerry James <loganjerry@gmail.com> - 3.1.6-9
+- Rebuild for ntl 8.1.0
+- Add Singular-ntl8.patch to adapt
+
 * Tue Oct 28 2014 Jerry James <loganjerry@gmail.com> - 3.1.6-8
 - Rebuild for ntl 6.2.1
 
