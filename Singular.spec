@@ -17,7 +17,7 @@
 
 Name:		Singular
 Version:	%(tr - . <<<%{upstreamver})
-Release:	9%{?dist}
+Release:	10%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 Group:		Applications/Engineering
 License:	BSD and LGPLv2+ and GPLv2+
@@ -539,6 +539,9 @@ sed -e 's|<\(cf_gmp.h>\)|<factory/\1|' \
 %{_emacs_sitestartdir}/singular-init.el
 
 %changelog
+* Mon Feb  2 2015 Jerry James <loganjerry@gmail.com> - 3.1.6-10
+- Rebuild for ntl 8.1.2
+
 * Thu Jan 15 2015 Jerry James <loganjerry@gmail.com> - 3.1.6-9
 - Rebuild for ntl 8.1.0
 - Add Singular-ntl8.patch to adapt
