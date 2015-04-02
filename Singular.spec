@@ -1,3 +1,4 @@
+#%#undefine _hardened_build
 %global singulardir	%{_libdir}/Singular
 %global upstreamver	3-1-6
 
@@ -17,7 +18,7 @@
 
 Name:		Singular
 Version:	%(tr - . <<<%{upstreamver})
-Release:	10%{?dist}
+Release:	11%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 Group:		Applications/Engineering
 License:	BSD and LGPLv2+ and GPLv2+
@@ -75,10 +76,15 @@ Patch14:	Singular-flint24.patch
 # Adapt to new template code in NTL 8
 Patch15:	Singular-ntl8.patch
 
+# This should be temporary
+# https://bugzilla.redhat.com/show_bug.cgi?id=1206815
+Patch16:	Singular-gcc5.patch
+
 ## Macaulay2 patches
 Patch20: Singular-M2_factory.patch
 Patch21: Singular-M2_memutil_debuggging.patch
 Patch22: Singular-M2_libfac.patch
+
 
 %description
 Singular is a computer algebra system for polynomial computations, with
@@ -181,6 +187,7 @@ Emacs mode for Singular.
 %if 0%{?ntl8:1}
 %patch15 -p1
 %endif
+%patch16 -p1
 
 #patch20 -p1 -b .M2_factory
 #patch21 -p1 -b .M2_memutil_debuggging
@@ -539,6 +546,9 @@ sed -e 's|<\(cf_gmp.h>\)|<factory/\1|' \
 %{_emacs_sitestartdir}/singular-init.el
 
 %changelog
+* Thu Apr  2 2015 pcpa <paulo.cesar.pereira.de.andrade@gmail.com> - 3.1.6-11
+- Rebuild for rawhide gcc5 and c++ string and list abi
+
 * Mon Feb  2 2015 Jerry James <loganjerry@gmail.com> - 3.1.6-10
 - Rebuild for ntl 8.1.2
 

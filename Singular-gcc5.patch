@@ -1,0 +1,21 @@
+diff -up Singular-3-1-6/Singular/Minor.cc.orig Singular-3-1-6/Singular/Minor.cc
+--- Singular-3-1-6/Singular/Minor.cc.orig	2015-03-28 20:41:36.396539843 -0300
++++ Singular-3-1-6/Singular/Minor.cc	2015-03-28 20:42:33.458542028 -0300
+@@ -799,7 +802,7 @@ string MinorKey::toString() const
+     z = this->getRowKey(r);
+     while (z != 0)
+     {
+-      if ((z % 2) != 0) t = "1" + t; else t = "0" + t;
++      if ((z % 2) != 0) t = string("1") + t; else t = string("0") + t;
+       z = z / 2;
+     }
+     if (r < this->getNumberOfRowBlocks() - 1)
+@@ -813,7 +816,7 @@ string MinorKey::toString() const
+     z = this->getColumnKey(c);
+     while (z != 0)
+     {
+-      if ((z % 2) != 0) t = "1" + t; else t = "0" + t;
++      if ((z % 2) != 0) t = string("1") + t; else t = string("0") + t;
+       z = z / 2;
+     }
+     if (c < this->getNumberOfColumnBlocks() - 1)
