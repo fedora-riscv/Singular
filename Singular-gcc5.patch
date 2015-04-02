@@ -1,21 +1,31 @@
 diff -up Singular-3-1-6/Singular/Minor.cc.orig Singular-3-1-6/Singular/Minor.cc
---- Singular-3-1-6/Singular/Minor.cc.orig	2015-03-28 20:41:36.396539843 -0300
-+++ Singular-3-1-6/Singular/Minor.cc	2015-03-28 20:42:33.458542028 -0300
-@@ -799,7 +802,7 @@ string MinorKey::toString() const
+--- Singular-3-1-6/Singular/Minor.cc.orig	2015-04-02 14:14:42.476181663 -0300
++++ Singular-3-1-6/Singular/Minor.cc	2015-04-02 14:15:29.714183472 -0300
+@@ -799,11 +799,11 @@ string MinorKey::toString() const
      z = this->getRowKey(r);
      while (z != 0)
      {
 -      if ((z % 2) != 0) t = "1" + t; else t = "0" + t;
-+      if ((z % 2) != 0) t = string("1") + t; else t = string("0") + t;
++      t.insert(t.begin(), (z % 2) ? '1' : '0');
        z = z / 2;
      }
      if (r < this->getNumberOfRowBlocks() - 1)
-@@ -813,7 +816,7 @@ string MinorKey::toString() const
+-      t = string(32 - t.length(), '0') + t;
++      t.insert(0, 32 - t.length(), '0');
+     s += t;
+   }
+   s += ", ";
+@@ -813,11 +813,11 @@ string MinorKey::toString() const
      z = this->getColumnKey(c);
      while (z != 0)
      {
 -      if ((z % 2) != 0) t = "1" + t; else t = "0" + t;
-+      if ((z % 2) != 0) t = string("1") + t; else t = string("0") + t;
++      t.insert(t.begin(), (z % 2) ? '1' : '0');
        z = z / 2;
      }
      if (c < this->getNumberOfColumnBlocks() - 1)
+-      t = string(32 - t.length(), '0') + t;
++      t.insert(0, 32 - t.length(), '0');
+     s += t;
+   }
+   s += ")";
