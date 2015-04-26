@@ -17,7 +17,7 @@ diff -up Singular-3-1-6/kernel/mod2.h.cmake.in.orig Singular-3-1-6/kernel/mod2.h
 diff -up Singular-3-1-6/kernel/structs.h.orig Singular-3-1-6/kernel/structs.h
 --- Singular-3-1-6/kernel/structs.h.orig	2015-04-26 13:33:00.633886357 -0300
 +++ Singular-3-1-6/kernel/structs.h	2015-04-26 13:36:12.477893703 -0300
-@@ -69,6 +69,28 @@ typedef void * ADDRESS;
+@@ -69,6 +69,27 @@ typedef void * ADDRESS;
    #ifdef HAVE_MULT_MOD
    #define HAVE_DIV_MOD
    #endif
@@ -35,7 +35,6 @@ diff -up Singular-3-1-6/kernel/structs.h.orig Singular-3-1-6/kernel/structs.h
 +  // #ifdef HAVE_MULT_MOD
 +  // #define HAVE_DIV_MOD
 +  // #endif
-+#endif
 +#elif defined(SI_CPU_AARCH64)
 +  // FIXME: need to run some tests
 +  #define HAVE_MULT_MOD
