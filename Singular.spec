@@ -18,7 +18,7 @@
 
 Name:		Singular
 Version:	%(tr - . <<<%{upstreamver})
-Release:	11%{?dist}
+Release:	12%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 Group:		Applications/Engineering
 License:	BSD and LGPLv2+ and GPLv2+
@@ -546,6 +546,9 @@ sed -e 's|<\(cf_gmp.h>\)|<factory/\1|' \
 %{_emacs_sitestartdir}/singular-init.el
 
 %changelog
+* Sun Apr 26 2015 pcpa <paulo.cesar.pereira.de.andrade@gmail.com> - 3.1.6-12
+- Update arches patch to support aarch64 (#1213484)
+
 * Thu Apr  2 2015 pcpa <paulo.cesar.pereira.de.andrade@gmail.com> - 3.1.6-11
 - Rebuild for rawhide gcc5 and c++ string and list abi
 
