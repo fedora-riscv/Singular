@@ -18,7 +18,7 @@
 
 Name:		Singular
 Version:	%(tr - . <<<%{upstreamver})
-Release:	12%{?dist}
+Release:	13%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 Group:		Applications/Engineering
 License:	BSD and LGPLv2+ and GPLv2+
@@ -546,6 +546,9 @@ sed -e 's|<\(cf_gmp.h>\)|<factory/\1|' \
 %{_emacs_sitestartdir}/singular-init.el
 
 %changelog
+* Sat May  9 2015 Jerry James <loganjerry@gmail.com> - 3.1.6-13
+- Rebuild for ntl 9.1.0
+
 * Sun Apr 26 2015 pcpa <paulo.cesar.pereira.de.andrade@gmail.com> - 3.1.6-12
 - Update arches patch to support aarch64 (#1213484)
 
