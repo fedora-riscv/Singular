@@ -14,11 +14,11 @@
 # rebuilt, because each BRs the other and both are linked against the old
 # version of the library.  Use this to rebuild Singular without polymake
 # support, rebuild polymake, then build Singular again with polymake support.
-%bcond_without polymake
+%bcond_with polymake
 
 Name:		Singular
 Version:	%(tr - . <<<%{upstreamver})
-Release:	15%{?dist}
+Release:	16%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 Group:		Applications/Engineering
 License:	BSD and LGPLv2+ and GPLv2+
@@ -546,6 +546,9 @@ sed -e 's|<\(cf_gmp.h>\)|<factory/\1|' \
 %{_emacs_sitestartdir}/singular-init.el
 
 %changelog
+* Sun Jul 19 2015 pcpa <paulo.cesar.pereira.de.andrade@gmail.com> - 3.1.6-16
+- Disable polymake due to broken dependency cycle
+
 * Tue Jun 16 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.1.6-15
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
 
