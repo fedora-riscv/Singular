@@ -80,6 +80,9 @@ Patch15:	Singular-ntl8.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1206815
 Patch16:	Singular-gcc5.patch
 
+# Previous perl warning is now an error
+Patch17:	Singular-perl-5.22.patch
+
 ## Macaulay2 patches
 Patch20: Singular-M2_factory.patch
 Patch21: Singular-M2_memutil_debuggging.patch
@@ -188,6 +191,7 @@ Emacs mode for Singular.
 %patch15 -p1
 %endif
 %patch16 -p1
+%patch17 -p1
 
 #patch20 -p1 -b .M2_factory
 #patch21 -p1 -b .M2_memutil_debuggging
@@ -377,7 +381,7 @@ popd
 # create a script also setting SINGULARPATH
 mkdir -p $RPM_BUILD_ROOT%{_bindir}
 cat > $RPM_BUILD_ROOT%{_bindir}/Singular << EOF
-#!/bin/sh
+#!/bin/bash -i
 
 module load surf-geometry-%{_arch}
 SINGULARPATH=%{singulardir} %{singulardir}/Singular-%{upstreamver} "\$@"
@@ -386,7 +390,7 @@ chmod +x $RPM_BUILD_ROOT%{_bindir}/Singular
 
 # TSingular
 cat > $RPM_BUILD_ROOT%{_bindir}/TSingular << EOF
-#!/bin/sh
+#!/bin/bash -i
 
 module load surf-geometry-%{_arch}
 %{singulardir}/TSingular --singular %{_bindir}/Singular "\$@"
@@ -398,7 +402,7 @@ chmod 644 $RPM_BUILD_ROOT%{singulardir}/LIB/*.lib
 
 # surfex
 cat > $RPM_BUILD_ROOT%{_bindir}/surfex << EOF
-#!/bin/sh
+#!/bin/bash -i
 
 module load surf-geometry-%{_arch}
 %{singulardir}/surfex %{singulardir}/LIB/surfex "\$@"
@@ -423,7 +427,7 @@ mv $RPM_BUILD_ROOT%{_emacs_sitelispdir}/singular/.emacs-singular \
 
 # ESingular
 cat > $RPM_BUILD_ROOT%{_bindir}/ESingular << EOF
-#!/bin/sh
+#!/bin/bash -i
 
 module load surf-geometry-%{_arch}
 export ESINGULAR_EMACS_LOAD=%{_emacs_sitestartdir}/singular-init.el
@@ -548,6 +552,8 @@ sed -e 's|<\(cf_gmp.h>\)|<factory/\1|' \
 %changelog
 * Sun Jul 19 2015 pcpa <paulo.cesar.pereira.de.andrade@gmail.com> - 3.1.6-16
 - Disable polymake due to broken dependency cycle
+- Correct previous perl warning that is now an error
+- Use interactive bash on wrappers to work with other login shells (#1243580)
 
 * Tue Jun 16 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.1.6-15
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild

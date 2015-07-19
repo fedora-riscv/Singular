@@ -1,0 +1,24 @@
+diff -up Singular-3-1-6/doc/texi2html.orig Singular-3-1-6/doc/texi2html
+--- Singular-3-1-6/doc/texi2html.orig	2015-07-19 15:56:21.013441826 -0300
++++ Singular-3-1-6/doc/texi2html	2015-07-19 15:56:41.736442620 -0300
+@@ -4898,9 +4898,9 @@ sub update_sec_num {
+     my $ret;
+ 
+     $level--; # here we start at 0
+-    if ($name =~ /^appendix/ || defined(@appendix_sec_num)) {
++    if ($name =~ /^appendix/ || @appendix_sec_num) {
+ 	# appendix style
+-	if (defined(@appendix_sec_num)) {
++	if (@appendix_sec_num) {
+ 	    &incr_sec_num($level, @appendix_sec_num);
+ 	} else {
+ 	    @appendix_sec_num = ('A', 0, 0, 0);
+@@ -4908,7 +4908,7 @@ sub update_sec_num {
+ 	$ret = join('.', @appendix_sec_num[0..$level]);
+     } else {
+ 	# normal style
+-	if (defined(@normal_sec_num)) 
++	if (@normal_sec_num)
+ 	{
+ 	  &incr_sec_num($level, @normal_sec_num);
+ 	} 
