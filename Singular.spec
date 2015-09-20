@@ -18,7 +18,7 @@
 
 Name:		Singular
 Version:	%(tr - . <<<%{upstreamver})
-Release:	16%{?dist}
+Release:	17%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 Group:		Applications/Engineering
 License:	BSD and LGPLv2+ and GPLv2+
@@ -550,6 +550,9 @@ sed -e 's|<\(cf_gmp.h>\)|<factory/\1|' \
 %{_emacs_sitestartdir}/singular-init.el
 
 %changelog
+* Sat Sep 19 2015 Jerry James <loganjerry@gmail.com> - 3.1.6-17
+- Rebuild for flint 2.5.2 and ntl 9.3.0
+
 * Sun Jul 19 2015 pcpa <paulo.cesar.pereira.de.andrade@gmail.com> - 3.1.6-16
 - Disable polymake due to broken dependency cycle
 - Correct previous perl warning that is now an error
