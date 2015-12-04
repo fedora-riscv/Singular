@@ -2,12 +2,8 @@
 %global singulardir	%{_libdir}/Singular
 %global upstreamver	3-1-6
 
-%if 0%{?fedora} > 20
-%global ntl8 1
-%else
 %if 0%{?fedora}
-%global ntl6 1
-%endif
+%global ntl8 1
 %endif
 
 # If a library used by both polymake and Singular is updated, neither can be
@@ -18,7 +14,7 @@
 
 Name:		Singular
 Version:	%(tr - . <<<%{upstreamver})
-Release:	19%{?dist}
+Release:	20%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 Group:		Applications/Engineering
 License:	BSD and LGPLv2+ and GPLv2+
@@ -33,7 +29,7 @@ BuildRequires:	flint-devel
 BuildRequires:	gmp-devel
 BuildRequires:	libxml2-devel
 BuildRequires:	ncurses-devel
-BuildRequires:	ntl-devel%{?ntl8: >= 8.0}%{?ntl6: >= 6.0}
+BuildRequires:	ntl-devel%{?ntl8: >= 8.0}
 %if %{with polymake}
 BuildRequires:	polymake-devel
 %endif
@@ -67,8 +63,6 @@ Patch6:		Singular-undefined.patch
 
 # Add missing #include directives in the semaphore code
 Patch11:	Singular-semaphore.patch
-# Adapt to new template code in NTL 6
-Patch12:	Singular-ntl6.patch
 # Support ARM and S390(x) architectures
 Patch13:	Singular-arches.patch
 # Adapt to changes in flint 2.4
@@ -182,9 +176,6 @@ Emacs mode for Singular.
 %patch6 -p1 -b .undefined
 
 %patch11 -p1
-%if 0%{?ntl6:1}
-%patch12 -p1
-%endif
 %patch13 -p1
 %patch14 -p1 -b .flint24
 %if 0%{?ntl8:1}
@@ -550,6 +541,10 @@ sed -e 's|<\(cf_gmp.h>\)|<factory/\1|' \
 %{_emacs_sitestartdir}/singular-init.el
 
 %changelog
+* Fri Dec  4 2015 Jerry James <loganjerry@gmail.com> - 3.1.6-20
+- Rebuild for ntl 9.6.2
+- Drop obsolete ntl6 patch
+
 * Fri Oct 16 2015 Jerry James <loganjerry@gmail.com> - 3.1.6-19
 - Rebuild for ntl 9.4.0
 
