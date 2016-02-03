@@ -14,7 +14,7 @@
 
 Name:		Singular
 Version:	%(tr - . <<<%{upstreamver})
-Release:	20%{?dist}
+Release:	21%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 Group:		Applications/Engineering
 License:	BSD and LGPLv2+ and GPLv2+
@@ -541,6 +541,9 @@ sed -e 's|<\(cf_gmp.h>\)|<factory/\1|' \
 %{_emacs_sitestartdir}/singular-init.el
 
 %changelog
+* Wed Feb 03 2016 Fedora Release Engineering <releng@fedoraproject.org> - 3.1.6-21
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
+
 * Fri Dec  4 2015 Jerry James <loganjerry@gmail.com> - 3.1.6-20
 - Rebuild for ntl 9.6.2
 - Drop obsolete ntl6 patch
