@@ -1,6 +1,6 @@
 #%#undefine _hardened_build
 %global singulardir	%{_libdir}/Singular
-%global upstreamver	3-1-6
+%global upstreamver	3-1-7
 
 %if 0%{?fedora}
 %global ntl8 1
@@ -14,7 +14,7 @@
 
 Name:		Singular
 Version:	%(tr - . <<<%{upstreamver})
-Release:	21%{?dist}
+Release:	1%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 Group:		Applications/Engineering
 License:	BSD and LGPLv2+ and GPLv2+
@@ -22,10 +22,12 @@ Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/%{upstrea
 # TEMPORARY: Remove this once Singular ships an updated version
 Source1:	normaliz.lib
 URL:		http://www.singular.uni-kl.de/
+BuildRequires:	bison
 BuildRequires:	cddlib-devel
 BuildRequires:	emacs
 BuildRequires:	flex
 BuildRequires:	flint-devel
+BuildRequires:	gcc-c++
 BuildRequires:	gmp-devel
 BuildRequires:	libxml2-devel
 BuildRequires:	ncurses-devel
@@ -36,7 +38,7 @@ BuildRequires:	polymake-devel
 BuildRequires:	readline-devel
 # Need uudecode for documentation images in tarball
 BuildRequires:	sharutils
-BuildRequires:	texinfo
+BuildRequires:	texinfo-tex
 BuildRequires:	tex(latex)
 BuildRequires:	zlib-devel
 Requires:	factory-gftables = %{version}-%{release}
@@ -65,23 +67,13 @@ Patch6:		Singular-undefined.patch
 Patch11:	Singular-semaphore.patch
 # Support ARM and S390(x) architectures
 Patch13:	Singular-arches.patch
-# Adapt to changes in flint 2.4
-Patch14:	Singular-flint24.patch
 # Adapt to new template code in NTL 8
 Patch15:	Singular-ntl8.patch
 
-# This should be temporary
-# https://bugzilla.redhat.com/show_bug.cgi?id=1206815
-Patch16:	Singular-gcc5.patch
-
 # Previous perl warning is now an error
 Patch17:	Singular-perl-5.22.patch
-
-## Macaulay2 patches
-Patch20: Singular-M2_factory.patch
-Patch21: Singular-M2_memutil_debuggging.patch
-Patch22: Singular-M2_libfac.patch
-
+# Fix a broken boolean expression
+Patch18:	Singular-boolean.patch
 
 %description
 Singular is a computer algebra system for polynomial computations, with
@@ -177,24 +169,18 @@ Emacs mode for Singular.
 
 %patch11 -p1
 %patch13 -p1
-%patch14 -p1 -b .flint24
 %if 0%{?ntl8:1}
 %patch15 -p1
 %endif
-%patch16 -p1
 %patch17 -p1
-
-#patch20 -p1 -b .M2_factory
-#patch21 -p1 -b .M2_memutil_debuggging
-#patch22 -p1 -b .M2_libfac
+%patch18 -p1
 
 sed -i -e "s|gftabledir=.*|gftabledir='%{singulardir}/LIB/gftables'|"	\
     -e "s|explicit_gftabledir=.*|explicit_gftabledir='%{singulardir}/LIB/gftables'|" \
     factory/configure.in factory/configure
 
 # Build the debug libfactory with the right CFLAGS
-sed -i 's/\($(CPPFLAGS)\) \($(FLINT_CFLAGS)\)/\1 $(CFLAGS) \2/' \
-    factory/GNUmakefile.in
+sed -i '/FLINT/s/\($(CPPFLAGS)\)$/\1 $(CFLAGS)/' factory/GNUmakefile.in
 
 # Build the debug kernel with the right CFLAGS
 sed -ri 's/(C(XX)?FLAGS)(.*= )-g/\1\3$(\1)/' kernel/Makefile.in
@@ -203,9 +189,10 @@ sed -ri 's/(C(XX)?FLAGS)(.*= )-g/\1\3$(\1)/' kernel/Makefile.in
 sed -r 's/(\$\{CXX\})[[:blank:]]+(-O2[[:blank:]]+)?(\$\{CPPFLAGS\})/\1 $\{CXXFLAGS\} \3/' \
     -i Singular/Makefile.in
 
-# Fix permissions
-sed -i 's,${INSTALL_PROGRAM} libsingular.h,${INSTALL_DATA} libsingular.h,' \
-    Singular/Makefile.in
+# Fix permissions and preserve timestamps
+sed -e 's,${INSTALL_PROGRAM} libsingular.h,${INSTALL_DATA} libsingular.h,' \
+    -e 's/cp /&-p /' \
+    -i Singular/Makefile.in
 
 # Force use of system ntl
 rm -fr ntl
@@ -228,18 +215,19 @@ sed -ri 's/@(prefix|exec_prefix|libdir|includedir)@/$(DESTDIR)&/g' \
 # Fix the default paths
 sed -e 's/"S_UNAME"/Singular/' \
     -e 's/"S_UNAME/Singular"/' \
+    -e 's/S_VERSION1/ &/' \
     -e 's,%b/\.\.,%b,' \
     -e 's,S_ROOT_DIR,"%{_libdir}",' \
     -i.orig kernel/feResource.cc
 touch -r kernel/feResource.cc.orig kernel/feResource.cc
 
-%if 0%{?fedora} > 20
+%if 0%{?fedora}
 # TEMPORARY: Remove this once Singular ships an updated version
 cp -p %{SOURCE1} Singular/LIB
 %endif
 
 %build
-export CFLAGS="%{optflags} -fPIC -fsigned-char -I%{_includedir}/cddlib -I%{_includedir}/flint"
+export CFLAGS="%{optflags} -fPIC -fsigned-char -fno-delete-null-pointer-checks -I%{_includedir}/cddlib -I%{_includedir}/flint"
 export CXXFLAGS=$CFLAGS
 export LDFLAGS="$RPM_LD_FLAGS -Wl,--as-needed -L$PWD/gfanlib"
 export LIBS="-lpthread -ldl"
@@ -281,7 +269,7 @@ make %{?_smp_mflags} -C gfanlib
 %endif
 
 pushd factory
-CFLAGS="%{optflags} -fPIC -fsigned-char -I%{_includedir}/cddlib -I%{_includedir}/flint"
+CFLAGS="%{optflags} -fPIC -fsigned-char -fno-delete-null-pointer-checks -I%{_includedir}/cddlib -I%{_includedir}/flint"
 CXXFLAGS=$CFLAGS
 LDFLAGS="$RPM_LD_FLAGS -Wl,--as-needed -L$PWD/gfanlib"
 LIBS="-lpthread -ldl"
@@ -369,6 +357,9 @@ pushd $RPM_BUILD_ROOT%{_libdir}
     mv dbmsr.so p_Procs*.so Singular
 popd
 
+# remove script that calls surf; we don't ship it
+rm -f $RPM_BUILD_ROOT%{singulardir}/singularsurf
+
 # create a script also setting SINGULARPATH
 mkdir -p $RPM_BUILD_ROOT%{_bindir}
 cat > $RPM_BUILD_ROOT%{_bindir}/Singular << EOF
@@ -437,7 +428,7 @@ pushd factory
     make DESTDIR=$RPM_BUILD_ROOT install
 # make a version without singular defined
     make clean
-    CFLAGS="%{optflags} -fPIC -fsigned-char -I%{_includedir}/cddlib -I%{_includedir}/flint"
+    CFLAGS="%{optflags} -fPIC -fsigned-char -fno-delete-null-pointer-checks -I%{_includedir}/cddlib -I%{_includedir}/flint"
     CXXFLAGS=$CFLAGS
     LDFLAGS="$RPM_LD_FLAGS -Wl,--as-needed -L$PWD/gfanlib"
     LIBS="-lpthread -ldl"
@@ -541,6 +532,11 @@ sed -e 's|<\(cf_gmp.h>\)|<factory/\1|' \
 %{_emacs_sitestartdir}/singular-init.el
 
 %changelog
+* Sat Feb 20 2016 Jerry James <loganjerry@gmail.com> - 3.1.7-1
+- Update to 3.1.7; fixes FTBFS (bz 1307301)
+- Drop upstreamed -flint24 and -gcc5 patches
+- Add -boolean patch to fix a malformed boolean expression
+
 * Wed Feb 03 2016 Fedora Release Engineering <releng@fedoraproject.org> - 3.1.6-21
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
 

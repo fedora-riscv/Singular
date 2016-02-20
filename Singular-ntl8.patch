@@ -1,5 +1,6 @@
---- Singular-3-1-6/factory/NTLconvert.cc.orig	2012-12-19 14:01:16.000000000 -0700
-+++ Singular-3-1-6/factory/NTLconvert.cc	2015-01-12 20:00:00.000000000 -0700
+diff -up Singular-3-1-7/factory/NTLconvert.cc.orig Singular-3-1-7/factory/NTLconvert.cc
+--- Singular-3-1-7/factory/NTLconvert.cc.orig	2014-08-06 09:59:15.000000000 -0600
++++ Singular-3-1-7/factory/NTLconvert.cc	2016-02-15 22:02:11.477940005 -0700
 @@ -55,6 +55,63 @@
  NTL_CLIENT
  #endif

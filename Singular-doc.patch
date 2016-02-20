@@ -1,7 +1,7 @@
-diff -up Singular-3-1-5/doc/Makefile.in.orig Singular-3-1-5/doc/Makefile.in
---- Singular-3-1-5/doc/Makefile.in.orig	2012-08-04 17:58:04.824209703 -0400
-+++ Singular-3-1-5/doc/Makefile.in	2012-08-04 17:59:02.478211895 -0400
-@@ -62,14 +62,14 @@ SINGULAR_LIB_DIR= ../Singular/LIB
+diff -up Singular-3-1-7/doc/Makefile.in.orig Singular-3-1-7/doc/Makefile.in
+--- Singular-3-1-7/doc/Makefile.in.orig	2016-02-15 20:50:21.520456080 -0700
++++ Singular-3-1-7/doc/Makefile.in	2016-02-15 21:20:09.517213137 -0700
+@@ -61,14 +61,14 @@ SINGULAR_LIB_DIR= ../Singular/LIB
  ifeq ($(SINGUNAME),"ix86-Win")
  LIBPARSE        = ${bindir}/libparse.exe
  else
@@ -18,17 +18,9 @@ diff -up Singular-3-1-5/doc/Makefile.in.orig Singular-3-1-5/doc/Makefile.in
  		  -exdir ${EX_SUBDIR} ${DOC2TEX_EXAMPLE_EXCLUSIONS}
  TAG		=
  PL2DOC		= ${PERL} ./pl2doc.pl ${TAG} -db ${CHKSUM_DB}
-@@ -322,7 +322,6 @@ install-sharedist: singular.hlp html sin
- 	${MKINSTALLDIRS} ${install_htmldir}
- 	cp ${HTML_SUBDIR}/*.htm ${install_htmldir}
- 	cp ${HTML_SUBDIR}/*.gif ${install_htmldir}
--	-cp ${HTML_SUBDIR}/*.png ${install_htmldir}
- 	cp ${HTML_SUBDIR}/*.jpg ${install_htmldir}
- 	chmod -R +rX ${install_htmldir}
- 	${MKINSTALLDIRS} ${install_docdir}
-diff -up Singular-3-1-5/emacs/Makefile.in.orig Singular-3-1-5/emacs/Makefile.in
---- Singular-3-1-5/emacs/Makefile.in.orig	2012-08-04 17:59:10.208212218 -0400
-+++ Singular-3-1-5/emacs/Makefile.in	2012-08-04 18:01:33.510217756 -0400
+diff -up Singular-3-1-7/emacs/Makefile.in.orig Singular-3-1-7/emacs/Makefile.in
+--- Singular-3-1-7/emacs/Makefile.in.orig	2014-08-06 09:59:15.000000000 -0600
++++ Singular-3-1-7/emacs/Makefile.in	2016-02-15 21:25:02.126618087 -0700
 @@ -6,11 +6,12 @@
  SHELL=/bin/sh
  
@@ -108,6 +100,5 @@ diff -up Singular-3-1-5/emacs/Makefile.in.orig Singular-3-1-5/emacs/Makefile.in
 +	${INSTALL_DATA} .emacs-general $(DESTDIR)${emacsdir}
  
  depend:
--	@echo "No make depend available!"
+ 	@echo "No make depend available!"
 \ No newline at end of file
-+	@echo "No make depend available!"
