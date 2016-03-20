@@ -14,7 +14,7 @@
 
 Name:		Singular
 Version:	%(tr - . <<<%{upstreamver})
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 Group:		Applications/Engineering
 License:	BSD and LGPLv2+ and GPLv2+
@@ -532,6 +532,9 @@ sed -e 's|<\(cf_gmp.h>\)|<factory/\1|' \
 %{_emacs_sitestartdir}/singular-init.el
 
 %changelog
+* Sat Mar 19 2016 Jerry James <loganjerry@gmail.com> - 3.1.7-2
+- Rebuild for ntl 9.7.0
+
 * Sat Feb 20 2016 Jerry James <loganjerry@gmail.com> - 3.1.7-1
 - Update to 3.1.7; fixes FTBFS (bz 1307301)
 - Drop upstreamed -flint24 and -gcc5 patches
