@@ -14,7 +14,7 @@
 
 Name:		Singular
 Version:	%(tr - . <<<%{upstreamver})
-Release:	2%{?dist}
+Release:	3%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 Group:		Applications/Engineering
 License:	BSD and LGPLv2+ and GPLv2+
@@ -220,6 +220,9 @@ sed -e 's/"S_UNAME"/Singular/' \
     -e 's,S_ROOT_DIR,"%{_libdir}",' \
     -i.orig kernel/feResource.cc
 touch -r kernel/feResource.cc.orig kernel/feResource.cc
+
+# Build with polymake 3.x
+sed -i '/SUPPORTEDPOLYMAKEVERSION/s/212/30/' callpolymake/configure
 
 %if 0%{?fedora}
 # TEMPORARY: Remove this once Singular ships an updated version
@@ -532,6 +535,9 @@ sed -e 's|<\(cf_gmp.h>\)|<factory/\1|' \
 %{_emacs_sitestartdir}/singular-init.el
 
 %changelog
+* Tue Apr 12 2016 Jerry James <loganjerry@gmail.com> - 3.1.7-3
+- Rebuild for polymake 3.0r1
+
 * Sat Mar 19 2016 Jerry James <loganjerry@gmail.com> - 3.1.7-2
 - Rebuild for ntl 9.7.0
 
