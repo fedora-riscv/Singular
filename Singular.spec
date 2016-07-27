@@ -10,7 +10,7 @@
 # rebuilt, because each BRs the other and both are linked against the old
 # version of the library.  Use this to rebuild Singular without polymake
 # support, rebuild polymake, then build Singular again with polymake support.
-%bcond_without polymake
+%bcond_with polymake
 
 Name:		Singular
 Version:	%(tr - . <<<%{upstreamver})
