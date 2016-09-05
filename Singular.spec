@@ -14,7 +14,7 @@
 
 Name:		Singular
 Version:	%(tr - . <<<%{upstreamver})
-Release:	7%{?dist}
+Release:	8%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 Group:		Applications/Engineering
 License:	BSD and LGPLv2+ and GPLv2+
@@ -535,6 +535,9 @@ sed -e 's|<\(cf_gmp.h>\)|<factory/\1|' \
 %{_emacs_sitestartdir}/singular-init.el
 
 %changelog
+* Mon Sep  5 2016 Jerry James <loganjerry@gmail.com> - 3.1.7-8
+- Rebuild for ntl 9.11.0
+
 * Tue Jul 26 2016 Jerry James <loganjerry@gmail.com> - 3.1.7-7
 - Rebuild with polymake support
 
