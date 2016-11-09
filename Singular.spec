@@ -10,11 +10,11 @@
 # rebuilt, because each BRs the other and both are linked against the old
 # version of the library.  Use this to rebuild Singular without polymake
 # support, rebuild polymake, then build Singular again with polymake support.
-%bcond_without polymake
+%bcond_with polymake
 
 Name:		Singular
 Version:	%(tr - . <<<%{upstreamver})
-Release:	9%{?dist}
+Release:	10%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 Group:		Applications/Engineering
 License:	BSD and LGPLv2+ and GPLv2+
@@ -535,6 +535,9 @@ sed -e 's|<\(cf_gmp.h>\)|<factory/\1|' \
 %{_emacs_sitestartdir}/singular-init.el
 
 %changelog
+* Wed Nov  9 2016 Paul Howarth <paul@city-fan.org> - 3.1.7-10
+- Bootstrap build for ppc64
+
 * Thu Oct 20 2016 Jerry James <loganjerry@gmail.com> - 3.1.7-9
 - Rebuild for ntl 10.1.0
 
