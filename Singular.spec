@@ -14,7 +14,7 @@
 
 Name:		Singular
 Version:	%(tr - . <<<%{upstreamver})
-Release:	10%{?dist}
+Release:	11%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 Group:		Applications/Engineering
 License:	BSD and LGPLv2+ and GPLv2+
@@ -535,6 +535,9 @@ sed -e 's|<\(cf_gmp.h>\)|<factory/\1|' \
 %{_emacs_sitestartdir}/singular-init.el
 
 %changelog
+* Thu Jan 12 2017 Igor Gnatenko <ignatenko@redhat.com> - 3.1.7-11
+- Rebuild for readline 7.x
+
 * Wed Nov  9 2016 Paul Howarth <paul@city-fan.org> - 3.1.7-10
 - Bootstrap build for ppc64
 
