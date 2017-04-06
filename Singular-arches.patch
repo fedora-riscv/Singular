@@ -1,267 +1,41 @@
-diff -up Singular-3-1-7/kernel/mod2.h.cmake.in.orig Singular-3-1-7/kernel/mod2.h.cmake.in
---- Singular-3-1-7/kernel/mod2.h.cmake.in.orig	2014-08-06 09:59:15.000000000 -0600
-+++ Singular-3-1-7/kernel/mod2.h.cmake.in	2016-02-15 21:49:18.052275064 -0700
-@@ -157,6 +157,12 @@
- #cmakedefine SI_CPU_IA64 1
- /* CPU type: x86_64: */
- #cmakedefine SI_CPU_X86_64 1
-+/* CPU type: arm: */
-+#cmakedefine SI_CPU_ARM 1
-+/* CPU type: s390 / s390x: */
-+#cmakedefine SI_CPU_S390 1
-+/* CPU type: aarch64: */
-+#cmakedefine SI_CPU_AARCH64 1
- 
- /*******************************************************************
-  * Defines which are not set by configure
-diff -up Singular-3-1-7/kernel/mod_raw.cc.orig Singular-3-1-7/kernel/mod_raw.cc
---- Singular-3-1-7/kernel/mod_raw.cc.orig	2014-08-06 09:59:15.000000000 -0600
-+++ Singular-3-1-7/kernel/mod_raw.cc	2016-02-15 21:53:02.950149126 -0700
-@@ -38,8 +38,8 @@ char* si_bultin_libs[]={ SI_FOREACH_BUIL
- 
- lib_types type_of_LIB(char *newlib, char *libnamebuf)
- {
--  const char mach_o[]={0xfe,0xed,0xfa,0xce,0};
--  const char mach_o_module[]={0xce,0xfa,0xed,0xfe,0};
-+  const unsigned char mach_o[]={0xfe,0xed,0xfa,0xce,0};
-+  const unsigned char mach_o_module[]={0xce,0xfa,0xed,0xfe,0};
-   int i=0;
-   while(si_bultin_libs[i]!=NULL)
-   {
-@@ -90,7 +90,7 @@ lib_types type_of_LIB(char *newlib, char
-     goto lib_type_end;
-   }
- 
--  if( (strncmp(buf, &mach_o[0], 4)==0)) /* generic Mach-O module */
-+  if( (strncmp(buf, (const char *)&mach_o[0], 4)==0)) /* generic Mach-O module */
-   {
-     LT = LT_MACH_O;
-     //omFree(newlib);
-@@ -98,7 +98,7 @@ lib_types type_of_LIB(char *newlib, char
-     goto lib_type_end;
-   }
- 
--  if( (strncmp(buf, &mach_o_module[0], 4)==0)) /* Mach-O bundle */
-+  if( (strncmp(buf, (const char *)&mach_o_module[0], 4)==0)) /* Mach-O bundle */
-   {
-     LT = LT_MACH_O;
-     //omFree(newlib);
-diff -up Singular-3-1-7/kernel/structs.h.orig Singular-3-1-7/kernel/structs.h
---- Singular-3-1-7/kernel/structs.h.orig	2014-08-06 09:59:15.000000000 -0600
-+++ Singular-3-1-7/kernel/structs.h	2016-02-15 21:49:18.053274984 -0700
-@@ -69,6 +69,27 @@ typedef void * ADDRESS;
-   #ifdef HAVE_MULT_MOD
-   #define HAVE_DIV_MOD
-   #endif
-+#elif defined(SI_CPU_ARM)
-+  // FIXME: need to run some tests
-+  #define HAVE_MULT_MOD
-+  // #define HAVE_GENERIC_ADD
-+  #ifdef HAVE_MULT_MOD
-+  #define HAVE_DIV_MOD
-+  #endif
-+#elif defined(SI_CPU_S390)
-+  // FIXME: need to run some tests
-+  // #define HAVE_MULT_MOD
-+  #define HAVE_GENERIC_ADD
-+  // #ifdef HAVE_MULT_MOD
-+  // #define HAVE_DIV_MOD
-+  // #endif
-+#elif defined(SI_CPU_AARCH64)
-+  // FIXME: need to run some tests
-+  #define HAVE_MULT_MOD
-+  #define HAVE_GENERIC_ADD
-+  #ifdef HAVE_MULT_MOD
-+  #define HAVE_DIV_MOD
-+  #endif
- #endif
- 
- #if SIZEOF_LONG == 4
-diff -up Singular-3-1-7/Singular/configure.in.orig Singular-3-1-7/Singular/configure.in
---- Singular-3-1-7/Singular/configure.in.orig	2014-08-06 09:59:15.000000000 -0600
-+++ Singular-3-1-7/Singular/configure.in	2016-02-15 21:49:18.054274903 -0700
-@@ -461,6 +461,21 @@ if test "$ac_cv_singuname" = ppcMac-darw
+--- singular-4.1.0/m4/cpu-check.m4.orig	2016-10-14 14:00:05.000000000 -0600
++++ singular-4.1.0/m4/cpu-check.m4	2017-01-16 17:59:49.348670992 -0700
+@@ -37,6 +37,18 @@ if test "$ac_cv_singcpuname" = ppc; then
+   AC_DEFINE(SI_CPU_PPC,1,"PPC")
    AC_SUBST(SI_CPU_PPC)
-   AC_MSG_RESULT(SI_CPU_PPC)
  fi
-+if test "$ac_cv_singuname" = arm-Linux; then
-+  AC_DEFINE(SI_CPU_ARM)
++if test "$ac_cv_singcpuname" = arm -o "$ac_cv_singcpuname" = armel; then
++  AC_DEFINE(SI_CPU_ARM,1,"ARM")
 +  AC_SUBST(SI_CPU_ARM)
-+  AC_MSG_RESULT(SI_CPU_ARM)
-+fi
-+if test "$ac_cv_singuname" = s390-Linux; then
-+  AC_DEFINE(SI_CPU_S390)
-+  AC_SUBST(SI_CPU_S390)
-+  AC_MSG_RESULT(SI_CPU_S390)
-+fi
-+if test "$ac_cv_singuname" = aarch64-Linux; then
-+  AC_DEFINE(SI_CPU_AARCH64)
-+  AC_SUBST(SI_CPU_AARCH64)
-+  AC_MSG_RESULT(SI_CPU_AARCH64)
-+fi
- # test again with CPU names
- if test "$ac_cv_singcpuname" = i386; then
-   AC_DEFINE(SI_CPU_I386)
-@@ -497,6 +512,21 @@ if test "$ac_cv_singcpuname" = armv6l; t
-   AC_SUBST(SI_CPU_ARM6L)
-   AC_MSG_RESULT(SI_CPU_ARM6L)
- fi
-+if test "$ac_cv_singcpuname" = arm; then
-+  AC_DEFINE(SI_CPU_ARM)
-+  AC_SUBST(SI_CPU_ARM)
-+  AC_MSG_RESULT(SI_CPU_ARM)
-+fi
-+if test "$ac_cv_singcpuname" = s390; then
-+  AC_DEFINE(SI_CPU_S390)
-+  AC_SUBST(SI_CPU_S390)
-+  AC_MSG_RESULT(SI_CPU_S390)
 +fi
 +if test "$ac_cv_singcpuname" = aarch64; then
-+  AC_DEFINE(SI_CPU_AARCH64)
++  AC_DEFINE(SI_CPU_AARCH64,1,"AARCH64")
 +  AC_SUBST(SI_CPU_AARCH64)
-+  AC_MSG_RESULT(SI_CPU_AARCH64)
-+fi
- 
- SING_UNAME=`echo $SINGUNAME | tr '-' '_' `
- AC_SUBST(SING_UNAME)
-diff -up Singular-3-1-7/Singular/configure.orig Singular-3-1-7/Singular/configure
---- Singular-3-1-7/Singular/configure.orig	2014-08-06 09:59:15.000000000 -0600
-+++ Singular-3-1-7/Singular/configure	2016-02-15 21:51:43.817526924 -0700
-@@ -676,6 +676,9 @@ SINGULAR_MAJOR_VERSION
- VERSION_DATE
- SINGULAR_VERSION
- SING_UNAME
-+SI_CPU_ARM
-+SI_CPU_S390
-+SI_CPU_AARCH64
- SI_CPU_ARM6L
- SI_CPU_SPARC
- SI_CPU_PPC
-@@ -3965,6 +3968,27 @@ if test "$ac_cv_singuname" = ppcMac-darw
-   { $as_echo "$as_me:${as_lineno-$LINENO}: result: SI_CPU_PPC" >&5
- $as_echo "SI_CPU_PPC" >&6; }
- fi
-+if test "$ac_cv_singuname" = arm-Linux; then
-+  $as_echo "#define SI_CPU_ARM 1" >>confdefs.h
-+
-+
-+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: SI_CPU_ARM" >&5
-+$as_echo "SI_CPU_ARM" >&6; }
-+fi
-+if test "$ac_cv_singuname" = s390-Linux; then
-+  $as_echo "#define SI_CPU_S390 1" >>confdefs.h
-+
-+
-+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: SI_CPU_S390" >&5
-+$as_echo "SI_CPU_S390" >&6; }
-+fi
-+if test "$ac_cv_singuname" = aarch64-Linux; then
-+  $as_echo "#define SI_CPU_AARCH64 1" >>confdefs.h
-+
-+
-+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: SI_CPU_AARCH64" >&5
-+$as_echo "SI_CPU_AARCH64" >&6; }
-+fi
- # test again with CPU names
- if test "$ac_cv_singcpuname" = i386; then
-   $as_echo "#define SI_CPU_I386 1" >>confdefs.h
-@@ -4008,6 +4032,27 @@ if test "$ac_cv_singcpuname" = ppc; then
-   { $as_echo "$as_me:${as_lineno-$LINENO}: result: SI_CPU_PPC" >&5
- $as_echo "SI_CPU_PPC" >&6; }
- fi
-+if test "$ac_cv_singcpuname" = arm; then
-+  $as_echo "#define SI_CPU_ARM 1" >>confdefs.h
-+
-+
-+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: SI_CPU_ARM" >&5
-+$as_echo "SI_CPU_ARM" >&6; }
 +fi
 +if test "$ac_cv_singcpuname" = s390; then
-+  $as_echo "#define SI_CPU_S390 1" >>confdefs.h
-+
-+
-+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: SI_CPU_S390" >&5
-+$as_echo "SI_CPU_S390" >&6; }
++  AC_DEFINE(SI_CPU_S390,1,"S390")
++  AC_SUBST(SI_CPU_S390)
 +fi
-+if test "$ac_cv_singcpuname" = aarch64; then
-+  $as_echo "#define SI_CPU_AARCH64 1" >>confdefs.h
-+
-+
-+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: SI_CPU_AARCH64" >&5
-+$as_echo "SI_CPU_AARCH64" >&6; }
-+fi
- if test "$ac_cv_singcpuname" = armv6l; then
-   $as_echo "#define SI_CPU_ARM6L 1" >>confdefs.h
  
-diff -up Singular-3-1-7/Singular/mod2.h.in.orig Singular-3-1-7/Singular/mod2.h.in
---- Singular-3-1-7/Singular/mod2.h.in.orig	2014-08-06 09:59:15.000000000 -0600
-+++ Singular-3-1-7/Singular/mod2.h.in	2016-02-15 21:49:18.057274661 -0700
-@@ -162,6 +162,12 @@
- #undef SI_CPU_IA64
- /* CPU type: x86_64: */
- #undef SI_CPU_X86_64
-+/* CPU type: arm: */
-+#undef SI_CPU_ARM
-+/* CPU type: s390 / s390x: */
-+#undef SI_CPU_S390
-+/* CPU type: aarch64: */
-+#undef SI_CPU_AARCH64
- /* Autoload reference counted types like reference and shared */
- #undef SI_COUNTEDREF_AUTOLOAD
- /* whether development version of python is available */
-diff -up Singular-3-1-7/singuname.sh.orig Singular-3-1-7/singuname.sh
---- Singular-3-1-7/singuname.sh.orig	2014-08-06 09:59:15.000000000 -0600
-+++ Singular-3-1-7/singuname.sh	2016-02-15 21:49:18.057274661 -0700
-@@ -202,7 +202,7 @@ then
- elif (echo $uname_m | $egrep "Power Macintosh" > $devnull)
- then
-     prefix="ppcMac"
--    if( uname -s | $egrep "Darwin" > $devnull)
-+    if (uname -s | $egrep "Darwin" > $devnull)
-     then
-         echo ${prefix}-darwin
-         exit 0
-@@ -247,7 +247,42 @@ then
-         echo ${prefix}-Unknown
-         exit 1
-     fi
--
-+# arm-Linux ##########################################################
-+elif (echo $uname_m | $egrep "arm" > $devnull)
-+then
-+    prefix=arm
-+    if (echo $uname_a | $egrep "Linux" > $devnull)
-+    then
-+        echo ${prefix}-Linux
-+        exit 0
-+    else
-+        echo ${prefix}-Unknown
-+        exit 1
-+    fi
-+# s390(x)-Linux ######################################################
-+elif (echo $uname_m | $egrep "s390" > $devnull)
-+then
-+    prefix=s390
-+    if (echo $uname_a | $egrep "Linux" > $devnull)
-+    then
-+        echo ${prefix}-Linux
-+        exit 0
-+    else
-+        echo ${prefix}-Unknown
-+        exit 1
-+    fi
-+# aarch64-Linux ##########################################################
-+elif (echo $uname_m | $egrep "aarch64" > $devnull)
-+then
-+    prefix=aarch64
-+    if (echo $uname_a | $egrep "Linux" > $devnull)
-+    then
-+        echo ${prefix}-Linux
-+        exit 0
-+    else
-+        echo ${prefix}-Unknown
-+        exit 1
-+    fi
- else # Unknown ########################################################
-     echo Unknown
-     exit 2
+ # UNAME and PATH
+ AC_MSG_CHECKING(uname for Singular)
+@@ -61,6 +73,19 @@ dnl the following settings seems to be b
+ dnl the following settings seems to be better on ppc processors
+ dnl testet on: ppc_Linux, 740/750 PowerMac G3, 512k L2 cache
+   [powerpc*|ppc*], [AC_DEFINE(HAVE_MULT_MOD,1,multiplication is fast on the cpu: a*b is with mod otherwise using tables of logartihms)],
++dnl FIXME: need to run some tests
++  [arm*], [
++            AC_DEFINE(HAVE_MULT_MOD,1,multiplication is fast on the cpu: a*b is with mod otherwise using tables of logartihms)
++            AC_DEFINE(HAVE_DIV_MOD,1,division using extend euclidian algorithm otherwise using tables of logartihms)
++            ],
++dnl FIXME: need to run some tests
++  [aarch64*], [
++            AC_DEFINE(HAVE_MULT_MOD,1,multiplication is fast on the cpu: a*b is with mod otherwise using tables of logartihms)
++            AC_DEFINE(HAVE_GENERIC_ADD,1,use branch for addition in Z/p otherwise it uses a generic add)
++            AC_DEFINE(HAVE_DIV_MOD,1,division using extend euclidian algorithm otherwise using tables of logartihms)
++            ],
++dnl FIXME: need to run some tests
++  [s390*], [AC_DEFINE(HAVE_GENERIC_ADD,1,use branch for addition in Z/p otherwise it uses a generic add)],
+   []
+ )
+ 

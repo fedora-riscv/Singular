@@ -1,0 +1,29 @@
+--- singular-4.1.0/Singular/dyn_modules/polymake/polymake_conversion.cc.orig	2017-02-20 10:33:27.000000000 -0700
++++ singular-4.1.0/Singular/dyn_modules/polymake/polymake_conversion.cc	2017-03-31 14:50:50.480769619 -0600
+@@ -120,7 +120,7 @@ int PmInteger2Int(const polymake::Intege
+   int i=0;
+   try
+   {
+-    i = pi.to_int();
++    i = (int)pi;
+   }
+   catch (const std::exception& ex)
+   {
+@@ -158,7 +158,7 @@ intvec* PmMatrixInteger2Intvec (polymake
+   int rows = mi->rows();
+   int cols = mi->cols();
+   intvec* iv = new intvec(rows,cols,0);
+-  const polymake::Integer* pi = concat_rows(*mi).begin();
++  pm::array_traits<pm::Integer>::iterator pi = concat_rows(*mi).begin();
+   for (int r = 1; r <= rows; r++)
+     for (int c = 1; c <= cols; c++)
+     {
+@@ -173,7 +173,7 @@ bigintmat* PmMatrixInteger2Bigintmat (po
+   int rows = mi->rows();
+   int cols = mi->cols();
+   bigintmat* bim= new bigintmat(rows,cols,coeffs_BIGINT);
+-  const polymake::Integer* pi = concat_rows(*mi).begin();
++  pm::array_traits<pm::Integer>::iterator pi = concat_rows(*mi).begin();
+   for (int r = 1; r <= rows; r++)
+     for (int c = 1; c <= cols; c++)
+     {

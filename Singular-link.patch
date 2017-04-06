@@ -1,52 +1,90 @@
-diff -up Singular-3-1-7/Singular/Makefile.in.orig Singular-3-1-7/Singular/Makefile.in
---- Singular-3-1-7/Singular/Makefile.in.orig	2016-02-15 21:07:59.903073250 -0700
-+++ Singular-3-1-7/Singular/Makefile.in	2016-02-15 21:16:53.916992781 -0700
-@@ -140,7 +140,7 @@ HAVE_MPSR       = @HAVE_MPSR@
- #
- # Handle libSINGULAR stuff
- #
--LIBSINGULAR_LIBS =-lsingfac -lsingcf -lntl -lreadline @FLINT_LIBS@ -lgmp -lomalloc
-+LIBSINGULAR_LIBS =-lsingfac -lsingcf -lntl -lreadline @FLINT_LIBS@ -lgmp -lomalloc -lpthread -ldl
+--- singular-4.1.0/configure.ac.orig	2017-02-20 10:33:27.000000000 -0700
++++ singular-4.1.0/configure.ac	2017-02-27 14:49:09.415812935 -0700
+@@ -253,4 +253,10 @@ AC_CONFIG_FILES([redhat/Makefile])
+ AC_CONFIG_FILES([redhat/singular.spec])
+ AC_CONFIG_FILES([desktop/Makefile desktop/Singular.desktop desktop/Singular-manual.desktop])
  
- SO_SUFFIX = so
++AC_CONFIG_COMMANDS([norpath], [
++sed -e 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' \
++    -e 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' \
++    -e 's|CC="\(g.*\)"|CC="\1 -Wl,--as-needed"|' \
++    -i libtool
++])
+ AC_OUTPUT
+--- singular-4.1.0/factory/configure.ac.orig	2017-02-20 10:34:57.000000000 -0700
++++ singular-4.1.0/factory/configure.ac	2017-02-27 14:49:09.416812931 -0700
+@@ -407,5 +407,11 @@ AC_DEFINE_UNQUOTED([FACTORYCONFIGURATION
  
-@@ -388,13 +388,13 @@ Singular${S_EXT}: mod2.h Makefile versio
- 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} \
- 	  -o Singular${S_EXT} \
- 	  tesths.cc iparith.o mpsr_Tok.o claptmpl.o\
--	  ${OBJS} ${LDFLAGS} ${LIBS} ../kernel/mmalloc.o 
-+	  ${OBJS} ${LDFLAGS} -L../kernel -L../factory -L../libfac -L../omalloc -lkernel ${LIBS} ../kernel/mmalloc.o 
  
- libsingular: mod2.h Makefile version.h $(WIN_LIBS) scanner.cc  ${OBJS} \
-          iparith.o libparse.cc claptmpl.o mpsr_Tok.o $(DL_LIBS) 
- 	$(LIBSINGULAR_LD) ${SLDFLAGS} ${LIBSINGULAR_FLAGS} -o libsingular.${SO_SUFFIX} \
- 	iparith.o mpsr_Tok.o claptmpl.o \
--	${OBJS} -lkernel -L../kernel -L../factory -L../libfac -L${libdir} ${LIBSINGULAR_LIBS}
-+	${OBJS} -L../kernel -L../factory -L../libfac -L../omalloc -lkernel -L${libdir} ${LIBSINGULAR_LIBS}
+ AC_CONFIG_FILES([Makefile include/factory/Makefile factory.pc]) #  ftest/GNUmakefile
++AC_CONFIG_COMMANDS([norpath], [
++sed -e 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' \
++    -e 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' \
++    -e 's|CC="\(g.*\)"|CC="\1 -Wl,--as-needed"|' \
++    -i libtool
++])
+ AC_OUTPUT
  
- libsingular.a: mod2.h Makefile version.h $(WIN_LIBS) scanner.cc  ${OBJS} \
-          iparith.o libparse.cc claptmpl.o mpsr_Tok.o
-@@ -445,7 +445,7 @@ version.h: ${SOURCES} ${HEADERS} Makefil
- 	echo "#define CXX \"" ${CXX} ${CXXFLAGS} ${DEFS} "\"" >>version.h
+--- singular-4.1.0/gfanlib/configure.ac.orig	2017-02-20 10:34:57.000000000 -0700
++++ singular-4.1.0/gfanlib/configure.ac	2017-02-27 14:49:09.416812931 -0700
+@@ -57,4 +57,10 @@ AC_LANG_POP()
  
- libparse: libparse_main.o utils.o
--	${CXX}  ${CPPFLAGS} -DSTANDALONE_PARSER -o libparse libparse_main.o utils.o ../kernel/fegetopt.o ${LDFLAGS2} -lomalloc
-+	${CXX}  ${CPPFLAGS} -DSTANDALONE_PARSER -o libparse libparse_main.o utils.o ../kernel/fegetopt.o ${LDFLAGS2} -L../omalloc -lomalloc
+ AC_CONFIG_FILES([Makefile])
+ ## AC_CONFIG_HEADERS([config.h])
++AC_CONFIG_COMMANDS([norpath], [
++sed -e 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' \
++    -e 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' \
++    -e 's|CC="\(g.*\)"|CC="\1 -Wl,--as-needed"|' \
++    -i libtool
++])
+ AC_OUTPUT
+--- singular-4.1.0/gfanlib/Makefile.am.orig	2017-02-20 10:34:57.000000000 -0700
++++ singular-4.1.0/gfanlib/Makefile.am	2017-02-27 14:49:09.416812931 -0700
+@@ -2,6 +2,7 @@ ACLOCAL_AMFLAGS = -I ../m4
  
- libparse_main.o: libparse.cc
- 	${CXX} ${CPPFLAGS} -c -o libparse_main.o libparse.cc  -DSTANDALONE_PARSER
-@@ -466,12 +466,12 @@ libparse.cc: libparse.l
- ESingular: mod2.h feOpt.cc version.h emacs.cc \
-            feOptES.inc
- 	${CXX} -O2 ${CPPFLAGS} ${DEFS} -DESINGULAR -DPROTO -o ESingular emacs.cc ../kernel/fegetopt.o \
--	${LDFLAGS} ${LIBS} ../kernel/mmalloc.o
-+	${LDFLAGS} -L../kernel -L../factory -L../libfac -L../omalloc ${LIBS} ../kernel/mmalloc.o
+ if HAVE_GFANLIB
+   libgfan_LTLIBRARIES=libgfan.la
++  libgfan_la_LIBADD=-lcddgmp -lgmp
+ endif
  
- TSingular: mod2.h feOpt.cc version.h emacs.cc \
-            feOptTS.inc
- 	${CXX} -O2 ${CPPFLAGS} ${DEFS} -DTSINGULAR -DPROTO -o TSingular emacs.cc ../kernel/fegetopt.o \
--	${LDFLAGS} ${LIBS} ../kernel/mmalloc.o
-+	${LDFLAGS} -L../kernel -L../factory -L../libfac -L../omalloc ${LIBS} ../kernel/mmalloc.o
+ libgfandir = $(libdir)
+--- singular-4.1.0/libpolys/configure.ac.orig	2017-02-20 10:34:57.000000000 -0700
++++ singular-4.1.0/libpolys/configure.ac	2017-02-27 14:49:09.416812931 -0700
+@@ -149,4 +149,10 @@ AC_CONFIG_FILES([coeffs/Makefile])
+ AC_CONFIG_FILES([polys/Makefile])
+ AC_CONFIG_FILES([tests/Makefile])
+ AC_CONFIG_FILES([libpolys-config libpolys.pc])
++AC_CONFIG_COMMANDS([norpath], [
++sed -e 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' \
++    -e 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' \
++    -e 's|CC="\(g.*\)"|CC="\1 -Wl,--as-needed"|' \
++    -i libtool
++])
+ AC_OUTPUT
+--- singular-4.1.0/omalloc/configure.ac.orig	2017-02-20 10:34:57.000000000 -0700
++++ singular-4.1.0/omalloc/configure.ac	2017-02-27 14:49:09.416812931 -0700
+@@ -636,5 +636,11 @@ dnl llllllllllllllllllllllllllllllllllll
+ dnl wrap it up
+ dnl
+ AC_CONFIG_FILES([Makefile omalloc.pc])
++AC_CONFIG_COMMANDS([norpath], [
++sed -e 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' \
++    -e 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' \
++    -e 's|CC="\(g.*\)"|CC="\1 -Wl,--as-needed"|' \
++    -i libtool
++])
+ AC_OUTPUT
  
- feOpt.o: feOpt.inc feOptES.inc feOptTS.inc
- extra.o: feOpt.inc
+--- singular-4.1.0/resources/configure.ac.orig	2017-02-20 10:34:57.000000000 -0700
++++ singular-4.1.0/resources/configure.ac	2017-02-27 14:49:09.416812931 -0700
+@@ -73,4 +73,10 @@ AX_NORMALIZE_PATH([config_datadir],['/']
+ AC_DEFINE_UNQUOTED([DATA_DIR],"$config_datadir",[datadir])
+ 
+ AC_CONFIG_FILES([singular_resources.pc Makefile])
++AC_CONFIG_COMMANDS([norpath], [
++sed -e 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' \
++    -e 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' \
++    -e 's|CC="\(g.*\)"|CC="\1 -Wl,--as-needed"|' \
++    -i libtool
++])
+ AC_OUTPUT

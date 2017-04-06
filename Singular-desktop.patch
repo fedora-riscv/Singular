@@ -1,0 +1,31 @@
+--- singular-4.1.0/desktop/Singular.desktop.in.orig	2016-10-14 06:26:25.000000000 -0600
++++ singular-4.1.0/desktop/Singular.desktop.in	2017-01-16 19:18:21.313516480 -0700
+@@ -3,12 +3,10 @@ Version=1.0
+ Name=Singular
+ Comment=run Singular @PACKAGE_VERSION@ in a terminal
+ Comment[de]=Singular @PACKAGE_VERSION@ in einem Terminal starten
+-Comment[es]=
+ Comment[fr]=démarrer Singular @PACKAGE_VERSION@ dans un terminal
+-Comment[ru]=
+ Type=Application
+ Exec=Singular
+ Terminal=true
+ Categories=Math;Science;Education;
+-Icon=@DATA_DIR@/icons/Singular.png
++Icon=Singular
+ 
+--- singular-4.1.0/desktop/Singular-manual.desktop.in.orig	2016-10-14 06:26:25.000000000 -0600
++++ singular-4.1.0/desktop/Singular-manual.desktop.in	2017-01-16 19:19:18.281326517 -0700
+@@ -4,10 +4,8 @@ Name=Singular Manual
+ Name[de]=Singular-Handbuch
+ Comment=read the user manual for Singular @PACKAGE_VERSION@
+ Comment[de]=im Benutzerhandbuch zu Singular @PACKAGE_VERSION@ lesen
+-Comment[es]=
+ Comment[fr]=lire le manuel d'utilisation de Singular @PACKAGE_VERSION@
+-Comment[ru]=
+ Type=Link
+-URL=file://@DOC_DIR@/html/index.htm
+-Icon=@DATA_DIR@/icons/Singular.png
++URL=file:///usr/share/doc/Singular-doc/html/index.htm
++Icon=Singular
+ 
