@@ -1,7 +1,7 @@
 %global singulardir	%{_libdir}/Singular
 %global upstreamver	4-1-0
 %global downstreamver	%(tr - . <<< %{upstreamver})
-%global patchver	p2
+%global patchver	p3
 
 %if 0%{?fedora}
 %global ntl8 1
@@ -24,8 +24,15 @@ Summary:	Computer Algebra System for polynomial computations
 #   the former more strict than the latter
 License:	GPLv2 or GPLv3
 Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/%{upstreamver}/singular-%{version}.tar.gz
+# Java sources omitted from the source tarball.  To recreate this:
+# - git clone https://github.com/Singular/Sources.git
+# - git checkout spielwiese
+# - git reset --hard df043ed9af2cfd53d92c247ae0d69fb0e74df729
+# - tar cJf surfex.tar.xz Singular/LIB/surfex
+Source1:	surfex.tar.xz
 URL:		http://www.singular.uni-kl.de/
 BuildRequires:	bison
+BuildRequires:	boost-devel
 BuildRequires:	cddlib-devel
 BuildRequires:	desktop-file-utils
 BuildRequires:	doxygen
@@ -34,6 +41,8 @@ BuildRequires:	flex
 BuildRequires:	flint-devel
 BuildRequires:	gcc-c++
 BuildRequires:	gmp-devel
+BuildRequires:	java-devel
+BuildRequires:	javapackages-tools
 BuildRequires:	libtool
 BuildRequires:	libxml2-devel
 BuildRequires:	mathicgb-devel
@@ -72,6 +81,8 @@ Patch6:		%{name}-sequence-point.patch
 Patch7:		%{name}-alias.patch
 # Adapt to polymake 3.1
 Patch8:		%{name}-polymake.patch
+# Let ESingular read a compressed singular.hlp file
+Patch9:		%{name}-emacs.patch
 
 %description
 Singular is a computer algebra system for polynomial computations, with
@@ -179,6 +190,7 @@ This package contains the Singular java interface.
 
 %prep
 %setup -q -n singular-%{downstreamver}
+%setup -q -n singular-%{downstreamver} -T -D -a 1
 %patch0 -p1 -b .arches
 %patch1 -p1 -b .link
 %patch2 -p1 -b .desktop
@@ -188,6 +200,11 @@ This package contains the Singular java interface.
 %patch6 -p1 -b .seqpoint
 %patch7 -p1 -b .alias
 %patch8 -p1 -b .polymake
+%patch9 -p1 -b .emacs
+
+# Fix the name of the boost_python library
+sed -ri 's/(lboost_python)-\$\{PYTHON_VERSION\}/\1/' \
+    Singular/dyn_modules/python/Makefile.am
 
 # Regenerate configure due to patches 0 and 1
 autoreconf -fi
@@ -196,6 +213,9 @@ autoreconf -fi
 iconv -f iso8859-1 -t utf-8 COPYING > COPYING.utf8
 touch -r COPYING COPYING.utf8
 mv -f COPYING.utf8 COPYING
+
+# Do not use the prebuilt surfex.jar
+rm -f Singular/LIB/surfex/surfex.jar
 
 
 %build
@@ -217,6 +237,8 @@ export LDFLAGS="-Wl,-z,relro"
 %else
 	--disable-polymake \
 %endif
+	--enable-python_module \
+	--enable-streamio \
 	--with-gmp \
 	--with-ntl \
 	--with-flint \
@@ -228,10 +250,17 @@ export LDFLAGS="-Wl,-z,relro"
 
 make %{?_smp_mflags}
 make %{?_smp_mflags} -C dox html
+pushd Singular/LIB/surfex
+./make_surfex
+popd
 
 
 %install
 make DESTDIR=%{buildroot} install
+
+# Install surfex.jar
+mkdir %{buildroot}%{_datadir}/singular/LIB/surfex
+cp -p Singular/LIB/surfex/surfex.jar %{buildroot}%{_datadir}/singular/LIB/surfex
 
 # Validate the desktop files
 desktop-file-validate %{buildroot}%{_datadir}/applications/Singular.desktop
@@ -258,8 +287,8 @@ cat > %{buildroot}%{_bindir}/Singular << EOF
 
 . /etc/profile.d/modules.sh
 module load surf-geometry-%{_arch}
-export SINGULARPATH=%{singulardir}
-exec %{singulardir}/Singular-%{upstreamver} "\$@"
+export SINGULAR_DATA_DIR=%{_datadir}
+exec %{singulardir}/Singular "\$@"
 EOF
 chmod 0755 %{buildroot}%{_bindir}/Singular
 
@@ -289,6 +318,7 @@ cat > %{buildroot}%{_bindir}/ESingular << EOF
 
 . /etc/profile.d/modules.sh
 module load surf-geometry-%{_arch}
+export ESINGULAR_EMACS_DIR=%{_datadir}/singular/emacs
 exec %{singulardir}/ESingular --singular %{_bindir}/Singular "\$@"
 EOF
 chmod 0755 %{buildroot}%{_bindir}/ESingular
@@ -345,6 +375,7 @@ fi
 %{_datadir}/singular/LIB/
 %exclude %{_datadir}/singular/LIB/polymake.lib
 %exclude %{_datadir}/singular/LIB/surfex.lib
+%exclude %{_datadir}/singular/LIB/surfex
 
 %files		devel
 %doc kernel/ChangeLog
@@ -377,6 +408,7 @@ fi
 %files		surfex
 %{_bindir}/surfex
 %{_datadir}/singular/LIB/surfex.lib
+%{_datadir}/singular/LIB/surfex/
 
 %files		-n factory
 %license factory/COPYING
@@ -424,6 +456,15 @@ fi
 
 
 %changelog
+* Mon May  1 2017 Jerry James <loganjerry@gmail.com> - 4.1.0p3-1
+- New upstream version
+- Add -emacs patch to fix ESingular
+- Build and install surfex.jar
+
+* Tue Apr 18 2017 pcpa <paulo.cesar.pereira.de.andrade@gmail.com> - 4.1.0p2-2
+- Correct Singular script
+- Correct path of Singular lib files
+
 * Wed Apr  5 2017 Jerry James <loganjerry@gmail.com> - 4.1.0p2-1
 - New upstream version (bz 1181772, 1321077)
 - Drop upstreamed patches: -destdir, -headers, -doc, -builddid, -undefined,
