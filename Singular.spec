@@ -26,6 +26,7 @@ License:	GPLv2 or GPLv3
 Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/%{upstreamver}/singular-%{version}.tar.gz
 # Java sources omitted from the source tarball.  To recreate this:
 # - git clone https://github.com/Singular/Sources.git
+# - cd Sources
 # - git checkout spielwiese
 # - git reset --hard df043ed9af2cfd53d92c247ae0d69fb0e74df729
 # - tar cJf surfex.tar.xz Singular/LIB/surfex
