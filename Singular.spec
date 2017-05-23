@@ -12,7 +12,7 @@
 
 Name:		Singular
 Version:	%{downstreamver}%{?patchver}
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 # License analysis:
 # - factory/readcf.cc, Singular/grammar.cc, and Singular/grammar.h are
@@ -84,6 +84,8 @@ Patch7:		%{name}-alias.patch
 Patch8:		%{name}-polymake.patch
 # Let ESingular read a compressed singular.hlp file
 Patch9:		%{name}-emacs.patch
+# Revert a change to static function in p3 due to sagemath requiring it
+Patch10:	%{name}-sagemath.patch
 
 %description
 Singular is a computer algebra system for polynomial computations, with
@@ -202,6 +204,7 @@ This package contains the Singular java interface.
 %patch7 -p1 -b .alias
 %patch8 -p1 -b .polymake
 %patch9 -p1 -b .emacs
+%patch10 -p1 -b .sagemath
 
 # Fix the name of the boost_python library
 sed -ri 's/(lboost_python)-\$\{PYTHON_VERSION\}/\1/' \
@@ -457,6 +460,9 @@ fi
 
 
 %changelog
+* Tue May 23 2017 pcpa <paulo.cesar.pereira.de.andrade@gmail.com> - 4.1.0p3-2
+- Revert a function changed to static in p3 due to sagemath requiring it
+
 * Mon May  1 2017 Jerry James <loganjerry@gmail.com> - 4.1.0p3-1
 - New upstream version
 - Add -emacs patch to fix ESingular
