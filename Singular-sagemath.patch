@@ -1,0 +1,34 @@
+diff -up singular-4.1.0/libpolys/polys/monomials/p_polys.cc.orig singular-4.1.0/libpolys/polys/monomials/p_polys.cc
+--- singular-4.1.0/libpolys/polys/monomials/p_polys.cc.orig	2017-05-23 09:20:32.414233209 -0400
++++ singular-4.1.0/libpolys/polys/monomials/p_polys.cc	2017-05-23 09:20:38.233233432 -0400
+@@ -4321,7 +4321,7 @@ int p_MinDeg(poly p,intvec *w, const rin
+ }
+ 
+ /***************************************************************/
+-static poly p_Invers(int n,poly u,intvec *w, const ring R)
++poly p_Invers(int n,poly u,intvec *w, const ring R)
+ {
+   if(n<0)
+     return NULL;
+diff -up singular-4.1.0/libpolys/polys/monomials/p_polys.h.orig singular-4.1.0/libpolys/polys/monomials/p_polys.h
+--- singular-4.1.0/libpolys/polys/monomials/p_polys.h.orig	2017-05-23 09:21:18.117234959 -0400
++++ singular-4.1.0/libpolys/polys/monomials/p_polys.h	2017-05-23 09:21:19.737235021 -0400
+@@ -2010,6 +2010,7 @@ poly p_PermPoly (poly p, const int * per
+ 
+ /*----------------------------------------------------*/
+ poly p_Series(int n,poly p,poly u, intvec *w, const ring R);
++poly p_Invers(int n,poly u,intvec *w, const ring R);
+ 
+ /*----------------------------------------------------*/
+ int   p_Var(poly mi, const ring r);
+diff -up singular-4.1.0/kernel/polys.h.orig singular-4.1.0/kernel/polys.h
+--- singular-4.1.0/kernel/polys.h.orig	2017-05-23 10:33:17.310400356 -0400
++++ singular-4.1.0/kernel/polys.h	2017-05-23 10:33:46.522401474 -0400
+@@ -352,6 +352,7 @@ inline void pNorm(poly p, const ring R =
+ #define   pJetW(p,m,iv) p_JetW(p,m,iv,currRing)
+ #define   pMinDeg(p,w) p_MinDeg(p,w,currRing)
+ #define   pSeries(n,p,u,w) p_Series(n,p,u,w,currRing)
++#define   pInvers(n,p,w) p_Invers(n,p,w,currRing)
+ // maximum weigthed degree of all monomials of p, w is indexed from
+ // 1..pVariables
+ 
