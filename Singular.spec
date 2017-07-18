@@ -12,7 +12,7 @@
 
 Name:		Singular
 Version:	%{downstreamver}%{?patchver}
-Release:	2%{?dist}
+Release:	3%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 # License analysis:
 # - factory/readcf.cc, Singular/grammar.cc, and Singular/grammar.h are
@@ -460,6 +460,9 @@ fi
 
 
 %changelog
+* Tue Jul 18 2017 Jonathan Wakely <jwakely@redhat.com> - 4.1.0p3-3
+- Rebuilt for Boost 1.64
+
 * Tue May 23 2017 pcpa <paulo.cesar.pereira.de.andrade@gmail.com> - 4.1.0p3-2
 - Revert a function changed to static in p3 due to sagemath requiring it
 
