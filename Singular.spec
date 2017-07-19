@@ -12,7 +12,7 @@
 
 Name:		Singular
 Version:	%{downstreamver}%{?patchver}
-Release:	3%{?dist}
+Release:	4%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 # License analysis:
 # - factory/readcf.cc, Singular/grammar.cc, and Singular/grammar.h are
@@ -460,6 +460,9 @@ fi
 
 
 %changelog
+* Wed Jul 19 2017 Jonathan Wakely <jwakely@redhat.com> - 4.1.0p3-4
+- Rebuilt for s390x binutils bug
+
 * Tue Jul 18 2017 Jonathan Wakely <jwakely@redhat.com> - 4.1.0p3-3
 - Rebuilt for Boost 1.64
 
