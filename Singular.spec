@@ -12,7 +12,7 @@
 
 Name:		Singular
 Version:	%{downstreamver}%{?patchver}
-Release:	6%{?dist}
+Release:	7%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 # License analysis:
 # - factory/readcf.cc, Singular/grammar.cc, and Singular/grammar.h are
@@ -95,6 +95,7 @@ geometry, and singularity theory.
 %package	libs
 Summary:	Singular library
 Requires:	%{name}-libpolys%{?_isa} = %{version}-%{release}
+Requires:	gfanlib%{?_isa} = %{version}-%{release}
 
 %description	libs
 This package contains the main Singular library.
@@ -103,6 +104,7 @@ This package contains the main Singular library.
 Summary:	Singular development files
 Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
 Requires:	%{name}-libpolys-devel%{?_isa} = %{version}-%{release}
+Requires:	gfanlib-devel%{?_isa} = %{version}-%{release}
 
 %description	devel
 This package contains the Singular development files.
@@ -153,6 +155,19 @@ BuildArch:	noarch
 
 %description	-n factory-gftables
 Factory uses addition tables to calculate in GF(p^n) in an efficient way.
+
+%package	-n gfanlib
+Summary:	Basic convex geometry
+
+%description	-n gfanlib
+This package provides support for basic convex geometry.
+
+%package	-n gfanlib-devel
+Summary:	Development files for gfanlib
+Requires:	gmp-devel%{?_isa}
+
+%description	-n gfanlib-devel
+Development files for gfanlib
 
 %package	libpolys
 Summary:	C++ class library for polynomials in Singular
@@ -344,6 +359,9 @@ fi
 %post		-n factory -p /sbin/ldconfig
 %postun		-n factory -p /sbin/ldconfig
 
+%post		-n gfanlib -p /sbin/ldconfig
+%postun		-n gfanlib -p /sbin/ldconfig
+
 %post		libpolys -p /sbin/ldconfig
 %postun		libpolys -p /sbin/ldconfig
 
@@ -371,7 +389,6 @@ fi
 %license COPYING
 %license GPL2
 %license GPL3
-%{_libdir}/libgfan.so.*
 %{_libdir}/libSingular-*.so
 %{_libexecdir}/singular/
 %exclude %{_libexecdir}/singular/MOD/polymake.so
@@ -384,11 +401,9 @@ fi
 %files		devel
 %doc kernel/ChangeLog
 %{_bindir}/libsingular-config
-%{_includedir}/gfanlib/
 %{_includedir}/singular/kernel/
 %{_includedir}/singular/Singular/
 %{_includedir}/singular/singularconfig.h
-%{_libdir}/libgfan.so
 %{_libdir}/libSingular.so
 %{_libdir}/pkgconfig/Singular.pc
 
@@ -438,6 +453,13 @@ fi
 %files		-n factory-gftables
 %{_datadir}/factory/
 
+%files		-n gfanlib
+%{_libdir}/libgfan.so.*
+
+%files		-n gfanlib-devel
+%{_includedir}/gfanlib/
+%{_libdir}/libgfan.so
+
 %files		libpolys
 %license libpolys/COPYING
 %doc libpolys/README
@@ -460,6 +482,10 @@ fi
 
 
 %changelog
+* Fri Sep 29 2017 Jerry James <loganjerry@gmail.com> - 4.1.0p3-7
+- Rebuild for cddlib and ntl 10.5.0
+- Break gfanlib out as a separate package for use by the gfan package
+
 * Wed Aug 02 2017 Fedora Release Engineering <releng@fedoraproject.org> - 4.1.0p3-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Binutils_Mass_Rebuild
 
