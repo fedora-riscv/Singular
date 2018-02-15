@@ -86,6 +86,8 @@ Patch8:		%{name}-polymake.patch
 Patch9:		%{name}-emacs.patch
 # Revert a change to static function in p3 due to sagemath requiring it
 Patch10:	%{name}-sagemath.patch
+# Adapt to changed python interface in boost 1.65
+Patch11:	%{name}-python.patch
 
 %description
 Singular is a computer algebra system for polynomial computations, with
@@ -220,6 +222,7 @@ This package contains the Singular java interface.
 %patch8 -p1 -b .polymake
 %patch9 -p1 -b .emacs
 %patch10 -p1 -b .sagemath
+%patch11 -p1 -b .python
 
 # Fix the name of the boost_python library
 sed -ri 's/(lboost_python)-\$\{PYTHON_VERSION\}/\1/' \
@@ -356,17 +359,11 @@ if [ $1 = 0 ]; then
   /sbin/install-info --delete %{_infodir}/singular.hlp %{_infodir}/dir 2>/dev/null || :
 fi
 
-%post		-n factory -p /sbin/ldconfig
-%postun		-n factory -p /sbin/ldconfig
 
-%post		-n gfanlib -p /sbin/ldconfig
-%postun		-n gfanlib -p /sbin/ldconfig
-
-%post		libpolys -p /sbin/ldconfig
-%postun		libpolys -p /sbin/ldconfig
-
-%post		libs -p /sbin/ldconfig
-%postun		libs -p /sbin/ldconfig
+%ldconfig_scriptlets -n factory
+%ldconfig_scriptlets -n gfanlib
+%ldconfig_scriptlets libpolys
+%ldconfig_scriptlets libs
 
 
 %files
@@ -482,6 +479,9 @@ fi
 
 
 %changelog
+* Wed Feb 14 2018 Jerry James <loganjerry@gmail.com> - 4.1.0p3-8
+- Add -python patch to adapt to changed boost python interface
+
 * Wed Feb 07 2018 Fedora Release Engineering <releng@fedoraproject.org> - 4.1.0p3-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
 
