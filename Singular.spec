@@ -12,7 +12,7 @@
 
 Name:		Singular
 Version:	%{downstreamver}%{?patchver}
-Release:	8%{?dist}
+Release:	9%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 # License analysis:
 # - factory/readcf.cc, Singular/grammar.cc, and Singular/grammar.h are
@@ -34,6 +34,7 @@ Source1:	surfex.tar.xz
 URL:		http://www.singular.uni-kl.de/
 BuildRequires:	bison
 BuildRequires:	boost-devel
+BuildRequires:	boost-python2-devel
 BuildRequires:	cddlib-devel
 BuildRequires:	desktop-file-utils
 BuildRequires:	doxygen
@@ -479,6 +480,9 @@ fi
 
 
 %changelog
+* Tue May 01 2018 Jonathan Wakely <jwakely@redhat.com> - -9
+- Add BuildRequires: boost-python2-devel to fix build with boost-1.66.0-7.fc29
+
 * Wed Feb 14 2018 Jerry James <loganjerry@gmail.com> - 4.1.0p3-8
 - Add -python patch to adapt to changed boost python interface
 
