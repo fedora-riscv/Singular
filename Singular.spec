@@ -8,11 +8,11 @@
 %endif
 
 # Use this to build without polymake support if polymake is broken.
-%bcond_without polymake
+%bcond_with polymake
 
 Name:		Singular
 Version:	%{downstreamver}%{?patchver}
-Release:	9%{?dist}
+Release:	9%{?dist}.1
 Summary:	Computer Algebra System for polynomial computations
 # License analysis:
 # - factory/readcf.cc, Singular/grammar.cc, and Singular/grammar.h are
@@ -45,6 +45,7 @@ BuildRequires:	gcc-c++
 BuildRequires:	gmp-devel
 BuildRequires:	java-devel
 BuildRequires:	javapackages-tools
+BuildRequires:	libgfan-devel
 BuildRequires:	libtool
 BuildRequires:	libxml2-devel
 BuildRequires:	mathicgb-devel
@@ -77,8 +78,8 @@ Patch3:		%{name}-ntl8.patch
 Patch4:		%{name}-format.patch
 # Add missing parentheses that can change code meaning in a macro
 Patch5:		%{name}-parens.patch
-# Fix a sequence point error
-Patch6:		%{name}-sequence-point.patch
+# Unbundle gfanlib
+Patch6:		%{name}-gfanlib.patch
 # Fix code that violates the strict aliasing rules
 Patch7:		%{name}-alias.patch
 # Adapt to polymake 3.1
@@ -98,7 +99,6 @@ geometry, and singularity theory.
 %package	libs
 Summary:	Singular library
 Requires:	%{name}-libpolys%{?_isa} = %{version}-%{release}
-Requires:	gfanlib%{?_isa} = %{version}-%{release}
 
 %description	libs
 This package contains the main Singular library.
@@ -107,7 +107,6 @@ This package contains the main Singular library.
 Summary:	Singular development files
 Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
 Requires:	%{name}-libpolys-devel%{?_isa} = %{version}-%{release}
-Requires:	gfanlib-devel%{?_isa} = %{version}-%{release}
 
 %description	devel
 This package contains the Singular development files.
@@ -159,19 +158,6 @@ BuildArch:	noarch
 %description	-n factory-gftables
 Factory uses addition tables to calculate in GF(p^n) in an efficient way.
 
-%package	-n gfanlib
-Summary:	Basic convex geometry
-
-%description	-n gfanlib
-This package provides support for basic convex geometry.
-
-%package	-n gfanlib-devel
-Summary:	Development files for gfanlib
-Requires:	gmp-devel%{?_isa}
-
-%description	-n gfanlib-devel
-Development files for gfanlib
-
 %package	libpolys
 Summary:	C++ class library for polynomials in Singular
 Requires:	factory%{?_isa} = %{version}-%{release}
@@ -185,9 +171,6 @@ Summary:	Development files for libpolys
 Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
 Requires:	factory-devel%{?_isa} = %{version}-%{release}
 Requires:	flint-devel%{?_isa}
-# These can be removed once Fedora 25 reached EOL
-Obsoletes:	libfac-devel < 4.0.0-1
-Provides:	libfac-devel = %{version}-%{release}
 
 %description	libpolys-devel
 Development files for libpolys.
@@ -218,7 +201,7 @@ This package contains the Singular java interface.
 %patch3 -p1 -b .ntl8
 %patch4 -p1 -b .format
 %patch5 -p1 -b .parens
-%patch6 -p1 -b .seqpoint
+%patch6 -p1 -b .gfanlib
 %patch7 -p1 -b .alias
 %patch8 -p1 -b .polymake
 %patch9 -p1 -b .emacs
@@ -229,7 +212,7 @@ This package contains the Singular java interface.
 sed -ri 's/(lboost_python)-\$\{PYTHON_VERSION\}/\1/' \
     Singular/dyn_modules/python/Makefile.am
 
-# Regenerate configure due to patches 0 and 1
+# Regenerate configure due to patches 0, 1, and 6
 autoreconf -fi
 
 # Fix encoding
@@ -242,7 +225,7 @@ rm -f Singular/LIB/surfex/surfex.jar
 
 
 %build
-export CPPFLAGS="-I%{_includedir}/flint"
+export CPPFLAGS="-I%{_includedir}/flint -I%{_includedir}/gfanlib"
 export CFLAGS="%{optflags} -fPIC -fno-delete-null-pointer-checks"
 export CXXFLAGS=$CFLAGS
 # Cannot use RPM_LD_FLAGS, as -Wl,-z,now breaks lazy module loading
@@ -280,6 +263,10 @@ popd
 
 %install
 make DESTDIR=%{buildroot} install
+
+# Do not install gfanlib; it is packaged separately
+rm -fr %{buildroot}%{_includedir}/gfanlib
+rm -f %{buildroot}%{_libdir}/libgfan*
 
 # Install surfex.jar
 mkdir %{buildroot}%{_datadir}/singular/LIB/surfex
@@ -362,7 +349,6 @@ fi
 
 
 %ldconfig_scriptlets -n factory
-%ldconfig_scriptlets -n gfanlib
 %ldconfig_scriptlets libpolys
 %ldconfig_scriptlets libs
 
@@ -451,13 +437,6 @@ fi
 %files		-n factory-gftables
 %{_datadir}/factory/
 
-%files		-n gfanlib
-%{_libdir}/libgfan.so.*
-
-%files		-n gfanlib-devel
-%{_includedir}/gfanlib/
-%{_libdir}/libgfan.so
-
 %files		libpolys
 %license libpolys/COPYING
 %doc libpolys/README
@@ -480,7 +459,12 @@ fi
 
 
 %changelog
-* Tue May 01 2018 Jonathan Wakely <jwakely@redhat.com> - -9
+* Sat Jun  2 2018 Jerry James <loganjerry@gmail.com> - 4.1.0p3-9.1
+- Rebuild for ntl 11.0.0
+- Unbundle gfanlib
+- Bootstrap without polymake support
+
+* Tue May 01 2018 Jonathan Wakely <jwakely@redhat.com> - 4.1.0p3-9
 - Add BuildRequires: boost-python2-devel to fix build with boost-1.66.0-7.fc29
 
 * Wed Feb 14 2018 Jerry James <loganjerry@gmail.com> - 4.1.0p3-8
