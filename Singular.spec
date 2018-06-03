@@ -8,11 +8,11 @@
 %endif
 
 # Use this to build without polymake support if polymake is broken.
-%bcond_with polymake
+%bcond_without polymake
 
 Name:		Singular
 Version:	%{downstreamver}%{?patchver}
-Release:	9%{?dist}.1
+Release:	10%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 # License analysis:
 # - factory/readcf.cc, Singular/grammar.cc, and Singular/grammar.h are
@@ -459,6 +459,9 @@ fi
 
 
 %changelog
+* Sat Jun  2 2018 Jerry James <loganjerry@gmail.com> - 4.1.0p3-10
+- Rebuild with polymake support
+
 * Sat Jun  2 2018 Jerry James <loganjerry@gmail.com> - 4.1.0p3-9.1
 - Rebuild for ntl 11.0.0
 - Unbundle gfanlib
