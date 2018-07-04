@@ -7,12 +7,15 @@
 %global ntl8 1
 %endif
 
+# Singular installs python files into nonstandard places
+%global _python_bytecompile_extra 0
+
 # Use this to build without polymake support if polymake is broken.
-%bcond_without polymake
+%bcond_with polymake
 
 Name:		Singular
 Version:	%{downstreamver}%{?patchver}
-Release:	10%{?dist}
+Release:	10%{?dist}.1
 Summary:	Computer Algebra System for polynomial computations
 # License analysis:
 # - factory/readcf.cc, Singular/grammar.cc, and Singular/grammar.h are
@@ -333,19 +336,13 @@ exec %{singulardir}/ESingular --singular %{_bindir}/Singular "\$@"
 EOF
 chmod 0755 %{buildroot}%{_bindir}/ESingular
 
+# Byte compile the python files
+%py_byte_compile %{__python2} %{buildroot}%{_datadir}/singular/LIB
+
 
 %check
 export LD_LIBRARY_PATH=%{buildroot}%{_libdir}
 make check
-
-
-%post
-/sbin/install-info %{_infodir}/singular.hlp %{_infodir}/dir 2>/dev/null || :
-
-%postun
-if [ $1 = 0 ]; then
-  /sbin/install-info --delete %{_infodir}/singular.hlp %{_infodir}/dir 2>/dev/null || :
-fi
 
 
 %ldconfig_scriptlets -n factory
@@ -459,6 +456,11 @@ fi
 
 
 %changelog
+* Tue Jul   32018 Jerry James <loganjerry@gmail.com> - 4.1.0p3-10.1
+- Rebuild for ntl 11.1.0 without polymake support
+- Remove scriptlets that call install-info
+- Follow new packaging guidelines for python files in nonstandard places
+
 * Sat Jun  2 2018 Jerry James <loganjerry@gmail.com> - 4.1.0p3-10
 - Rebuild with polymake support
 
