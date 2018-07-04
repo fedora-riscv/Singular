@@ -11,11 +11,11 @@
 %global _python_bytecompile_extra 0
 
 # Use this to build without polymake support if polymake is broken.
-%bcond_with polymake
+%bcond_without polymake
 
 Name:		Singular
 Version:	%{downstreamver}%{?patchver}
-Release:	10%{?dist}.1
+Release:	11%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 # License analysis:
 # - factory/readcf.cc, Singular/grammar.cc, and Singular/grammar.h are
@@ -456,6 +456,9 @@ make check
 
 
 %changelog
+* Tue Jul  3 2018 Jerry James <loganjerry@gmail.com> - 4.1.0p3-11
+- Rebuild with polymake support
+
 * Tue Jul  3 2018 Jerry James <loganjerry@gmail.com> - 4.1.0p3-10.1
 - Rebuild for ntl 11.1.0 without polymake support
 - Remove scriptlets that call install-info
