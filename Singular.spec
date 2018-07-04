@@ -456,7 +456,7 @@ make check
 
 
 %changelog
-* Tue Jul   32018 Jerry James <loganjerry@gmail.com> - 4.1.0p3-10.1
+* Tue Jul  3 2018 Jerry James <loganjerry@gmail.com> - 4.1.0p3-10.1
 - Rebuild for ntl 11.1.0 without polymake support
 - Remove scriptlets that call install-info
 - Follow new packaging guidelines for python files in nonstandard places
