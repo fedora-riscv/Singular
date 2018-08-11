@@ -11,7 +11,7 @@
 %global _python_bytecompile_extra 0
 
 # Use this to build without polymake support if polymake is broken.
-%bcond_without polymake
+%bcond_with polymake
 
 Name:		Singular
 Version:	%{downstreamver}%{?patchver}
@@ -457,7 +457,7 @@ make check
 
 %changelog
 * Fri Aug 10 2018 Jerry James <loganjerry@gmail.com> - 4.1.0p3-13
-- Rebuild for ntl 11.2.1
+- Rebuild for ntl 11.2.1, without polymake support to bootstrap
 
 * Thu Jul 12 2018 Fedora Release Engineering <releng@fedoraproject.org> - 4.1.0p3-12
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
