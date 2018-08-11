@@ -15,7 +15,7 @@
 
 Name:		Singular
 Version:	%{downstreamver}%{?patchver}
-Release:	12%{?dist}
+Release:	13%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 # License analysis:
 # - factory/readcf.cc, Singular/grammar.cc, and Singular/grammar.h are
@@ -55,7 +55,7 @@ BuildRequires:	mathicgb-devel
 BuildRequires:	ncurses-devel
 BuildRequires:	ntl-devel%{?ntl8: >= 8.0}
 %if %{with polymake}
-BuildRequires:	polymake
+BuildRequires:	polymake-singular
 %endif
 BuildRequires:	python2-devel
 BuildRequires:	readline-devel
@@ -456,6 +456,9 @@ make check
 
 
 %changelog
+* Fri Aug 10 2018 Jerry James <loganjerry@gmail.com> - 4.1.0p3-13
+- Rebuild for ntl 11.2.1
+
 * Thu Jul 12 2018 Fedora Release Engineering <releng@fedoraproject.org> - 4.1.0p3-12
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
 
