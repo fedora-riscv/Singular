@@ -15,7 +15,7 @@
 
 Name:		Singular
 Version:	%{downstreamver}%{?patchver}
-Release:	14%{?dist}
+Release:	15%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 # License analysis:
 # - factory/readcf.cc, Singular/grammar.cc, and Singular/grammar.h are
@@ -456,6 +456,9 @@ make check
 
 
 %changelog
+* Sat Oct 13 2018 Jerry James <loganjerry@gmail.com> - 4.1.0p3-15
+- Rebuild for ntl 11.3.0 and cddlib 0.94j
+
 * Fri Aug 10 2018 Jerry James <loganjerry@gmail.com> - 4.1.0p3-14
 - Rebuild with polymake support
 
