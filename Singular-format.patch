@@ -1,5 +1,5 @@
---- singular-4.1.0/kernel/linear_algebra/CacheImplementation.h.orig	2017-02-20 10:33:27.000000000 -0700
-+++ singular-4.1.0/kernel/linear_algebra/CacheImplementation.h	2017-02-28 08:35:19.070578172 -0700
+--- singular-4.1.1/kernel/linear_algebra/CacheImplementation.h.orig	2018-07-31 07:05:52.000000000 -0600
++++ singular-4.1.1/kernel/linear_algebra/CacheImplementation.h	2018-10-24 08:36:14.739165486 -0600
 @@ -354,7 +354,7 @@ bool Cache<KeyClass, ValueClass>::put (c
  template<class KeyClass, class ValueClass>
  std::string Cache<KeyClass, ValueClass>::toString() const
@@ -9,9 +9,9 @@
    std::string s = "Cache:";
    s += "\n   entries: ";
    sprintf(h, "%d", getNumberOfEntries()); s += h;
---- singular-4.1.0/Singular/extra.cc.orig	2017-02-20 10:33:27.000000000 -0700
-+++ singular-4.1.0/Singular/extra.cc	2017-02-28 08:36:17.566405458 -0700
-@@ -2499,7 +2499,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv r
+--- singular-4.1.1/Singular/extra.cc.orig	2018-07-31 07:05:52.000000000 -0600
++++ singular-4.1.1/Singular/extra.cc	2018-10-24 08:36:14.740165469 -0600
+@@ -2537,7 +2537,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv r
          if(strcmp(sys_cmd,"changeRing")==0)
          {
            int varN = currRing->N;

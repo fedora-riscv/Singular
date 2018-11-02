@@ -1,6 +1,6 @@
---- singular-4.1.0/factory/ftmpl_inst.cc.orig	2016-10-14 14:00:05.000000000 -0600
-+++ singular-4.1.0/factory/ftmpl_inst.cc	2017-01-16 20:23:04.488346521 -0700
-@@ -74,7 +74,7 @@ template List<Variable> Difference ( con
+--- singular-4.1.1/factory/ftmpl_inst.cc.orig	2018-07-31 07:05:52.000000000 -0600
++++ singular-4.1.1/factory/ftmpl_inst.cc	2018-10-24 08:35:33.090883509 -0600
+@@ -73,7 +73,7 @@ template List<Variable> Difference ( con
  // NTL 6
  #ifdef HAVE_NTL
  #include<NTL/version.h>

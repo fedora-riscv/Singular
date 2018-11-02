@@ -1,7 +1,3 @@
-/normaliz.lib
-/Singular-3-1-5.tar.gz
-/Singular-3-1-6.tar.gz
-/Singular-3-1-7.tar.gz
-/singular-4.1.0p2.tar.gz
-/singular-4.1.0p3.tar.gz
+/Singular-*.tar.gz
+/singular-*.tar.gz
 /surfex.tar.xz

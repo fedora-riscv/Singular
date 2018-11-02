@@ -1,6 +1,6 @@
---- singular-4.1.0/configure.ac.orig	2017-02-20 10:33:27.000000000 -0700
-+++ singular-4.1.0/configure.ac	2017-02-27 14:49:09.415812935 -0700
-@@ -253,4 +253,10 @@ AC_CONFIG_FILES([redhat/Makefile])
+--- singular-4.1.1/configure.ac.orig	2018-07-31 07:05:52.000000000 -0600
++++ singular-4.1.1/configure.ac	2018-10-24 08:33:42.979724820 -0600
+@@ -264,4 +264,10 @@ AC_CONFIG_FILES([redhat/Makefile])
  AC_CONFIG_FILES([redhat/singular.spec])
  AC_CONFIG_FILES([desktop/Makefile desktop/Singular.desktop desktop/Singular-manual.desktop])
  
@@ -11,9 +11,9 @@
 +    -i libtool
 +])
  AC_OUTPUT
---- singular-4.1.0/factory/configure.ac.orig	2017-02-20 10:34:57.000000000 -0700
-+++ singular-4.1.0/factory/configure.ac	2017-02-27 14:49:09.416812931 -0700
-@@ -407,5 +407,11 @@ AC_DEFINE_UNQUOTED([FACTORYCONFIGURATION
+--- singular-4.1.1/factory/configure.ac.orig	2018-07-31 07:07:38.000000000 -0600
++++ singular-4.1.1/factory/configure.ac	2018-10-24 08:33:42.980724804 -0600
+@@ -412,5 +412,11 @@ AC_DEFINE_UNQUOTED([FACTORYCONFIGURATION
  
  
  AC_CONFIG_FILES([Makefile include/factory/Makefile factory.pc]) #  ftest/GNUmakefile
@@ -25,8 +25,8 @@
 +])
  AC_OUTPUT
  
---- singular-4.1.0/gfanlib/configure.ac.orig	2017-02-20 10:34:57.000000000 -0700
-+++ singular-4.1.0/gfanlib/configure.ac	2017-02-27 14:49:09.416812931 -0700
+--- singular-4.1.1/gfanlib/configure.ac.orig	2018-07-31 07:07:38.000000000 -0600
++++ singular-4.1.1/gfanlib/configure.ac	2018-10-24 08:33:42.981724789 -0600
 @@ -57,4 +57,10 @@ AC_LANG_POP()
  
  AC_CONFIG_FILES([Makefile])
@@ -38,8 +38,8 @@
 +    -i libtool
 +])
  AC_OUTPUT
---- singular-4.1.0/gfanlib/Makefile.am.orig	2017-02-20 10:34:57.000000000 -0700
-+++ singular-4.1.0/gfanlib/Makefile.am	2017-02-27 14:49:09.416812931 -0700
+--- singular-4.1.1/gfanlib/Makefile.am.orig	2018-07-31 07:07:38.000000000 -0600
++++ singular-4.1.1/gfanlib/Makefile.am	2018-10-24 08:33:42.981724789 -0600
 @@ -2,6 +2,7 @@ ACLOCAL_AMFLAGS = -I ../m4
  
  if HAVE_GFANLIB
@@ -48,9 +48,9 @@
  endif
  
  libgfandir = $(libdir)
---- singular-4.1.0/libpolys/configure.ac.orig	2017-02-20 10:34:57.000000000 -0700
-+++ singular-4.1.0/libpolys/configure.ac	2017-02-27 14:49:09.416812931 -0700
-@@ -149,4 +149,10 @@ AC_CONFIG_FILES([coeffs/Makefile])
+--- singular-4.1.1/libpolys/configure.ac.orig	2018-07-31 07:07:38.000000000 -0600
++++ singular-4.1.1/libpolys/configure.ac	2018-10-24 08:33:42.982724773 -0600
+@@ -159,4 +159,10 @@ AC_CONFIG_FILES([coeffs/Makefile])
  AC_CONFIG_FILES([polys/Makefile])
  AC_CONFIG_FILES([tests/Makefile])
  AC_CONFIG_FILES([libpolys-config libpolys.pc])
@@ -61,9 +61,9 @@
 +    -i libtool
 +])
  AC_OUTPUT
---- singular-4.1.0/omalloc/configure.ac.orig	2017-02-20 10:34:57.000000000 -0700
-+++ singular-4.1.0/omalloc/configure.ac	2017-02-27 14:49:09.416812931 -0700
-@@ -636,5 +636,11 @@ dnl llllllllllllllllllllllllllllllllllll
+--- singular-4.1.1/omalloc/configure.ac.orig	2018-07-31 07:07:38.000000000 -0600
++++ singular-4.1.1/omalloc/configure.ac	2018-10-24 08:33:42.982724773 -0600
+@@ -600,5 +600,11 @@ dnl llllllllllllllllllllllllllllllllllll
  dnl wrap it up
  dnl
  AC_CONFIG_FILES([Makefile omalloc.pc])
@@ -75,9 +75,9 @@
 +])
  AC_OUTPUT
  
---- singular-4.1.0/resources/configure.ac.orig	2017-02-20 10:34:57.000000000 -0700
-+++ singular-4.1.0/resources/configure.ac	2017-02-27 14:49:09.416812931 -0700
-@@ -73,4 +73,10 @@ AX_NORMALIZE_PATH([config_datadir],['/']
+--- singular-4.1.1/resources/configure.ac.orig	2018-07-31 07:07:38.000000000 -0600
++++ singular-4.1.1/resources/configure.ac	2018-10-24 08:33:42.983724758 -0600
+@@ -74,4 +74,10 @@ AX_NORMALIZE_PATH([config_datadir],['/']
  AC_DEFINE_UNQUOTED([DATA_DIR],"$config_datadir",[datadir])
  
  AC_CONFIG_FILES([singular_resources.pc Makefile])

@@ -1,6 +1,6 @@
---- singular-4.1.0/Singular/links/ndbm.cc.orig	2017-02-20 10:33:27.000000000 -0700
-+++ singular-4.1.0/Singular/links/ndbm.cc	2017-02-28 09:03:36.396520458 -0700
-@@ -293,7 +293,7 @@ datum dbm_nextkey(register DBM *db)
+--- singular-4.1.1/Singular/links/ndbm.cc.orig	2018-07-31 07:05:52.000000000 -0600
++++ singular-4.1.1/Singular/links/ndbm.cc	2018-10-24 08:39:16.614020655 -0600
+@@ -280,7 +280,7 @@ datum dbm_nextkey(DBM *db)
          db->dbm_flags |= _DBM_IOERR;
  #endif
      }
