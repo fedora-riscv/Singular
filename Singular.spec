@@ -15,7 +15,7 @@
 
 Name:		Singular
 Version:	%{downstreamver}%{?patchver}
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 # License analysis:
 # - factory/readcf.cc, Singular/grammar.cc, and Singular/grammar.h are
@@ -202,7 +202,7 @@ This package contains the Singular java interface.
 %patch8 -p1 -b .emacs
 
 # Fix the name of the boost_python library
-sed -ri 's/(lboost_python)-\$\{PYTHON_VERSION\}/\1/' \
+sed -ri 's/(lboost_python)-\$\{PYTHON_VERSION\}/\1%{python2_version_nodots}/' \
     Singular/dyn_modules/python/Makefile.am
 
 # Do not force the use of c++11, since the polymake code requires c++14
@@ -448,6 +448,9 @@ make check
 
 
 %changelog
+* Wed Jan 30 2019 Jonathan Wakely <jwakely@redhat.com> - 4.1.1p3-2
+- Rebuilt for Boost 1.69
+
 * Wed Oct 24 2018 Jerry James <loganjerry@gmail.com> - 4.1.1p3-1
 - New upstream version
 - Drop upstreamed -polymake, -sagemath, and -python patches
