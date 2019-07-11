@@ -15,7 +15,7 @@
 
 Name:		Singular
 Version:	%{downstreamver}%{?patchver}
-Release:	4%{?dist}
+Release:	5%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 # License analysis:
 # - factory/readcf.cc, Singular/grammar.cc, and Singular/grammar.h are
@@ -36,7 +36,7 @@ Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/%{upstrea
 # - git reset --hard c4532ad56fe482b30e500057ca76121dac774af2
 # - tar cJf surfex.tar.xz Singular/LIB/surfex
 Source1:	surfex.tar.xz
-URL:		http://www.singular.uni-kl.de/
+URL:		https://www.singular.uni-kl.de/
 BuildRequires:	bison
 BuildRequires:	boost-devel
 BuildRequires:	boost-python2-devel
@@ -89,6 +89,8 @@ Patch6:		%{name}-gfanlib.patch
 Patch7:		%{name}-alias.patch
 # Let ESingular read a compressed singular.hlp file
 Patch8:		%{name}-emacs.patch
+# Adapt to polymake >= 3.3
+Patch9:		%{name}-polymake.patch
 
 %description
 Singular is a computer algebra system for polynomial computations, with
@@ -200,6 +202,7 @@ This package contains the Singular java interface.
 %patch6 -p1 -b .gfanlib
 %patch7 -p1 -b .alias
 %patch8 -p1 -b .emacs
+%patch9 -p1 -b .polymake
 
 # Fix the name of the boost_python library
 sed -ri 's/(lboost_python)-\$\{PYTHON_VERSION\}/\1%{python2_version_nodots}/' \
@@ -448,6 +451,9 @@ make check
 
 
 %changelog
+* Wed Jul 10 2019 Jerry James <loganjerry@gmail.com> - 4.1.1p3-5
+- Add -polymake patch to fix polymake plugin
+
 * Sun Feb 17 2019 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 4.1.1p3-4
 - Rebuild for readline 8.0
 
