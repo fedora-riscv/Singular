@@ -15,7 +15,7 @@
 
 Name:		Singular
 Version:	%{downstreamver}%{?patchver}
-Release:	5%{?dist}
+Release:	6%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 # License analysis:
 # - factory/readcf.cc, Singular/grammar.cc, and Singular/grammar.h are
@@ -451,6 +451,9 @@ make check
 
 
 %changelog
+* Wed Jul 24 2019 Fedora Release Engineering <releng@fedoraproject.org> - 4.1.1p3-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
+
 * Wed Jul 10 2019 Jerry James <loganjerry@gmail.com> - 4.1.1p3-5
 - Add -polymake patch to fix polymake plugin
 
