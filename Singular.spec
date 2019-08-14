@@ -51,6 +51,7 @@ BuildRequires:	gmp-devel
 BuildRequires:	java-devel
 BuildRequires:	javapackages-tools
 BuildRequires:	libgfan-devel
+BuildRequires:	libnormaliz-devel
 BuildRequires:	libtool
 BuildRequires:	libxml2-devel
 BuildRequires:	mathicgb-devel
