@@ -7,15 +7,19 @@
 %global ntl8 1
 %endif
 
+%bcond_with python
+
+%if %{with python}
 # Singular installs python files into nonstandard places
 %global _python_bytecompile_extra 0
+%endif
 
 # Use this to build without polymake support if polymake is broken.
 %bcond_without polymake
 
 Name:		Singular
 Version:	%{downstreamver}%{?patchver}
-Release:	6%{?dist}
+Release:	7%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 # License analysis:
 # - factory/readcf.cc, Singular/grammar.cc, and Singular/grammar.h are
@@ -39,7 +43,9 @@ Source1:	surfex.tar.xz
 URL:		https://www.singular.uni-kl.de/
 BuildRequires:	bison
 BuildRequires:	boost-devel
+%if %{with python}
 BuildRequires:	boost-python2-devel
+%endif
 BuildRequires:	cddlib-devel
 BuildRequires:	desktop-file-utils
 BuildRequires:	doxygen
@@ -60,7 +66,9 @@ BuildRequires:	ntl-devel%{?ntl8: >= 8.0}
 %if %{with polymake}
 BuildRequires:	polymake-singular
 %endif
+%if %{with python}
 BuildRequires:	python2-devel
+%endif
 BuildRequires:	readline-devel
 # Need uudecode for documentation images in tarball
 BuildRequires:	sharutils
@@ -205,9 +213,11 @@ This package contains the Singular java interface.
 %patch8 -p1 -b .emacs
 %patch9 -p1 -b .polymake
 
+%if %{with python}
 # Fix the name of the boost_python library
 sed -ri 's/(lboost_python)-\$\{PYTHON_VERSION\}/\1%{python2_version_nodots}/' \
     Singular/dyn_modules/python/Makefile.am
+%endif
 
 # Do not force the use of c++11, since the polymake code requires c++14
 sed -i 's/-std=c++11//' m4/ntl-check.m4
@@ -220,8 +230,11 @@ rm -f Singular/LIB/surfex/surfex.jar
 
 
 %build
+export CPPFLAGS="-I%{_includedir}/flint -I%{_includedir}/gfanlib"
+%if %{with python}
 pyincdir=$(python2 -Esc "import sysconfig; print(sysconfig.get_paths()['include'])")
-export CPPFLAGS="-I%{_includedir}/flint -I%{_includedir}/gfanlib -I$pyincdir"
+CPPFLAGS="$CPPFLAGS -I$pyincdir"
+%endif
 export CFLAGS="%{optflags} -fPIC -fno-delete-null-pointer-checks"
 export CXXFLAGS="$CFLAGS"
 # Cannot use RPM_LD_FLAGS, as -Wl,-z,now breaks lazy module loading
@@ -239,13 +252,21 @@ export LDFLAGS="-Wl,-z,relro"
 %else
 	--disable-polymake \
 %endif
+%if %{with python}
 	--enable-python_module \
+%else
+	--disable-python_module \
+%endif
 	--enable-streamio \
 	--with-gmp \
 	--with-ntl \
 	--with-flint \
 	--with-mathicgb \
+%if %{with python}
 	--with-python=%{__python2} \
+%else
+	--without-python \
+%endif
 	--with-readline \
 	--disable-doc \
 	--with-malloc=system
@@ -332,8 +353,10 @@ exec %{singulardir}/ESingular --singular %{_bindir}/Singular "\$@"
 EOF
 chmod 0755 %{buildroot}%{_bindir}/ESingular
 
+%if %{with python}
 # Byte compile the python files
 %py_byte_compile %{__python2} %{buildroot}%{_datadir}/singular/LIB
+%endif
 
 
 %check
@@ -452,6 +475,9 @@ make check
 
 
 %changelog
+* Fri Sep  6 2019 pcpa <paulo.cesar.pereira.de.andrade@gmail.com> - 4.1.1p3-7
+- Disable the python interface (#1741426)
+
 * Wed Jul 24 2019 Fedora Release Engineering <releng@fedoraproject.org> - 4.1.1p3-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
 
