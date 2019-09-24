@@ -19,7 +19,7 @@
 
 Name:		Singular
 Version:	%{downstreamver}%{?patchver}
-Release:	7%{?dist}
+Release:	8%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 # License analysis:
 # - factory/readcf.cc, Singular/grammar.cc, and Singular/grammar.h are
@@ -475,6 +475,9 @@ make check
 
 
 %changelog
+* Tue Sep 24 2019 Jerry James <loganjerry@gmail.com> - 4.1.1p3-8
+- Rebuild for ntl 11.3.4
+
 * Fri Sep  6 2019 pcpa <paulo.cesar.pereira.de.andrade@gmail.com> - 4.1.1p3-7
 - Disable the python interface (#1741426)
 
