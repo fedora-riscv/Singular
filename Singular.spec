@@ -19,7 +19,7 @@
 
 Name:		Singular
 Version:	%{downstreamver}%{?patchver}
-Release:	8%{?dist}
+Release:	9%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 # License analysis:
 # - factory/readcf.cc, Singular/grammar.cc, and Singular/grammar.h are
@@ -475,6 +475,9 @@ make check
 
 
 %changelog
+* Fri Oct 11 2019 Jerry James <loganjerry@gmail.com> - 4.1.1p3-9
+- Rebuild for mpfr 4
+
 * Tue Sep 24 2019 Jerry James <loganjerry@gmail.com> - 4.1.1p3-8
 - Rebuild for ntl 11.3.4
 
