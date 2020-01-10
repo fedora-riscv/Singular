@@ -19,7 +19,7 @@
 
 Name:		Singular
 Version:	%{downstreamver}%{?patchver}
-Release:	10%{?dist}
+Release:	11%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 # License analysis:
 # - factory/readcf.cc, Singular/grammar.cc, and Singular/grammar.h are
@@ -50,6 +50,7 @@ BuildRequires:	cddlib-devel
 BuildRequires:	desktop-file-utils
 BuildRequires:	doxygen
 BuildRequires:	emacs
+BuildRequires:	environment(modules)
 BuildRequires:	flex
 BuildRequires:	flint-devel
 BuildRequires:	gcc-c++
@@ -76,7 +77,7 @@ BuildRequires:	texinfo-tex
 BuildRequires:	tex(latex)
 BuildRequires:	zlib-devel
 Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
-Requires:	environment-modules
+Requires:	environment(modules)
 Requires:	less
 Requires:	surf-geometry
 
@@ -475,6 +476,9 @@ make check
 
 
 %changelog
+* Thu Jan  9 2019 Jerry James <loganjerry@gmail.com> - 4.1.1p3-11
+- Rebuild for ntl 11.4.3
+
 * Mon Dec  2 2019 Jerry James <loganjerry@gmail.com> - 4.1.1p3-10
 - Rebuild for polymake 3.6
 
