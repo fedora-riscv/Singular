@@ -476,7 +476,7 @@ make check
 
 
 %changelog
-* Thu Jan  9 2019 Jerry James <loganjerry@gmail.com> - 4.1.1p3-11
+* Thu Jan  9 2020 Jerry James <loganjerry@gmail.com> - 4.1.1p3-11
 - Rebuild for ntl 11.4.3
 
 * Mon Dec  2 2019 Jerry James <loganjerry@gmail.com> - 4.1.1p3-10
