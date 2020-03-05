@@ -19,7 +19,7 @@
 
 Name:		Singular
 Version:	%{downstreamver}%{?patchver}
-Release:	12%{?dist}
+Release:	13%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 # License analysis:
 # - factory/readcf.cc, Singular/grammar.cc, and Singular/grammar.h are
@@ -60,22 +60,22 @@ BuildRequires:	javapackages-tools
 BuildRequires:	libgfan-devel
 BuildRequires:	libnormaliz-devel
 BuildRequires:	libtool
-BuildRequires:	libxml2-devel
-BuildRequires:	mathicgb-devel
-BuildRequires:	ncurses-devel
 BuildRequires:	ntl-devel%{?ntl8: >= 8.0}
+BuildRequires:  pkgconfig(libxml-2.0)
+BuildRequires:  pkgconfig(mathicgb)
+BuildRequires:  pkgconfig(ncurses)
+BuildRequires:  pkgconfig(readline)
+BuildRequires:  pkgconfig(zlib)
 %if %{with polymake}
 BuildRequires:	polymake-singular
 %endif
 %if %{with python}
 BuildRequires:	python2-devel
 %endif
-BuildRequires:	readline-devel
 # Need uudecode for documentation images in tarball
 BuildRequires:	sharutils
 BuildRequires:	texinfo-tex
 BuildRequires:	tex(latex)
-BuildRequires:	zlib-devel
 Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
 Requires:	environment(modules)
 Requires:	less
@@ -203,16 +203,7 @@ This package contains the Singular java interface.
 %prep
 %setup -q -n singular-%{downstreamver}
 %setup -q -n singular-%{downstreamver} -T -D -a 1
-%patch0 -p1 -b .arches
-%patch1 -p1 -b .link
-%patch2 -p1 -b .desktop
-%patch3 -p1 -b .ntl8
-%patch4 -p1 -b .format
-%patch5 -p1 -b .parens
-%patch6 -p1 -b .gfanlib
-%patch7 -p1 -b .alias
-%patch8 -p1 -b .emacs
-%patch9 -p1 -b .polymake
+%autopatch -p1
 
 %if %{with python}
 # Fix the name of the boost_python library
@@ -365,11 +356,6 @@ export LD_LIBRARY_PATH=%{buildroot}%{_libdir}
 make check
 
 
-%ldconfig_scriptlets -n factory
-%ldconfig_scriptlets libpolys
-%ldconfig_scriptlets libs
-
-
 %files
 %doc README.md
 %{_bindir}/Singular
@@ -476,6 +462,9 @@ make check
 
 
 %changelog
+* Wed Mar  4 2020 Jerry James <loganjerry@gmail.com> - 4.1.1p3-13
+- Rebuild for polymake 4.0
+
 * Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 4.1.1p3-12
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
 
