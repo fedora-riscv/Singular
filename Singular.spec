@@ -15,7 +15,7 @@
 %endif
 
 # Use this to build without polymake support if polymake is broken.
-%bcond_without polymake
+%bcond_with polymake
 
 Name:		Singular
 Version:	%{downstreamver}%{?patchver}
