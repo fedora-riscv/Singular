@@ -1,0 +1,22 @@
+--- singular-4.1.1/m4/flint-check.m4.orig	2018-07-31 07:05:52.000000000 -0600
++++ singular-4.1.1/m4/flint-check.m4	2020-07-06 10:59:54.667384578 -0600
+@@ -69,7 +69,7 @@ for FLINT_HOME in ${FLINT_HOME_PATH}
+ 	[
+ 	AC_TRY_RUN(
+ 	[#include <flint/flint.h>
+-	int main () { if ((int) version[0] < 2) return -1; else return 0; }
++	int main () { if ((int) flint_version[0] < 2) return -1; else return 0; }
+ 	],[
+ 	flint_found="yes"
+ 	break
+--- singular-4.1.1/Singular/misc_ip.cc.orig	2018-07-31 07:05:52.000000000 -0600
++++ singular-4.1.1/Singular/misc_ip.cc	2020-07-06 11:00:28.616358457 -0600
+@@ -811,7 +811,7 @@ char * versionString(/*const bool bShowD
+ #endif
+ 
+ #ifdef HAVE_FLINT
+-              StringAppend("FLINT(%s),",version);
++              StringAppend("FLINT(%s),",flint_version);
+ #endif
+               StringAppendS("factory(" FACTORYVERSION "),\n\t");
+ #ifdef XMEMORY_H

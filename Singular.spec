@@ -19,7 +19,7 @@
 
 Name:		Singular
 Version:	%{downstreamver}%{?patchver}
-Release:	13%{?dist}
+Release:	13.1%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 # License analysis:
 # - factory/readcf.cc, Singular/grammar.cc, and Singular/grammar.h are
@@ -101,6 +101,8 @@ Patch7:		%{name}-alias.patch
 Patch8:		%{name}-emacs.patch
 # Adapt to polymake >= 3.3
 Patch9:		%{name}-polymake.patch
+# Adapt to flint 2.6
+Patch10:	%{name}-flint.patch
 
 %description
 Singular is a computer algebra system for polynomial computations, with
@@ -462,6 +464,10 @@ make check
 
 
 %changelog
+* Wed Jul  8 2020 Jerry James <loganjerry@gmail.com> - 4.1.1p3-13.1
+- Rebuild for flint 2.6.0 and normaliz 3.8.6 without polymake support
+- Add -flint patch
+
 * Wed Mar  4 2020 Jerry James <loganjerry@gmail.com> - 4.1.1p3-13
 - Rebuild for polymake 4.0
 
