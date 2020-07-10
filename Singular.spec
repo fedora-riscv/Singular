@@ -15,11 +15,11 @@
 %endif
 
 # Use this to build without polymake support if polymake is broken.
-%bcond_with polymake
+%bcond_without polymake
 
 Name:		Singular
 Version:	%{downstreamver}%{?patchver}
-Release:	13.1%{?dist}
+Release:	14%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 # License analysis:
 # - factory/readcf.cc, Singular/grammar.cc, and Singular/grammar.h are
@@ -464,6 +464,9 @@ make check
 
 
 %changelog
+* Thu Jul  9 2020 Jerry James <loganjerry@gmail.com> - 4.1.1p3-14
+- Rebuild with polymake support
+
 * Wed Jul  8 2020 Jerry James <loganjerry@gmail.com> - 4.1.1p3-13.1
 - Rebuild for flint 2.6.0 and normaliz 3.8.6 without polymake support
 - Add -flint patch
