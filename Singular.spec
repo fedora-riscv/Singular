@@ -19,7 +19,7 @@
 
 Name:		Singular
 Version:	%{downstreamver}%{?patchver}
-Release:	15%{?dist}
+Release:	16%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 # License analysis:
 # - factory/readcf.cc, Singular/grammar.cc, and Singular/grammar.h are
@@ -103,6 +103,8 @@ Patch8:		%{name}-emacs.patch
 Patch9:		%{name}-polymake.patch
 # Adapt to flint 2.6
 Patch10:	%{name}-flint.patch
+# Adapt to Java 11
+Patch11:	%{name}-javac.patch
 
 %description
 Singular is a computer algebra system for polynomial computations, with
@@ -464,6 +466,9 @@ make check
 
 
 %changelog
+* Thu Jul 23 2020 Jerry James <loganjerry@gmail.com> - 4.1.1p3-16
+- Add -javac patch for better JDK 11 support
+
 * Sat Jul 11 2020 Jiri Vanek <jvanek@redhat.com> - 4.1.1p3-15
 - Rebuilt for JDK-11, see https://fedoraproject.org/wiki/Changes/Java11
 

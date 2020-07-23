@@ -1,0 +1,2511 @@
+--- singular-4.1.1/Singular/LIB/surfex/AboutFrame.java.orig	2018-10-24 08:27:19.000000000 -0600
++++ singular-4.1.1/Singular/LIB/surfex/AboutFrame.java	2020-07-22 21:28:36.500381090 -0600
+@@ -94,8 +94,8 @@ public class AboutFrame extends JFrame {
+ 		JPanel panel3 = new JPanel();
+ 		panel3.setLayout(new GridLayout(13, 1));
+ 		panel3.add(new JLabel(""));
+-		panel3.add(new JLabel("Surfex v" + surfex_.strVersion + " "
+-				+ surfex_.strDate));
++		panel3.add(new JLabel("Surfex v" + surfex.strVersion + " "
++				+ surfex.strDate));
+ 		panel3.add(new JLabel(""));
+ 		panel3.add(new JLabel("http://www.surfex.AlgebraicSurface.net"));
+ 		panel3.add(new JLabel(""));
+--- singular-4.1.1/Singular/LIB/surfex/AppearanceScheme.java.orig	2018-10-24 08:27:19.000000000 -0600
++++ singular-4.1.1/Singular/LIB/surfex/AppearanceScheme.java	2020-07-22 21:43:53.578403593 -0600
+@@ -86,22 +86,22 @@ public class AppearanceScheme {
+ 	public Color getEquationColorInside(int no) {
+ 		return (brighter(baseSurfaceColors[(no - 1)
+ 				% (baseSurfaceColors.length)], surfaceIntensityFactor,
+-				((int) (no / (baseSurfaceColors.length))) * 3 + 2));
++				(no / baseSurfaceColors.length) * 3 + 2));
+ 	}
+ 
+ 	public Color getEquationColorOutside(int no) {
+ 		return (brighter(baseSurfaceColors[(no - 1)
+ 				% (baseSurfaceColors.length)], surfaceIntensityFactor,
+-				((int) (no / (baseSurfaceColors.length))) * 3 + 1));
++				(no / baseSurfaceColors.length) * 3 + 1));
+ 	}
+ 
+ 	public Color getCurveColor(int no) {
+ 		if (no % 2 == 1) {
+ 			return (brighter(baseCurveColors[(no - 1) % 2],
+-					curveIntensityFactor, ((int) ((no) / 2)) + 1));
++					curveIntensityFactor, (no / 2) + 1));
+ 		} else {
+ 			return (darker(baseCurveColors[(no - 1) % 2], curveIntensityFactor,
+-					((int) ((no - 1) / 2)) + 1));
++					((no - 1) / 2) + 1));
+ 		}
+ 	}
+ } // end class AppearanceScheme
+--- singular-4.1.1/Singular/LIB/surfex/ConfigFrame.java.orig	2018-10-24 08:27:19.000000000 -0600
++++ singular-4.1.1/Singular/LIB/surfex/ConfigFrame.java	2020-07-22 21:39:47.756145873 -0600
+@@ -101,7 +101,7 @@ public class ConfigFrame extends JFrame
+ 				}
+ 				if (!rayImme.isSelected() && last[4]) {
+ 					last[4] = false;
+-					surfex_.updateRayframeImmediatlyThread.stop();
++					surfex_.updateRayframeImmediatlyThread.stopThread();
+ 				}
+ 			}
+ 
+@@ -378,7 +378,7 @@ public class ConfigFrame extends JFrame
+ 			Runtime r = Runtime.getRuntime();
+ 			Process p;
+ 			p = r.exec(iviewPath.getText() + " i_view32_test.jpg /convert="
+-					+ surfex_.tmpDir + "i_view32_test.jpg");
++					+ surfex.tmpDir + "i_view32_test.jpg");
+ 			iviewPath.setBackground(Color.white);
+ 			return true;
+ 		} catch (Exception e1) {
+--- singular-4.1.1/Singular/LIB/surfex/CurveAdmin.java.orig	2018-10-24 08:27:19.000000000 -0600
++++ singular-4.1.1/Singular/LIB/surfex/CurveAdmin.java	2020-07-22 20:32:26.887446361 -0600
+@@ -57,7 +57,7 @@ public class CurveAdmin extends JPanel i
+ 	private surfex surfex_;
+ 
+ 	// this Project
+-	Vector cunList = new Vector();
++	Vector<Curve> cunList = new Vector<Curve>();
+ 
+ 	int cuncounter = 0;
+ 
+@@ -81,15 +81,15 @@ public class CurveAdmin extends JPanel i
+ 	}
+ 
+ 	public void equationListChanged_add(String EqName) {
+-		ListIterator li = cunList.listIterator();
++		ListIterator<Curve> li = cunList.listIterator();
+ 		Curve cu;
+ 		int i;
+ 		while (li.hasNext()) {
+ 			//       System.out.println("update pla oe" );
+-			cu = (Curve) li.next();
++			cu = li.next();
+ 			for (i = 0; i <= 9; i++) {
+ 				//             System.out.println(i);
+-				cu.C[i].addItem(EqName);
++				cu.C.get(i).addItem(EqName);
+ 			}
+ 		}
+ 	}
+@@ -106,11 +106,11 @@ public class CurveAdmin extends JPanel i
+ 
+ 
+ 
+-	public Vector getEqNrs() {
+-		Vector temp = new Vector();
+-		ListIterator li = cunList.listIterator();
++	public Vector<Integer> getEqNrs() {
++		Vector<Integer> temp = new Vector<Integer>();
++		ListIterator<Curve> li = cunList.listIterator();
+ 		while (li.hasNext()) {
+-			temp.add(new Integer(((Curve) li.next()).cunr));
++			temp.add(Integer.valueOf(li.next().cunr));
+ 		}
+ 		return temp;
+ 	}
+@@ -252,11 +252,10 @@ public class CurveAdmin extends JPanel i
+ 		cuPanel.removeAll();
+ 		cuPanel.setLayout(new GridLayout(20, 0));
+ 		//  System.out.println("updatepanel");
+-		ListIterator li = cunList.listIterator();
+-		Curve cu;
++		ListIterator<Curve> li = cunList.listIterator();
+ 		int internalCunr = 1;
+ 		while (li.hasNext()) {
+-			cu = (Curve) li.next();
++			Curve cu = li.next();
+ 			cu.updateActionCommands(internalCunr++);
+ 			cuPanel.add(cu);
+ 		}
+@@ -309,7 +308,7 @@ public class CurveAdmin extends JPanel i
+ 								|| (strline.equals("showcbox:"))) {
+ 							//          System.out.println("strline:"+strline);
+ 							if (strline.equals("curveno:")) {
+-								((Curve) cunList.lastElement())
++								cunList.lastElement()
+ 										.setCurveNo(Integer.parseInt(bs
+ 												.readLine()));
+ 							}
+@@ -317,7 +316,7 @@ public class CurveAdmin extends JPanel i
+ 								for (j = 0; j <= 9; j++) {
+ 									try {
+ 										bs.mark(255);
+-										((Curve) cunList.lastElement()).C[j]
++										cunList.lastElement().C.get(j)
+ 												.setSelectedIndex(Integer
+ 														.parseInt(bs.readLine()));
+ 									} catch (Exception nex) {
+@@ -326,14 +325,14 @@ public class CurveAdmin extends JPanel i
+ 								}
+ 							}
+ 							if (strline.equals("color:")) {
+-								((Curve) cunList.lastElement()).colorButton_i
++								cunList.lastElement().colorButton_i
+ 										.setBackground(new Color(
+ 												Integer.parseInt(bs.readLine()),
+ 												Integer.parseInt(bs.readLine()),
+ 												Integer.parseInt(bs.readLine())));
+ 							}
+ 							if (strline.equals("showcbox:")) {
+-								((Curve) cunList.lastElement()).cbox
++								cunList.lastElement().cbox
+ 										.setSelected((Boolean.valueOf(bs
+ 												.readLine())).booleanValue());
+ 							}
+@@ -347,12 +346,12 @@ public class CurveAdmin extends JPanel i
+ 				}
+ 				if (datatype.equals("complete") || datatype.equals("onlyeqns")
+ 						|| datatype.equals("eqnsvis")) {
+-					((Curve) cunList.lastElement()).setCurveNo(Integer
++					cunList.lastElement().setCurveNo(Integer
+ 							.parseInt(bs.readLine()));
+ 					for (j = 0; j <= 9; j++) {
+ 						try {
+ 							bs.mark(255);
+-							((Curve) cunList.lastElement()).C[j]
++							cunList.lastElement().C.get(j)
+ 									.setSelectedIndex(Integer.parseInt(bs
+ 											.readLine()));
+ 						} catch (Exception nex) {
+@@ -362,7 +361,7 @@ public class CurveAdmin extends JPanel i
+ 					}
+ 				}
+ 				if (datatype.equals("complete") || datatype.equals("onlystyle")) {
+-					((Curve) cunList.lastElement()).colorButton_i
++					cunList.lastElement().colorButton_i
+ 							.setBackground(new Color(Integer.parseInt(bs
+ 									.readLine()), Integer.parseInt(bs
+ 									.readLine()), Integer.parseInt(bs
+@@ -370,7 +369,7 @@ public class CurveAdmin extends JPanel i
+ 				}
+ 				if (datatype.equals("complete") || datatype.equals("onlystyle")
+ 						|| datatype.equals("eqnsvis")) {
+-					((Curve) cunList.lastElement()).cbox.setSelected((Boolean
++					cunList.lastElement().cbox.setSelected((Boolean
+ 							.valueOf(bs.readLine())).booleanValue());
+ 				}
+ 			}
+@@ -383,11 +382,11 @@ public class CurveAdmin extends JPanel i
+ 		String str = "";
+ 		//  System.out.println("save cu" );
+ 		//pw.println("String");
+-		ListIterator li = cunList.listIterator();
++		ListIterator<Curve> li = cunList.listIterator();
+ 		str += "////////////////// CURVES: /////////////////////////" + "\n";
+ 		str += cunList.size() + "\n";
+ 		while (li.hasNext()) {
+-			str += ((Curve) li.next()).saveYourself();
++			str += li.next().saveYourself();
+ 		}
+ 		return (str);
+ 	}
+--- singular-4.1.1/Singular/LIB/surfex/Curve.java.orig	2018-10-24 08:27:19.000000000 -0600
++++ singular-4.1.1/Singular/LIB/surfex/Curve.java	2020-07-22 20:35:07.654411706 -0600
+@@ -36,6 +36,7 @@ import java.awt.GridLayout;
+ import java.awt.event.ActionEvent;
+ import java.awt.event.ActionListener;
+ import java.io.PrintWriter;
++import java.util.ArrayList;
+ 
+ import javax.swing.JButton;
+ import javax.swing.JCheckBox;
+@@ -55,10 +56,7 @@ public class Curve extends JPanel {
+ 
+ 	// GUI
+ 
+-	public JComboBox C[] = { new JComboBox(), new JComboBox(), new JComboBox(),
+-			new JComboBox(), new JComboBox(), new JComboBox(), new JComboBox(),
+-			new JComboBox(), new JComboBox(), new JComboBox() };//new
+-																// JComboBox[10];
++	public ArrayList<JComboBox<Object>> C = new ArrayList<JComboBox<Object>>(10);
+ 
+ 	//JPanel configPanel = new JPanel();
+ 
+@@ -92,6 +90,9 @@ public class Curve extends JPanel {
+ 	Curve(int internalCunr, int cunr, CurveAdmin ca, Project pro) {
+ 		//System.out.println("testpl" );
+ 
++		for (int i = 0; i < 10; i++)
++			C.add(new JComboBox<Object>());
++
+ //		polyCalc.doPrint = false;
+ 		cuAdm = ca;
+ 		this.project = pro;
+@@ -138,8 +139,8 @@ public class Curve extends JPanel {
+ 		 * C[i].addItem(cunrT);//=(new JComboBox(eqNrs)); centerPanel.add(C[i]); } }
+ 		 */
+ 		for (i = 0; i <= 9; i++) {
+-			C[i] = new JComboBox(project.eqAdm.getEqNrs());
+-			centerPanel.add(C[i]);
++			C.set(i, new JComboBox<Object>(project.eqAdm.getEqNrs()));
++			centerPanel.add(C.get(i));
+ 		}
+ 
+ 		setLayout(new BorderLayout());
+@@ -211,11 +212,11 @@ public class Curve extends JPanel {
+ 		str += "curve_width = 2.5;\n";
+ 
+ 		for (i = 1; i <= 8; i++) {
+-			if (((C[i].getSelectedItem()).toString()).equals("-")) {
++			if (((C.get(i).getSelectedItem()).toString()).equals("-")) {
+ 				str += "cutsurface" + (i) + " = 0;";
+ 			} else {
+ 				str += "cutsurface" + (i) + " = f"
+-						+ ((C[i].getSelectedItem()).toString()) + ";";
++						+ ((C.get(i).getSelectedItem()).toString()) + ";";
+ 				str += "cutsurface" + (i) + "=rotate(cutsurface" + (i) + ","
+ 						+ ang[0] + ",yAxis);\n";
+ 				str += "cutsurface" + (i) + "=rotate(cutsurface" + (i) + ","
+@@ -244,7 +245,7 @@ public class Curve extends JPanel {
+ 		int i;
+ 		pw.println("" + eindeutigeCuNr + "\n");
+ 		for (i = 0; i <= 9; i++) {
+-			pw.println(C[i].getSelectedIndex());
++			pw.println(C.get(i).getSelectedIndex());
+ 		}
+ 		pw.println(colorButton_i.getBackground().getRed());
+ 		pw.println(colorButton_i.getBackground().getGreen());
+@@ -259,7 +260,7 @@ public class Curve extends JPanel {
+ 		int i;
+ 		str += ("" + cunr + "\n");
+ 		for (i = 0; i <= 9; i++) {
+-			str += C[i].getSelectedIndex() + "\n";
++			str += C.get(i).getSelectedIndex() + "\n";
+ 		}
+ 		str += colorButton_i.getBackground().getRed() + "\n";
+ 		str += colorButton_i.getBackground().getGreen() + "\n";
+--- singular-4.1.1/Singular/LIB/surfex/EquationAdmin.java.orig	2018-10-24 08:27:19.000000000 -0600
++++ singular-4.1.1/Singular/LIB/surfex/EquationAdmin.java	2020-07-22 21:52:46.602885333 -0600
+@@ -82,7 +82,7 @@ public class EquationAdmin extends JPane
+ 	private double[] scale = new double[3];
+ 
+ 	// this Project
+-	Vector eqnList = new Vector();
++	Vector<Equation> eqnList = new Vector<Equation>();
+ 
+ 	int eqncounter = 0;
+ 
+@@ -108,7 +108,7 @@ public class EquationAdmin extends JPane
+ 	EquationAdmin(jv4surfex jv4sx, RayFrame ray, surfex su, Project myp) {
+ 		project = myp;
+ 		surfex_ = su;
+-		img_filename = surfex_.tmpDir + "test.png";
++		img_filename = surfex.tmpDir + "test.png";
+ 		this.jv4sx = jv4sx;
+ 		rayFrame = ray;
+ 		projectName = "Project 1";
+@@ -136,21 +136,20 @@ public class EquationAdmin extends JPane
+ 	eqnpanel.removeAll();
+     }
+ 
+-    public Vector getEqNrs() {
+-	Vector temp = new Vector();
++    public Vector<Object> getEqNrs() {
++	Vector<Object> temp = new Vector<Object>();
+ 	temp.add("-");
+-	ListIterator li = eqnList.listIterator();
++	ListIterator<Equation> li = eqnList.listIterator();
+ 	while (li.hasNext()) {
+-	    temp.add(new Integer(((Equation) li.next()).eqnr));
++	    temp.add(Integer.valueOf(li.next().eqnr));
+ 	}
+ 	return temp;
+     }
+ 
+     public Equation getEqnFromNo(int no) {
+-	ListIterator li = eqnList.listIterator();
+-	Equation tmpEq;
++	ListIterator<Equation> li = eqnList.listIterator();
+ 	while (li.hasNext()) {
+-	    tmpEq = (Equation) li.next();
++	    Equation tmpEq = li.next();
+ 	    if (tmpEq.eqnr == no) {
+ 		return (tmpEq);
+ 	    }
+@@ -169,7 +168,7 @@ public class EquationAdmin extends JPane
+ 	ProjectNumber = i;
+ 	projectName = "Project" + i;
+ 	this.surfex_ = su;
+-	img_filename = surfex_.tmpDir + "test.png";
++	img_filename = surfex.tmpDir + "test.png";
+ 
+ 	//savePicDialog = new SavePicDialog(projectName, rayFrame, this, surfex_);
+ 	// es muss vorher der Projectname da sein
+@@ -192,9 +191,9 @@ public class EquationAdmin extends JPane
+ 	eqnpanel.setLayout(new GridLayout(20, 0));
+ 	newEquation();
+ 
+-	oldeq = (Equation) eqnList.firstElement();
++	oldeq = eqnList.firstElement();
+ 	//  ((Equation) eqnList.firstElement()).setBasePlane(true, jv4sx, scale);
+-	((Equation) eqnList.firstElement()).setBasePlaneDefault();
++	eqnList.firstElement().setBasePlaneDefault();
+ 	this.add(eqnpanel);
+     }
+ 
+@@ -209,11 +208,10 @@ public class EquationAdmin extends JPane
+ 	    // normalen Vergleich will er aus irgendeinem Grund nicht, desshalb muss es halt ueber den hashcode gehen ...
+ 	    // klar: basePlaneButton
+ 	    //      System.out.println("plan");
+-	    ListIterator li = eqnList.listIterator();
+-	    Equation eq;
++	    ListIterator<Equation> li = eqnList.listIterator();
+ 	    oldeq.setBasePlane(false);
+ 	    while (li.hasNext()) {
+-		eq = ((Equation) li.next());
++		Equation eq = li.next();
+ 		if (eq.basePlaneButton.getActionCommand() == command) {
+ 		    // fertig
+ 		    oldeq = eq;
+@@ -230,16 +228,16 @@ public class EquationAdmin extends JPane
+ 	    // klar: deletePlaneButton
+ 	    int internalEqnr = (new Integer(command.substring(17, command
+ 							      .length()))).intValue();
+-	    if (((Equation) eqnList.elementAt(internalEqnr - 1)).isBasePlane()) {
++	    if (eqnList.elementAt(internalEqnr - 1).isBasePlane()) {
+ 		// dann muss ne andere die BasePlane werden
+ 		updateScale();
+ 		if (internalEqnr != 1) {
+-		    ((Equation) eqnList.elementAt(internalEqnr - 2))
++		    eqnList.elementAt(internalEqnr - 2)
+ 			.setBasePlane(true, jv4sx, scale);
+ 		} else {
+ 		    if (eqnList.size() >= 2) {
+ 			// wurde die erste geloescht, setze die naechste als Baseplane
+-			((Equation) eqnList.elementAt(internalEqnr))
++			eqnList.elementAt(internalEqnr)
+ 			    .setBasePlane(true, jv4sx, scale);
+ 		    }
+ 		    // else sind keine Planes mehr da!
+@@ -451,7 +449,7 @@ public class EquationAdmin extends JPane
+ 	// define some constants:
+ 	strSurf += "double PI = 2*arcsin(1);";
+ 
+-	ListIterator li;
++	ListIterator<OneParameter> li;
+ 
+ 	// copy the parameters here:
+ 	strSurf += "\n" + "// the parameters:\n";
+@@ -463,7 +461,7 @@ public class EquationAdmin extends JPane
+ 	String thisSurfCode;
+ 	while (li.hasNext()) {
+ 	    //      System.out.println("no:"+cp);
+-	    thisop = (OneParameter) li.next();
++	    thisop = li.next();
+ 	    //      if (thisop.isSelected()) {
+ 	    thisSurfCode=thisop.getSurfCode();
+ 	    //System.out.println("was rauskomt:"+thisSurfCode);
+@@ -485,25 +483,25 @@ public class EquationAdmin extends JPane
+ 
+ 	// get the equations of the surfaces used:
+ 	strSurf += "\n" + "// the equations:\n";
+-	li = eqnList.listIterator();
++	ListIterator<Equation> li2 = eqnList.listIterator();
+ 	Equation thisEqn;
+ 	int lc = 0;
+ 	int ec = 1;
+-	while (li.hasNext()) {
+-	    thisEqn = (Equation) li.next();
++	while (li2.hasNext()) {
++	    thisEqn = li2.next();
+ 	    strSurf += thisEqn.getPolyCode("f" + ec)+"\n";
+ 	    ec++;
+ 	}
+ 
+ 	// the surfaces which will be shown:
+-	while (li.hasPrevious()) {
+-	    li.previous();
++	while (li2.hasPrevious()) {
++	    li2.previous();
+ 	}
+ 	lc = 0;
+ 	ec = 1;
+ //	System.out.println("getSurfCode");
+-	while (li.hasNext()) {
+-	    thisEqn = (Equation) li.next();
++	while (li2.hasNext()) {
++	    thisEqn = li2.next();
+ 	    thisEqn.surf_no = -1;
+ 	    if (thisEqn.isSelected() && !(thisEqn.visType.getSelectedIndex()==2)) {
+ 		if (lc <= 9) {
+@@ -518,14 +516,14 @@ public class EquationAdmin extends JPane
+ 	}
+ 
+ 	// the clip surfaces:
+-	while (li.hasPrevious()) {
+-	    li.previous();
++	while (li2.hasPrevious()) {
++	    li2.previous();
+ 	}
+ 	int lcc = 0;
+ 	int ecc = 1;
+ 	String strSurfNo = "";
+-	while (li.hasNext()) {
+-	    thisEqn = (Equation) li.next();
++	while (li2.hasNext()) {
++	    thisEqn = li2.next();
+ //	    thisEqn.surf_no = -1;
+ 	    if (thisEqn.isSelected() && thisEqn.visType.getSelectedIndex()==2) {
+ 		if (lcc <= 9) {
+@@ -546,15 +544,15 @@ public class EquationAdmin extends JPane
+ 	// get the coordinates of the isolated points
+ 	// and draw the small spheres:
+ 	strSurf += "\n" + "// the solitary points (shown as spheres):\n";
+-	li = project.solPtsAdm.solPtsList.listIterator();
++	ListIterator<SolitaryPoint> li3 = project.solPtsAdm.solPtsList.listIterator();
+ 	SolitaryPoint thisPt;
+ 	int ptc = 0;
+ 	String strSurface = "";
+ 	Equation tmpEq;
+ 	String strTmp;
+ 	int usedEqNo = lc;
+-	while (li.hasNext()) {
+-	    thisPt = (SolitaryPoint) li.next();
++	while (li3.hasNext()) {
++	    thisPt = li3.next();
+ 	    //      System.out.println("rad:");
+ 	    if (!(((thisPt.radiusLabel).getText()).equals("0.0"))) {
+ 		strSurf += thisPt.getSurfCode();
+@@ -659,25 +657,24 @@ public class EquationAdmin extends JPane
+ 
+ 	// draw the curves given by intersections of some of the equations above:
+ 	strSurf += "\n" + "// the curves:\n";
+-	li = project.cuAdm.cunList.listIterator();
++	ListIterator<Curve> li4 = project.cuAdm.cunList.listIterator();
+ 	Curve thisCun;
+ 	lc = 0;
+ 	int cc = 1;
+ 	String tmpSurfNo = "-";
+ 	int iTmpSurfNo = -1;
+ //	System.out.println("curves...");
+-	while (li.hasNext()) {
+-	    thisCun = (Curve) li.next();
++	while (li4.hasNext()) {
++	    thisCun = li4.next();
+ //	    System.out.println("next...");
+ 	    if (thisCun.isSelected()) {
+ //		System.out.println("selected...");
+ 		//    if (lc <= 9) {
+ 		//    System.out.println("cu:"+thisCun.C[0].getSelectedItem().toString());
+-		tmpSurfNo = (thisCun.C[0].getSelectedItem().toString());
++		tmpSurfNo = (thisCun.C.get(0).getSelectedItem().toString());
+ 		if (!tmpSurfNo.equals("-")) {
+-		    iTmpSurfNo = ((Equation)
+-				  (eqnList.elementAt(
+-				      Integer.parseInt(tmpSurfNo) - 1))).surf_no;
++		    iTmpSurfNo = (eqnList.elementAt(
++				      Integer.parseInt(tmpSurfNo) - 1)).surf_no;
+ //		    System.out.println("surf_no:"+iTmpSurfNo);
+ 		    if (!(iTmpSurfNo == -1)) {
+ 			strSurf += thisCun.getSurfCode(
+@@ -754,13 +751,12 @@ public class EquationAdmin extends JPane
+ 			 + (project.bgColorButton.getBackground().getBlue())
+ 			 + ";\n");
+ 	    // Polynome aus der Liste uebergebn
+-	    ListIterator li = eqnList.listIterator();
+-	    Equation thisEqn;
++	    ListIterator<Equation> li = eqnList.listIterator();
+ 	    int lc = 0;
+ 	    int ec = 1;
+ //	    System.out.println("saveSurfCode");
+ 	    while (li.hasNext()) {
+-		thisEqn = (Equation) li.next();
++		Equation thisEqn = li.next();
+ 		if (thisEqn.isSelected()) {
+ 		    if (lc <= 9) {
+ 			thisEqn.savesurfCode(pw,
+@@ -791,11 +787,10 @@ public class EquationAdmin extends JPane
+ 	eqnpanel.removeAll();
+ 	eqnpanel.setLayout(new GridLayout(20, 0));
+ 	//  System.out.println("updatepanel");
+-	ListIterator li = eqnList.listIterator();
+-	Equation eq;
++	ListIterator<Equation> li = eqnList.listIterator();
+ 	int internalEqnr = 1;
+ 	while (li.hasNext()) {
+-	    eq = (Equation) li.next();
++	    Equation eq = li.next();
+ 	    eq.updateActionCommands(internalEqnr++);
+ 	    eqnpanel.add(eq);
+ 	}
+@@ -999,23 +994,23 @@ public class EquationAdmin extends JPane
+ 			       || (strline.equals("transparency:"))) {
+ 			    //          System.out.println("strline:"+strline);
+ 			    if (strline.equals("eqno:")) {
+-				((Equation) eqnList.lastElement())
++				eqnList.lastElement()
+ 				    .setEquationNo(Integer.parseInt(bs
+ 								    .readLine()));
+ 			    }
+ 			    if (strline.equals("equation:")) {
+-				((Equation) eqnList.lastElement()).text
++				eqnList.lastElement().text
+ 				    .setText(bs.readLine());
+ 			    }
+ 			    if (strline.equals("insidecolor:")) {
+-				((Equation) eqnList.lastElement()).colorButton_i
++				eqnList.lastElement().colorButton_i
+ 				    .setBackground(new Color(
+ 						       Integer.parseInt(bs.readLine()),
+ 						       Integer.parseInt(bs.readLine()),
+ 						       Integer.parseInt(bs.readLine())));
+ 			    }
+ 			    if (strline.equals("outsidecolor:")) {
+-				((Equation) eqnList.lastElement()).colorButton_o
++				eqnList.lastElement().colorButton_o
+ 				    .setBackground(new Color(
+ 						       Integer.parseInt(bs.readLine()),
+ 						       Integer.parseInt(bs.readLine()),
+@@ -1024,30 +1019,30 @@ public class EquationAdmin extends JPane
+ 			    if (strline.equals("basecolor:")) {
+ 				int i = Integer.parseInt(bs.readLine());
+ 				if (i != 255) {
+-				    ((Equation) eqnList.lastElement()).basePlaneButton
++				    eqnList.lastElement().basePlaneButton
+ 					.setBackground(new Color(0, 255, 0));
+ 				} else {
+-				    ((Equation) eqnList.lastElement()).basePlaneButton
++				    eqnList.lastElement().basePlaneButton
+ 					.setBackground(new Color(255, 255,
+ 								 255));
+ 				}
+ 			    }
+ 			    if (strline.equals("showcbox:")) {
+-				((Equation) eqnList.lastElement()).cbox
++				eqnList.lastElement().cbox
+ 				    .setSelected((Boolean.valueOf(bs
+ 								  .readLine())).booleanValue());
+ 			    }
+ 			    if (strline.equals("clipping:")) {
+-				((Equation) eqnList.lastElement()).optionButtonPane.bt2
++				eqnList.lastElement().optionButtonPane.bt2
+ 				    .setSelected(!(Boolean.valueOf(bs
+ 								   .readLine()).booleanValue()));
+ 			    }
+ 			    if (strline.equals("clipradius:")) {
+-				((Equation) eqnList.lastElement()).optionButtonPane.clipingRadiusTextField
++				eqnList.lastElement().optionButtonPane.clipingRadiusTextField
+ 				    .setText(bs.readLine());
+ 			    }
+ 			    if (strline.equals("transparency:")) {
+-				((Equation) eqnList.lastElement()).optionButtonPane.slider1
++				eqnList.lastElement().optionButtonPane.slider1
+ 				    .setValue(Integer.parseInt(bs
+ 							       .readLine()));
+ 			    }
+@@ -1064,31 +1059,31 @@ public class EquationAdmin extends JPane
+ 			|| datatype.equals("onlyeqns")
+ 			|| datatype.equals("eqnsvis")) {
+ 			//      System.out.println("eqno, equations...");
+-			((Equation) eqnList.lastElement())
++			eqnList.lastElement()
+ 			    .setEquationNo(Integer.parseInt(bs.readLine()));
+-			((Equation) eqnList.lastElement()).text.setText(bs.readLine());
++			eqnList.lastElement().text.setText(bs.readLine());
+ 			//      System.out.println("end eqno, equations.");
+ 		    }
+ 		    if (datatype.equals("complete")
+ 			|| datatype.equals("onlystyle")) {
+ 			//      System.out.println("colors...");
+-			((Equation) eqnList.lastElement()).colorButton_i
++			eqnList.lastElement().colorButton_i
+ 			    .setBackground(new Color(
+ 					       Integer.parseInt(bs.readLine()),
+ 					       Integer.parseInt(bs.readLine()),
+ 					       Integer.parseInt(bs.readLine())));
+-			((Equation) eqnList.lastElement()).colorButton_o
++			eqnList.lastElement().colorButton_o
+ 			    .setBackground(new Color(Integer.parseInt(bs.readLine()),
+ 						     Integer.parseInt(bs.readLine()),
+ 						     Integer.parseInt(bs.readLine())));
+ 			int i = Integer.parseInt(bs.readLine());
+ 			if (i != 255) {
+ 			    //      System.out.println("green");
+-			    ((Equation) eqnList.lastElement()).basePlaneButton
++			    eqnList.lastElement().basePlaneButton
+ 				.setBackground(new Color(0, 255, 0));
+ 			} else {
+ 			    //      System.out.println("white");
+-			    ((Equation) eqnList.lastElement()).basePlaneButton
++			    eqnList.lastElement().basePlaneButton
+ 				.setBackground(new Color(255, 255, 255));
+ 			}
+ 		    }
+@@ -1097,20 +1092,20 @@ public class EquationAdmin extends JPane
+ 			|| datatype.equals("onlystyle")
+ 			|| datatype.equals("eqnsvis")) {
+ 			//      System.out.println("cbox...");
+-			((Equation) eqnList.lastElement()).cbox
++			eqnList.lastElement().cbox
+ 			    .setSelected((Boolean.valueOf(bs.readLine()))
+ 					 .booleanValue());
+ 			if(iVersion>=8907) {
+-			    ((Equation) eqnList.lastElement()).visType
++			    eqnList.lastElement().visType
+ 				.setSelectedIndex(Integer.parseInt(bs.readLine()));
+ 			}
+ 		    }
+ 		    if (datatype.equals("complete")
+ 			|| datatype.equals("onlystyle")) {
+-			((Equation) eqnList.lastElement()).optionButtonPane.bt2
++			eqnList.lastElement().optionButtonPane.bt2
+ 			    .setSelected(!(Boolean.valueOf(bs.readLine())
+ 					   .booleanValue()));
+-			((Equation) eqnList.lastElement()).optionButtonPane
++			eqnList.lastElement().optionButtonPane
+ 			    .clipingRadiusTextField
+ 			    .setText(bs.readLine());
+ 		    }
+@@ -1118,7 +1113,7 @@ public class EquationAdmin extends JPane
+ 			|| datatype.equals("onlystyle")
+ 			|| datatype.equals("eqnsvis")) {
+ 			//      System.out.println("slider1...");
+-			((Equation) eqnList.lastElement()).optionButtonPane.slider1
++			eqnList.lastElement().optionButtonPane.slider1
+ 			    .setValue(Integer.parseInt(bs.readLine()));
+ 		    }
+ 		}
+@@ -1131,22 +1126,22 @@ public class EquationAdmin extends JPane
+ 
+     public void save(PrintWriter pw) {
+ 	//  System.out.println("save Eq" );
+-	ListIterator li = eqnList.listIterator();
++	ListIterator<Equation> li = eqnList.listIterator();
+ 	pw.println("////////////////// EQUATIONS: /////////////////////////");
+ 	pw.println(eqnList.size());
+ 	while (li.hasNext()) {
+-	    ((Equation) li.next()).saveYourself(pw);
++	    li.next().saveYourself(pw);
+ 	}
+     }
+ 
+     public String save() {
+ 	String str = "";
+ 	//  System.out.println("save Eq" );
+-	ListIterator li = eqnList.listIterator();
++	ListIterator<Equation> li = eqnList.listIterator();
+ 	str += "////////////////// EQUATIONS: /////////////////////////" + "\n";
+ 	str += eqnList.size() + "\n";
+ 	while (li.hasNext()) {
+-	    str += ((Equation) li.next()).saveYourself();
++	    str += li.next().saveYourself();
+ 	}
+ 	return (str);
+     }
+@@ -1156,10 +1151,9 @@ public class EquationAdmin extends JPane
+ 	/// muss noch gefuellt werden ...
+ 	// wird aufgeufen, wenn das Projekt gewechselt wurde
+ 	// um das Bildchen in javaview upzudaten
+-	ListIterator li = eqnList.listIterator();
+-	Equation eq;
++	ListIterator<Equation> li = eqnList.listIterator();
+ 	while (li.hasNext()) {
+-	    eq = (Equation) li.next();
++	    Equation eq = li.next();
+ 	    if (eq.isBasePlane()) {
+ 		eq.updateJV4SX();
+ 		break;
+@@ -1172,10 +1166,9 @@ public class EquationAdmin extends JPane
+ 
+     public void updateJV4SXandReconstructLastView() {
+ //	System.out.println("updateJV4SXandRec...");
+-	ListIterator li = eqnList.listIterator();
+-	Equation eq;
++	ListIterator<Equation> li = eqnList.listIterator();
+ 	while (li.hasNext()) {
+-	    eq = (Equation) li.next();
++	    Equation eq = li.next();
+ 	    //      System.out.println("is base?"+eq.getEqNo());
+ 	    if (eq.isBasePlane()) {
+ 		eq.updateJV4SX();
+--- singular-4.1.1/Singular/LIB/surfex/Equation.java.orig	2018-10-24 08:27:19.000000000 -0600
++++ singular-4.1.1/Singular/LIB/surfex/Equation.java	2020-07-22 20:41:34.391350249 -0600
+@@ -90,7 +90,7 @@ public class Equation extends JPanel {
+     jv4surfex jv4sx;
+ 
+     JCheckBox cbox = new JCheckBox();
+-    JComboBox visType = new JComboBox();
++    JComboBox<String> visType = new JComboBox<String>();
+ 
+     EquationAdmin eqAdm;
+ 
+@@ -102,13 +102,17 @@ public class Equation extends JPanel {
+     // Ende Variablen
+ 
+     public String getImpsurfCode(String strPoly, double[] scale) {
+-	String strRichMor = "DEF=" + URLEncoder.encode(strPoly + "=0;")
+-	    + "&XMIN=-" + (9.0 / scale[0]) + "&XMAX=" + (9.3 / scale[0])
+-	    + "&YMIN=-" + (9.1 / scale[1]) + "&YMAX=" + (9.1 / scale[1])
+-	    + "&ZMIN=-" + (9.2 / scale[2]) + "&ZMAX=" + (9.3 / scale[2])
+-	    + "" + "&COARSE=8&FINE=64&FACE=512&EDGE=4096"
+-	    + "&TIMEOUT=1000&VERSION=3";
+-	return (strRichMor);
++	try {
++	    String strRichMor = "DEF=" + URLEncoder.encode(strPoly + "=0;", "UTF-8")
++		+ "&XMIN=-" + (9.0 / scale[0]) + "&XMAX=" + (9.3 / scale[0])
++		+ "&YMIN=-" + (9.1 / scale[1]) + "&YMAX=" + (9.1 / scale[1])
++		+ "&ZMIN=-" + (9.2 / scale[2]) + "&ZMAX=" + (9.3 / scale[2])
++		+ "" + "&COARSE=8&FINE=64&FACE=512&EDGE=4096"
++		+ "&TIMEOUT=1000&VERSION=3";
++	    return (strRichMor);
++	} catch (java.io.UnsupportedEncodingException ex) {
++	    return "";
++	}
+     }
+ 
+     public boolean triangulate(String strPoly, double[] scale,
+@@ -131,12 +135,12 @@ public class Equation extends JPanel {
+ 		    .print("prefix=surfex_tmp"
+ 			   + "&filelocation="
+ 			   + URLEncoder.encode("./" + eindeutigeEqnNr
+-					       + ".jvx")
++					       + ".jvx", "UTF-8")
+ 			   + "&tmpsubdir="
+ 			   + URLEncoder
+-			   .encode(surfex_.getCurrentProject().old_tmpsubdir)
++			   .encode(surfex_.getCurrentProject().old_tmpsubdir, "UTF-8")
+ 			   + "&prg=impsurf" + "&prg_code_part1="
+-			   + URLEncoder.encode(strRichMor)
++			   + URLEncoder.encode(strRichMor, "UTF-8")
+ 			   + "&prg_code_part2=");
+ 		out.close();
+ 		// read the file names
+--- singular-4.1.1/Singular/LIB/surfex/ExtensionFileFilter.java.orig	2018-10-24 08:27:19.000000000 -0600
++++ singular-4.1.1/Singular/LIB/surfex/ExtensionFileFilter.java	2020-07-22 21:49:06.073710798 -0600
+@@ -60,7 +60,7 @@ public class ExtensionFileFilter extends
+ 			this.description = description;
+ 		}
+ 
+-		this.extensions = (String[]) extensions.clone();
++		this.extensions = extensions.clone();
+ 		// Convert array to lowercase
+ 		// Don't alter original entries
+ 		toLower(this.extensions);
+--- singular-4.1.1/Singular/LIB/surfex/jv4surfex.java.orig	2018-10-24 08:27:19.000000000 -0600
++++ singular-4.1.1/Singular/LIB/surfex/jv4surfex.java	2020-07-22 21:40:49.226210318 -0600
+@@ -77,7 +77,7 @@ public class jv4surfex {
+ 
+     double lastScale,factor;
+ 
+-    Vector lamps=new Vector();
++    Vector<Lamp> lamps=new Vector<Lamp>();
+ 
+     double scale = 1.0;
+     public double scaleMin = 0.0;
+@@ -366,7 +366,7 @@ public class jv4surfex {
+ 	frame.setVisible(false);
+     }
+ 
+-    public void setLamps(Vector lamps){
++    public void setLamps(Vector<Lamp> lamps){
+ 	this.lamps=lamps;
+ //		System.out.println("222joahr----"+((Lamp)lamps.firstElement()).getXpos());
+ 
+@@ -393,13 +393,12 @@ public class jv4surfex {
+ 	disp.removeGeometries();
+ 
+ 
+-	int i=lamps.size()-1;
+-	Lamp l;
++	int i;
+ //		System.out.println("lampsize:"+lamps.size());
+ 	for(i=0;i<lamps.size();i++){
+ 	    //	System.out.println("333joahr----"+((Lamp)lamps.firstElement()).getXpos());
+ 
+-	    l=(Lamp)lamps.elementAt(i);//(Lamp)li.next();
++	    Lamp l = lamps.elementAt(i);//(Lamp)li.next();
+ 
+ 	    PdVector[] p=new PdVector[4];
+ 
+@@ -472,14 +471,13 @@ public class jv4surfex {
+ 	try {
+ 	    PgJvxLoader myJvxLoader = new PgJvxLoader();
+ 	    //		System.out.println("loader created!");
+-	    PgLoader myLoader = new PgLoader();
+ 	    //		System.out.println("loader created:"+fullfilename+".");
+ 	    PgGeometry geoms[];
+ 	    if (inAnApplet) {
+-		geoms = myLoader.load(surfex_.webPrgs.surfPath.getText()
++		geoms = PgLoader.load(surfex_.webPrgs.surfPath.getText()
+ 				      + fullfilename);
+ 	    } else {
+-		geoms = myLoader.load(fullfilename);
++		geoms = PgLoader.load(fullfilename);
+ 	    }
+ 
+ 	    //		System.out.println("loaded!");
+--- singular-4.1.1/Singular/LIB/surfex/LampAdmin.java.orig	2018-10-24 08:27:19.000000000 -0600
++++ singular-4.1.1/Singular/LIB/surfex/LampAdmin.java	2020-07-23 08:41:01.706925282 -0600
+@@ -69,7 +69,8 @@ public class LampAdmin extends JFrame im
+ 
+ 	//JComboBox paramComboBox; // used for SaveMovieDialog
+ 
+-	public Vector lampList = new Vector();
++	public Vector<Lamp> lampList = new Vector<Lamp>();
++	public Vector<OneParameter> parList = new Vector<OneParameter>();
+ 
+ //	updateJV4SX();
+ 	double lastScale = 1.0;
+@@ -322,7 +323,7 @@ public class LampAdmin extends JFrame im
+ 
+ 	public Lamp getSelectedLamp(){
+ 		//System.out.println("sdgdfgfdgfdg");
+-		return ((Lamp)lampList.elementAt(selectedLamp));
++		return lampList.elementAt(selectedLamp);
+ 	}
+ 
+ 	public Lamp getCameraLamp(){
+@@ -332,8 +333,8 @@ public class LampAdmin extends JFrame im
+ 		return getSelectedLamp().previewLamp(0.0,0.0,100.0);
+ 	}
+ 
+-	public Vector getModifiedLampList(){
+-		Vector lamps=new Vector();
++	public Vector<Lamp> getModifiedLampList(){
++		Vector<Lamp> lamps=new Vector<Lamp>();
+ 		lamps.add(getCameraLamp());
+ 
+ 		// switch off other lamps
+@@ -389,14 +390,13 @@ public class LampAdmin extends JFrame im
+ 
+ 	}
+ 
+-	public Vector getLampsForJv4sx(){
++	public Vector<Lamp> getLampsForJv4sx(){
+ 		// returned alle Lampen die angeschaltet sind.
+ 
+-		Vector list=new Vector();
+-		ListIterator li=lampList.listIterator();
+-		Lamp tmp;
++		Vector<Lamp> list=new Vector<Lamp>();
++		ListIterator<Lamp> li=lampList.listIterator();
+ 		while(li.hasNext()){
+-			tmp=((Lamp)li.next());
++			Lamp tmp = li.next();
+ 			if((tmp.isShining()) && (tmp.lampNo-1 != selectedLamp)){
+ 				list.add(tmp);
+ //				System.out.println(tmp.lampNo+" "+selectedLamp);
+@@ -417,7 +417,7 @@ public class LampAdmin extends JFrame im
+ 
+ 		if(lampIsSelected()){
+ 			if(updateRayframeImmediatlyThread!=null){
+-				updateRayframeImmediatlyThread.stop();
++				updateRayframeImmediatlyThread.stopThread();
+ 			}
+ 		getSelectedLamp().setSelected(false);
+ 		selectedLamp=no;
+@@ -454,14 +454,13 @@ public class LampAdmin extends JFrame im
+ 		jv4sx.updateDisp();
+ 	}
+ 
+-	public Vector getAllLamps(){
++	public Vector<Lamp> getAllLamps(){
+ 		// returned alle Lampen die angeschaltet sind.
+ 
+-		Vector list=new Vector();
+-		ListIterator li=lampList.listIterator();
+-		Lamp tmp;
++		Vector<Lamp> list=new Vector<Lamp>();
++		ListIterator<Lamp> li=lampList.listIterator();
+ 		while(li.hasNext()){
+-			tmp=((Lamp)li.next());
++			Lamp tmp = li.next();
+ 			if(tmp.isShining()){
+ 				list.add(tmp);
+ 			}
+@@ -479,7 +478,7 @@ public class LampAdmin extends JFrame im
+ 			int i,
+ 			boolean shines){
+ 		newLamp();
+-		Lamp lamp=(Lamp)lampList.lastElement();
++		Lamp lamp=lampList.lastElement();
+ 		lamp.setKoords(x,y,z);
+ 		lamp.setIntensity( i);
+ 		lamp.setColor(r,g,b);
+@@ -576,9 +575,10 @@ public class LampAdmin extends JFrame im
+ 
+ 		// find a non-used parameter number:
+ 		int n = lampList.size() + 1;
+-		ListIterator li = lampList.listIterator();
++		ListIterator<Lamp> li = lampList.listIterator();
+ 		while (li.hasNext()) {
+-			if (n == ((Lamp) (li.next())).lampNo) {
++			Lamp temp = li.next();
++			if (n == temp.lampNo) {
+ 				// if the parameter number n is already in use
+ 				n = n + 1; // try the next number
+ 				// reset the list iterator to the first element in the list:
+@@ -608,11 +608,12 @@ public class LampAdmin extends JFrame im
+ 
+ 	public String save() {
+ 		String str = "";
+-		ListIterator li = lampList.listIterator();
++		ListIterator<Lamp> li = lampList.listIterator();
+ 		str += "////////////////// LAMPS: /////////////////////////" + "\n";
+ 		str += lampList.size() + "\n";
+ 		while (li.hasNext()) {
+-			str += ((Lamp) li.next()).saveYourself();
++			Lamp temp = li.next();
++			str += temp.saveYourself();
+ 		}
+ 		return (str);
+ 	}
+@@ -636,25 +637,25 @@ public class LampAdmin extends JFrame im
+ 								|| (strline.equals("fromtoval:"))) {
+ 							//          System.out.println("strline:"+strline);
+ 							if (strline.equals("parno:")) {
+-								((OneParameter) lampList.lastElement())
++								parList.lastElement()
+ 										.setParNo(Integer.parseInt(bs
+ 												.readLine()));
+ 							}
+ 							if (strline.equals("fromtoval:")) {
+-								((OneParameter) lampList.lastElement()).oldFrom = Double
++								parList.lastElement().oldFrom = Double
+ 										.parseDouble(bs.readLine());
+-								((OneParameter) lampList.lastElement()).newFrom = ((OneParameter) lampList
+-										.lastElement()).oldFrom;
++								parList.lastElement().newFrom = parList
++										.lastElement().oldFrom;
+ 
+-								((OneParameter) lampList.lastElement()).oldTo = Double
++								parList.lastElement().oldTo = Double
+ 										.parseDouble(bs.readLine());
+-								((OneParameter) lampList.lastElement()).newTo = ((OneParameter) lampList
+-										.lastElement()).oldTo;
++								parList.lastElement().newTo = parList
++										.lastElement().oldTo;
+ 
+-								((OneParameter) lampList.lastElement()).parSlider
++								parList.lastElement().parSlider
+ 										.setValue(Integer.parseInt(bs
+ 												.readLine()));
+-								((OneParameter) lampList.lastElement())
++								parList.lastElement()
+ 										.updateparSliderAndLabel();
+ 							}
+ 							bs.mark(255);
+@@ -667,25 +668,25 @@ public class LampAdmin extends JFrame im
+ 				}
+ 				if (datatype.equals("complete") || datatype.equals("onlyeqns")
+ 						|| datatype.equals("eqnsvis")) {
+-					((OneParameter) lampList.lastElement()).setParNo(Integer
++					parList.lastElement().setParNo(Integer
+ 							.parseInt(bs.readLine()));
+-					((OneParameter) lampList.lastElement()).oldFrom = Double
++					parList.lastElement().oldFrom = Double
+ 							.parseDouble(bs.readLine());
+-					((OneParameter) lampList.lastElement()).newFrom = ((OneParameter) lampList
+-							.lastElement()).oldFrom;
+-					((OneParameter) lampList.lastElement()).oldTo = Double
++					parList.lastElement().newFrom = parList
++							.lastElement().oldFrom;
++					parList.lastElement().oldTo = Double
+ 							.parseDouble(bs.readLine());
+-					((OneParameter) lampList.lastElement()).newTo = ((OneParameter) lampList
+-							.lastElement()).oldTo;
+-					((OneParameter) lampList.lastElement()).parSlider
++					parList.lastElement().newTo = parList
++							.lastElement().oldTo;
++					parList.lastElement().parSlider
+ 							.setValue(Integer.parseInt(bs.readLine()));
+-					((OneParameter) lampList.lastElement()).from.setText(""
+-							+ ((OneParameter) lampList.lastElement()).newFrom);
+-					((OneParameter) lampList.lastElement()).to.setText(""
+-							+ ((OneParameter) lampList.lastElement()).newTo);
+-					((OneParameter) lampList.lastElement())
++					parList.lastElement().from.setText(""
++							+ parList.lastElement().newFrom);
++					parList.lastElement().to.setText(""
++							+ parList.lastElement().newTo);
++					parList.lastElement()
+ 							.updateparSliderAndLabel();
+-					((OneParameter) lampList.lastElement()).repaint();
++					parList.lastElement().repaint();
+ 				}
+ 				if (datatype.equals("complete") || datatype.equals("onlystyle")) {
+ 					//        ((OneParameter) lampList.lastElement()).cbox.setSelected((Boolean.valueOf(bs.readLine())).booleanValue());
+@@ -708,10 +709,9 @@ public class LampAdmin extends JFrame im
+ 	 }*/
+ 
+ 	public OneParameter getParameter(String s) {
+-		ListIterator li = lampList.listIterator();
+-		OneParameter tmpParameter;
++		ListIterator<OneParameter> li = parList.listIterator();
+ 		while (li.hasNext()) {
+-			tmpParameter = ((OneParameter) li.next());
++			OneParameter tmpParameter = li.next();
+ 			if (tmpParameter.nameLabel.getText().compareTo(s) == 0) {
+ 				return tmpParameter;
+ 			}
+--- singular-4.1.1/Singular/LIB/surfex/make_surfex.orig	2018-10-24 08:27:19.000000000 -0600
++++ singular-4.1.1/Singular/LIB/surfex/make_surfex	2020-07-22 21:53:58.194941992 -0600
+@@ -5,7 +5,7 @@
+ #
+ # compile:
+ #
+-javac *.java
++javac -source 1.8 -target 1.8 *.java
+ 
+ #javac surfex.java
+ #javac Project.java
+--- singular-4.1.1/Singular/LIB/surfex/OptionButtonPane.java.orig	2018-10-24 08:27:19.000000000 -0600
++++ singular-4.1.1/Singular/LIB/surfex/OptionButtonPane.java	2020-07-22 21:48:38.898689292 -0600
+@@ -106,7 +106,7 @@ public class OptionButtonPane extends JF
+ 		group.add(bt2);
+ 		panel3.add(bt2);
+ 		panel3.add(new JLabel("               cliping radius"));
+-		clipingRadiusTextField = new JTextField((String) Double
++		clipingRadiusTextField = new JTextField(Double
+ 				.toString(presettedClipingRadius));
+ 		clipingRadiusTextField.setEnabled(false);
+ 		panel3.add(clipingRadiusTextField);
+@@ -118,9 +118,9 @@ public class OptionButtonPane extends JF
+ 		slider1.setMajorTickSpacing(10);
+ 		slider1.setPaintTicks(true);
+ 		// Bei 50 und 100 einen Text setzen
+-		Hashtable labelTable = new Hashtable();
+-		labelTable.put(new Integer(50), new JLabel("50%"));
+-		labelTable.put(new Integer(100), new JLabel("100%"));
++		Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
++		labelTable.put(Integer.valueOf(50), new JLabel("50%"));
++		labelTable.put(Integer.valueOf(100), new JLabel("100%"));
+ 		slider1.setLabelTable(labelTable);
+ 		panel3.add(slider1);
+ 
+--- singular-4.1.1/Singular/LIB/surfex/ParameterAdmin.java.orig	2018-10-24 08:27:19.000000000 -0600
++++ singular-4.1.1/Singular/LIB/surfex/ParameterAdmin.java	2020-07-22 21:48:14.669670111 -0600
+@@ -52,9 +52,9 @@ public class ParameterAdmin extends JPan
+ 
+ 	JPanel parPanel;
+ 
+-	JComboBox paramComboBox; // wird fuer den SaveMovieDialog gebraucht
++	JComboBox<String> paramComboBox; // wird fuer den SaveMovieDialog gebraucht
+ 
+-	public Vector parList = new Vector();
++	public Vector<OneParameter> parList = new Vector<OneParameter>();
+ 
+ 	Project project;
+ 
+@@ -64,7 +64,7 @@ public class ParameterAdmin extends JPan
+ 		surfex_ = su;
+ 		project = pro;
+ 
+-		paramComboBox=new JComboBox();
++		paramComboBox=new JComboBox<String>();
+ 
+ 		setLayout(new BorderLayout());
+ 		parPanel = new JPanel(new GridLayout(20, 0));
+@@ -82,12 +82,11 @@ public class ParameterAdmin extends JPan
+ 
+ 	public String[] getAllParams(){
+ 		String[] s=new String[this.parList.size()];
+-		ListIterator li = parList.listIterator();
+-		OneParameter tmpParameter;
++		ListIterator<OneParameter> li = parList.listIterator();
+ 		int i=0;
+ 
+ 		while (li.hasNext()) {
+-			tmpParameter=((OneParameter)li.next());
++			OneParameter tmpParameter=li.next();
+ 			s[i]=tmpParameter.nameLabel.getText();
+ 
+ 
+@@ -98,12 +97,11 @@ public class ParameterAdmin extends JPan
+ 
+     public double[] getAllParamValues(){
+ 	double[] s=new double[this.parList.size()];
+-	ListIterator li = parList.listIterator();
+-	OneParameter tmpParameter;
++	ListIterator<OneParameter> li = parList.listIterator();
+ 	int i=0;
+ 
+ 	while (li.hasNext()) {
+-	    tmpParameter=((OneParameter)li.next());
++	    OneParameter tmpParameter=li.next();
+ 	    s[i]=tmpParameter.getValue()/1000.0;
+ 
+ 	    i++;
+@@ -120,9 +118,9 @@ public class ParameterAdmin extends JPan
+ 
+ 		// find a non-used parameter number:
+ 		int n = parList.size() + 1;
+-		ListIterator li = parList.listIterator();
++		ListIterator<OneParameter> li = parList.listIterator();
+ 		while (li.hasNext()) {
+-			if (n == ((OneParameter) (li.next())).parNo) {
++			if (n == li.next().parNo) {
+ 				// if the parameter number n is already in use
+ 				n = n + 1; // try the next number
+ 				// reset the list iterator to the first element in the list:
+@@ -144,7 +142,7 @@ public class ParameterAdmin extends JPan
+ 		int i=0;
+ 		//System.out.;
+ 		for(i=0;i<paramComboBox.getItemCount();i++){
+-			if(((String)paramComboBox.getItemAt(i)).compareTo(par.nameLabel.getText())>=0){
++			if(paramComboBox.getItemAt(i).compareTo(par.nameLabel.getText())>=0){
+ 		//		i--;
+ 				break;
+ 			}
+@@ -162,12 +160,12 @@ public class ParameterAdmin extends JPan
+ 
+ 	public String save() {
+ 		String str = "";
+-		ListIterator li = parList.listIterator();
++		ListIterator<OneParameter> li = parList.listIterator();
+ 		str += "////////////////// PARAMETERS: /////////////////////////"
+ 				+ "\n";
+ 		str += parList.size() + "\n";
+ 		while (li.hasNext()) {
+-			str += ((OneParameter) li.next()).saveYourself();
++			str += li.next().saveYourself();
+ 		}
+ 		return (str);
+ 	}
+@@ -193,35 +191,32 @@ public class ParameterAdmin extends JPan
+ 			       || (strline.equals("function:"))) {
+ 			    //          System.out.println("strline:"+strline);
+ 			    if (strline.equals("parno:")) {
+-				((OneParameter) parList.lastElement())
++				parList.lastElement()
+ 				    .setParNo(Integer.parseInt(bs
+ 							       .readLine()));
+ 			    }
+ 			    if (strline.equals("function:")) {
+-				((OneParameter) parList.lastElement())
++				parList.lastElement()
+ 				    .fct.setText(bs.readLine());
+ 			    }
+ 			    if (strline.equals("fromtoval:")) {
+-				((OneParameter) parList.lastElement()).oldFrom = Double
++				parList.lastElement().oldFrom = Double
+ 				    .parseDouble(bs.readLine());
+-				((OneParameter) parList.lastElement()).newFrom = ((OneParameter) parList
+-										  .lastElement()).oldFrom;
++				parList.lastElement().newFrom = parList.lastElement().oldFrom;
+ 
+-				((OneParameter) parList.lastElement()).oldTo = Double
++				parList.lastElement().oldTo = Double
+ 				    .parseDouble(bs.readLine());
+-				((OneParameter) parList.lastElement()).newTo = ((OneParameter) parList
+-										.lastElement()).oldTo;
++				parList.lastElement().newTo = parList.lastElement().oldTo;
+ 
+-				((OneParameter) parList.lastElement()).parSlider
+-				    .setMinimum((int)(((OneParameter) parList.lastElement()).newFrom*1000.0));
+-				((OneParameter) parList.lastElement()).parSlider
+-				    .setMaximum((int)(((OneParameter) parList.lastElement()).newTo*1000.0));
++				parList.lastElement().parSlider
++				    .setMinimum((int)(parList.lastElement().newFrom*1000.0));
++				parList.lastElement().parSlider
++				    .setMaximum((int)(parList.lastElement().newTo*1000.0));
+ 
+-				((OneParameter) parList.lastElement()).parSlider
++				parList.lastElement().parSlider
+ 				    .setValue(Integer.parseInt(bs
+ 							       .readLine()));
+-				((OneParameter) parList.lastElement())
+-				    .updateparSliderAndLabel();
++				parList.lastElement().updateparSliderAndLabel();
+ 			    }
+ 			    bs.mark(255);
+ 			    strline = bs.readLine();
+@@ -233,38 +228,34 @@ public class ParameterAdmin extends JPan
+ 		}
+ 		if (datatype.equals("complete") || datatype.equals("onlyeqns")
+ 		    || datatype.equals("eqnsvis")) {
+-		    ((OneParameter) parList.lastElement())
++		    parList.lastElement()
+ 			.setParNo(Integer.parseInt(bs.readLine()));
+-		    ((OneParameter) parList.lastElement()).oldFrom = Double
++		    parList.lastElement().oldFrom = Double
+ 			.parseDouble(bs.readLine());
+-		    ((OneParameter) parList.lastElement())
+-			.newFrom = ((OneParameter) parList.lastElement()).oldFrom;
+-		    ((OneParameter) parList.lastElement()).oldTo = Double
++		    parList.lastElement()
++			.newFrom = parList.lastElement().oldFrom;
++		    parList.lastElement().oldTo = Double
+ 			.parseDouble(bs.readLine());
+-		    ((OneParameter) parList.lastElement()).newTo =
+-			((OneParameter) parList.lastElement()).oldTo;
+-		    ((OneParameter) parList.lastElement()).parSlider
+-			.setMinimum((int)(((OneParameter) parList
+-					   .lastElement()).newFrom*1000.0));
+-		    ((OneParameter) parList.lastElement()).parSlider
+-			.setMaximum((int)(((OneParameter) parList
+-					   .lastElement()).newTo*1000.0));
+-		    ((OneParameter) parList.lastElement()).parSlider
++		    parList.lastElement().newTo = parList.lastElement().oldTo;
++		    parList.lastElement().parSlider
++			.setMinimum((int)(parList
++					   .lastElement().newFrom*1000.0));
++		    parList.lastElement().parSlider
++			.setMaximum((int)(parList
++					   .lastElement().newTo*1000.0));
++		    parList.lastElement().parSlider
+ 			.setValue(Integer.parseInt(bs.readLine()));
+-		    ((OneParameter) parList.lastElement()).from
+-			.setText("" + ((OneParameter)
+-				       parList.lastElement()).newFrom);
+-		    ((OneParameter) parList.lastElement()).to
+-			.setText("" + ((OneParameter) parList.lastElement()).newTo);
+-		    ((OneParameter) parList.lastElement())
+-			.updateparSliderAndLabel();
++		    parList.lastElement().from
++			.setText("" + parList.lastElement().newFrom);
++		    parList.lastElement().to
++			.setText("" + parList.lastElement().newTo);
++		    parList.lastElement().updateparSliderAndLabel();
+ 
+ 		    if(iVersion>=8906) {
+-			((OneParameter) parList.lastElement()).fct
+-			    .setText(bs.readLine());
++			parList.lastElement().fct.setText(bs.readLine());
+ 		    }
+ 
+-		    ((OneParameter) parList.lastElement()).repaint();
++		    parList.lastElement().repaint();
+ 		}
+ 		if (datatype.equals("complete") || datatype.equals("onlystyle")) {
+ 		    //        ((OneParameter) parList.lastElement()).cbox.setSelected((Boolean.valueOf(bs.readLine())).booleanValue());
+@@ -286,16 +277,15 @@ public class ParameterAdmin extends JPan
+       return l;
+       }*/
+ 
+-    public JComboBox getParamComboBox(){
++    public JComboBox<String> getParamComboBox(){
+ 	return paramComboBox;
+ 
+     }
+ 
+     public OneParameter getParameter(String s){
+-	ListIterator li = parList.listIterator();
+-		OneParameter tmpParameter;
++	ListIterator<OneParameter> li = parList.listIterator();
+ 		while (li.hasNext()) {
+-			tmpParameter=((OneParameter)li.next());
++			OneParameter tmpParameter=li.next();
+ 			if(tmpParameter.nameLabel.getText().compareTo(s)==0){
+ 				return tmpParameter;
+ 			}
+--- singular-4.1.1/Singular/LIB/surfex/Project.java.orig	2018-10-24 08:27:19.000000000 -0600
++++ singular-4.1.1/Singular/LIB/surfex/Project.java	2020-07-22 21:39:27.066124182 -0600
+@@ -105,7 +105,7 @@ public class Project extends JPanel impl
+ 
+   RayFrame rayFrame;
+ 
+-  Vector tbuttons = new Vector();
++  // Vector tbuttons = new Vector();
+ 
+   JButton bt1 = new JButton();
+ 
+@@ -129,7 +129,7 @@ public class Project extends JPanel impl
+ 
+   JButton bgColorButton = null;
+ 
+-  JComboBox clipMode = new JComboBox();
++  JComboBox<String> clipMode = new JComboBox<String>();
+ 
+   JTextField clipRadius = new JTextField("9.0");
+ 
+@@ -139,7 +139,7 @@ public class Project extends JPanel impl
+     String epsilon = "0.00000000000001";
+ 
+     int interpolConst = 2;
+-    JComboBox interpolConstBox = null;
++    JComboBox<Integer> interpolConstBox = null;
+ 
+ //  JSlider scaleSlider = null;
+ 
+@@ -176,7 +176,7 @@ public class Project extends JPanel impl
+ 	// int i, String filename, RayFrame ray, surfex su,
+ 	// jv4surfex jv4sx
+ 	eqAdm = new EquationAdmin(proNr, "", surfex_.rayFrame, surfex_,
+-				  surfex_.jv4sx, this);
++				  surfex.jv4sx, this);
+ 	cuAdm = new CurveAdmin(proNr, "", surfex_, this);
+ 
+ 	setLayout(new BorderLayout());//new GridLayout(3,1));
+@@ -420,12 +420,12 @@ public class Project extends JPanel impl
+ 	// a checkbox for activating antialiasing
+ 	globalConfigPanel.add(antialiasing);
+ 
+-	Vector temp = new Vector();
+-	temp.add(new Integer(1));
+-	temp.add(new Integer(2));
+-	temp.add(new Integer(4));
+-	temp.add(new Integer(8));
+-	interpolConstBox = new JComboBox(temp);
++	Vector<Integer> temp = new Vector<Integer>();
++	temp.add(Integer.valueOf(1));
++	temp.add(Integer.valueOf(2));
++	temp.add(Integer.valueOf(4));
++	temp.add(Integer.valueOf(8));
++	interpolConstBox = new JComboBox<Integer>(temp);
+ 	interpolConstBox.setSelectedIndex(1);
+ 	interpolConstBox.addActionListener(new ActionListener() {
+ 		public void actionPerformed(ActionEvent evt) {
+@@ -565,7 +565,7 @@ public class Project extends JPanel impl
+ 	return(interpolConst);
+     }
+ 
+-  public Vector getAllLamps(){
++  public Vector<Lamp> getAllLamps(){
+   	return lampAdmin.getAllLamps();
+   }
+ 
+@@ -575,10 +575,10 @@ public class Project extends JPanel impl
+ 
+   public void newEquation() {
+     eqAdm.newEquation();
+-    cuAdm.equationListChanged_add(new Integer(((Equation) eqAdm.eqnList
+-        .lastElement()).eqnr).toString());
+-    solPtsAdm.equationListChanged_add(new Integer(((Equation) eqAdm.eqnList
+-        .lastElement()).eqnr).toString());
++    cuAdm.equationListChanged_add(Integer.valueOf(eqAdm.eqnList
++        .lastElement().eqnr).toString());
++    solPtsAdm.equationListChanged_add(Integer.valueOf(eqAdm.eqnList
++        .lastElement().eqnr).toString());
+    }
+ 
+   public void bt6ActionPerformed(ActionEvent evt) {
+@@ -606,11 +606,11 @@ public class Project extends JPanel impl
+ 
+   public void bt2ActionPerformed(ActionEvent evt) {
+     // raytracen
+-    String fn = surfex_.tmpDir + "test.png";
++    String fn = surfex.tmpDir + "test.png";
+     if (surfex_.configFrame.surf.isSelected()) {
+-      fn = surfex_.tmpDir + tmp_surfex_file;
++      fn = surfex.tmpDir + tmp_surfex_file;
+     } else {
+-      fn = surfex_.tmpDir + "test.png";
++      fn = surfex.tmpDir + "test.png";
+     }
+     SavePic saveThread = new SavePic(fn, false, antialiasing.isSelected(),
+         rayFrame.getContentPane().getSize().height
+@@ -632,18 +632,18 @@ public class Project extends JPanel impl
+         if (getInterpolConst() != 1) {
+ //          System.out.println("resample");
+           p = r.exec(surfex_.configFrame.iviewPath.getText() + " "
+-              + surfex_.tmpDir + "test.png /resample=(0,"
++              + surfex.tmpDir + "test.png /resample=(0,"
+               + rayFrame.getContentPane().getSize().height
+-              + ") /convert=" + surfex_.tmpDir + "test.png");
++              + ") /convert=" + surfex.tmpDir + "test.png");
+         } else {
+ 
+-          p = r.exec("iview\\i_view32.exe " + surfex_.tmpDir
+-              + "test.png /convert=" + surfex_.tmpDir
++          p = r.exec("iview\\i_view32.exe " + surfex.tmpDir
++              + "test.png /convert=" + surfex.tmpDir
+               + "test.png");
+ 
+         }
+         p.waitFor();
+-        eqAdm.img_filename = surfex_.tmpDir + "test.png";
++        eqAdm.img_filename = surfex.tmpDir + "test.png";
+       } catch (Exception er) {
+         System.out.println(er);
+       }
+@@ -687,7 +687,7 @@ public class Project extends JPanel impl
+     }
+     if (!raytraceAlways.isSelected() && surfex_.configFrame.last[4]) {
+       surfex_.configFrame.last[4] = false;
+-      surfex_.updateRayframeImmediatlyThread.stop();
++      surfex_.updateRayframeImmediatlyThread.stopThread();
+     }
+   } // end of bt4ActionPerformed()
+ 
+@@ -803,7 +803,7 @@ public class Project extends JPanel impl
+ 
+     public String getSuxFile() {
+ 	String str = "";
+-    str += "this is surfex v" + surfex_.strVersion + "\n";
++    str += "this is surfex v" + surfex.strVersion + "\n";
+     str += "///////// TYPE: //////" + "\n";
+     str += "complete\n";
+     str += "///////// GENERAL DATA: //////" + "\n";
+@@ -852,11 +852,11 @@ public class Project extends JPanel impl
+ 		out
+ 		    .print("tmpsubdir="
+ 			   + URLEncoder
+-			   .encode(this.old_tmpsubdir)
++			   .encode(this.old_tmpsubdir, "UTF-8")
+ 			   + "&prg=save" + "&filelocation="
+-			   + URLEncoder.encode(filelocation)
++			   + URLEncoder.encode(filelocation, "UTF-8")
+ 			   + "&prg_code_part1="
+-			   + URLEncoder.encode(getSuxFile()));
++			   + URLEncoder.encode(getSuxFile(), "UTF-8"));
+ 		out.close();
+ 
+ 		BufferedReader in = new BufferedReader(new InputStreamReader(
+--- singular-4.1.1/Singular/LIB/surfex/SaveMovieDialog.java.orig	2018-10-24 08:27:19.000000000 -0600
++++ singular-4.1.1/Singular/LIB/surfex/SaveMovieDialog.java	2020-07-22 18:09:45.243640687 -0600
+@@ -99,13 +99,13 @@ public class SaveMovieDialog extends JFr
+     RayFrame rayFrame;
+     //JComboBox outputFormat;
+ 
+-    JComboBox colorType;
++    JComboBox<String> colorType;
+ 
+-    JComboBox omitType;
++    JComboBox<String> omitType;
+ 
+-    JComboBox antialiasingQuality;
++    JComboBox<String> antialiasingQuality;
+ 
+-    JComboBox standardDim;
++    JComboBox<String> standardDim;
+ 
+ 
+     JSpinner XrotSpinner =new JSpinner(new SpinnerNumberModel(1,0,5,1));
+@@ -115,20 +115,20 @@ public class SaveMovieDialog extends JFr
+ 
+     JScrollPane listScrollPane;
+ 
+-    private JList parameterList;
+-    private DefaultListModel listModel;
++    private JList<String> parameterList;
++    private DefaultListModel<String> listModel;
+ 
+     private static final String addString = "add";
+     private static final String removeString = "remove from list";
+     private JLabel addLabel;
+     private JButton removeButton;
+-    private JComboBox paramName;
++    private JComboBox<String> paramName;
+ 
+ 
+     JRadioButton ROTATE = new JRadioButton("ROTATE_Y_AXIS");
+ 
+ 
+-    JComboBox measure;
++    JComboBox<String> measure;
+ 
+     JPanel panel = new JPanel();/*
+ 
+@@ -478,7 +478,7 @@ public class SaveMovieDialog extends JFr
+ 		panel.add(new JLabel(""));
+ */
+ 
+-	colorType=new JComboBox();
++	colorType=new JComboBox<String>();
+ 	colorType.insertItemAt("color",0);
+ 	colorType.insertItemAt("dithered - black/white",1);
+ // 	colorType.insertItemAt("stereo - red/green",2);
+@@ -487,14 +487,14 @@ public class SaveMovieDialog extends JFr
+ 	panel.add(new JLabel("color type:"));
+ 	colorTypePanel.add(colorType);
+ 
+-	omitType=new JComboBox();
++	omitType=new JComboBox<String>();
+ 	omitType.insertItemAt("omit no frame",0);
+ 	omitType.insertItemAt("omit first frame",1);
+ 	omitType.insertItemAt("omit last frame",2);
+ 	omitType.setSelectedIndex(0);
+ 	omitTypePanel.add(omitType);
+ 
+-	antialiasingQuality=new JComboBox();
++	antialiasingQuality=new JComboBox<String>();
+ 	antialiasingQuality.insertItemAt("1",0);
+ 	antialiasingQuality.insertItemAt("2",1);
+ 	antialiasingQuality.insertItemAt("3",2);
+@@ -510,10 +510,10 @@ public class SaveMovieDialog extends JFr
+ 	// p6N.add(new JLabel());
+ 
+ 	// p6C.add(new JLabel());
+-	listModel = new DefaultListModel();
++	listModel = new DefaultListModel<String>();
+ 
+ 	//Create the list and put it in a scroll pane.
+-	parameterList = new JList(listModel);
++	parameterList = new JList<String>(listModel);
+ 	parameterList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+ 	parameterList.setSelectedIndex(0);
+ 
+@@ -653,7 +653,7 @@ public class SaveMovieDialog extends JFr
+ 	    });
+ 	//	p3.add(dpi);
+ 
+-	measure=new JComboBox();
++	measure=new JComboBox<String>();
+ 
+ 	measure.insertItemAt("pixel",0);
+ 	measure.insertItemAt("cm",1);
+@@ -737,7 +737,7 @@ public class SaveMovieDialog extends JFr
+ 	    });
+ 
+ 
+-	standardDim=new JComboBox();
++	standardDim=new JComboBox<String>();
+ 	standardDim.insertItemAt("choose a size (in pixels)",0);
+  	standardDim.insertItemAt("for presentation (600x600)",1);
+  	standardDim.insertItemAt("for web (300x300)",2);
+@@ -923,10 +923,10 @@ rb[8] = new JRadioButton("Best fit to de
+ 		            tmpPanel.setLayout(new FlowLayout());
+ 		            if (colorType.getSelectedIndex()==1) {
+ 		              String strFormats[] = { "tif" };
+-		              tmpPanel.add(new JComboBox(strFormats));
++		              tmpPanel.add(new JComboBox<String>(strFormats));
+ 		            } else {
+ 		              String strFormats[] = { "jpg" };
+-		              tmpPanel.add(new JComboBox(strFormats));
++		              tmpPanel.add(new JComboBox<String>(strFormats));
+ 		            }
+ 		            JButton jbsave = new JButton("create and save as");
+ 		            jbsave.addActionListener(aL);
+@@ -1197,7 +1197,7 @@ rb[8] = new JRadioButton("Best fit to de
+ 	        int i=0;
+ 	        //System.out.;
+ 	        for(i=0;i<paramName.getItemCount();i++){
+-	          if(((String)paramName.getItemAt(i)).compareTo((String)parameterList.getSelectedValue())>=0){
++	          if(paramName.getItemAt(i).compareTo(parameterList.getSelectedValue())>=0){
+ 	        //    i--;
+ 	            break;
+ 	          }
+@@ -1261,7 +1261,7 @@ rb[8] = new JRadioButton("Best fit to de
+ 	            int i;
+ 	            String Item =(String)paramName.getSelectedItem();
+ 	            for(i=0;i<parameterList.getModel().getSize();i++){
+-	          if(((String)parameterList.getModel().getElementAt(i)).compareTo(Item)>=0){
++	          if(parameterList.getModel().getElementAt(i).compareTo(Item)>=0){
+ 	        //    i--;
+ 	            break;
+ 	          }
+@@ -1337,7 +1337,7 @@ rb[8] = new JRadioButton("Best fit to de
+ 	      String[] l=new String[parameterList.getModel().getSize()];
+ 	      int i;
+ 	      for(i=0;i<parameterList.getModel().getSize();i++){
+-	        l[i]=(String)parameterList.getModel().getElementAt(i);
++	        l[i]=parameterList.getModel().getElementAt(i);
+ 	      }
+ 
+ 	      return l;
+--- singular-4.1.1/Singular/LIB/surfex/SaveMovie.java.orig	2018-10-24 08:27:19.000000000 -0600
++++ singular-4.1.1/Singular/LIB/surfex/SaveMovie.java	2020-07-22 21:50:31.603778491 -0600
+@@ -161,7 +161,7 @@ public class SaveMovie extends Thread {
+ 	MakeMovie(StandardRot(Xrot, Yrot, Zrot));//RotTypeROTATE_y_AXIS());
+     }
+ 
+-    private LinkedList getRotStrings(int rotType) {
++    private LinkedList<String> getRotStrings(int rotType) {
+ 	switch (rotType) {
+ 	    //case ROTATE_X_AXIS:
+ 	    // return StandardRot(Xrot, Yrot, Zrot);
+@@ -172,8 +172,8 @@ public class SaveMovie extends Thread {
+ 
+     }
+ 
+-    private LinkedList StandardRot(int Xrot, int Yrot, int Zrot) {
+-	LinkedList rotStrings = new LinkedList();
++    private LinkedList<String> StandardRot(int Xrot, int Yrot, int Zrot) {
++	LinkedList<String> rotStrings = new LinkedList<String>();
+ 	double tmp;
+ 	for (int i = 0; i < N; i++) {
+ 	    tmp = ((double) i) / N * 2 * Math.PI;
+@@ -183,7 +183,7 @@ public class SaveMovie extends Thread {
+ 	return rotStrings;
+     }
+ 
+-    private void MakeMovie(LinkedList rotateStrings){//double[] camPos, double[]
++    private void MakeMovie(LinkedList<String> rotateStrings){//double[] camPos, double[]
+ 	// viewDir,double[]
+ 	// upVector,double[]
+ 	// rightVector){
+@@ -197,7 +197,7 @@ public class SaveMovie extends Thread {
+ 
+ 	NumberFormat nf=NumberFormat.getNumberInstance();
+ 	nf.setMinimumIntegerDigits(3); // ggf. mit fuehrenden Nullen ausgeben
+-	ListIterator rotateStringsIterator=rotateStrings.listIterator();
++	ListIterator<String> rotateStringsIterator=rotateStrings.listIterator();
+ 	OneParameter tmpParam;
+ 
+ 	while(rotateStringsIterator.hasNext() &&
+@@ -220,20 +220,20 @@ public class SaveMovie extends Thread {
+ 	    if(omitType==0 ||
+ 	       (omitType==1 && i+1>1) ||
+ 	       (omitType==2 && i+1<N)) {
+-		if(surfex_.cygwin==1) {
++		if(surfex.cygwin==1) {
+ 		    ((ProgressFrame)pframe.getContentPane()).refresh(i+1,
+ 								     "Creating Frame "+(i+1)+"/"+N,
+-								     surfex_.toWindows(surfex_.tmpDir+"tmp_surfex_MoviePic_"+rand+"_"+nf.format(i-1)+".jpg"));
++								     surfex.toWindows(surfex.tmpDir+"tmp_surfex_MoviePic_"+rand+"_"+nf.format(i-1)+".jpg"));
+ 		} else {
+ 		    ((ProgressFrame)pframe.getContentPane()).refresh(i+1,"Creating Frame "+(i+1)+"/"+N,
+-								     surfex_.tmpDir+"tmp_surfex_MoviePic_"+rand+"_"+nf.format(i-1)+".jpg");
++								     surfex.tmpDir+"tmp_surfex_MoviePic_"+rand+"_"+nf.format(i-1)+".jpg");
+ 		}
+ 		try {
+-		    SavePic save=new SavePic(surfex_.tmpDir+"tmp_surfex_MoviePic_"+rand+"_"+nf.format(i)+".jpg",false,
++		    SavePic save=new SavePic(surfex.tmpDir+"tmp_surfex_MoviePic_"+rand+"_"+nf.format(i)+".jpg",false,
+ 					     antialiasing,height, width,300, surfex_, pro, CamPos,
+ 					     viewDir, upVector, rightVector, parametersToRun, runningParametersValue,
+-					     surfex_.jv4sx, pro.getAllLamps() );
+-		    save.setRotateString((String) rotateStringsIterator.next());
++					     surfex.jv4sx, pro.getAllLamps() );
++		    save.setRotateString(rotateStringsIterator.next());
+ 		    save.set3d(this._3d);
+ 		    //  System.out.println(save.rotateString);
+ 		    save.start();
+@@ -266,15 +266,15 @@ public class SaveMovie extends Thread {
+ // 			   surfex.toWindows(surfex_.tmpDir+"tmp_surfex_MoviePic_"+rand+"*.jpg") +" \\\""+
+ // 			   surfex.toWindows(SaveToFileLocation)+"\\\"\"");
+ 		Process p;
+-		if(surfex_.cygwin==1) {
++		if(surfex.cygwin==1) {
+ 		    //	    p = r.exec("sh -exec \"convert -delay "+delay+" -loop 0 "+surfex_.tmpDir+"tmp_surfex_MoviePic_"+rand+"*.jpg \\\""+surfex.toLinux(SaveToFileLocation)+"\\\"\"");
+ 		    p = r.exec("sh -exec \"convert -delay "+delay+" -loop 0 \\\""+
+-			       (surfex.toWindows(surfex_.tmpDir+"tmp_surfex_MoviePic_"+rand+"_*.jpg")).replaceAll("\\\\","\\\\\\\\") +"\\\" \\\""+
++			       (surfex.toWindows(surfex.tmpDir+"tmp_surfex_MoviePic_"+rand+"_*.jpg")).replaceAll("\\\\","\\\\\\\\") +"\\\" \\\""+
+ 			       (surfex.toWindows(SaveToFileLocation)).replaceAll("\\\\","\\\\\\\\")+"\\\"\"");
+ 		} else {
+ //		    System.out.println("try to save movie to:"+
+ //				       SaveToFileLocation.replaceAll(" ", "\\\\ ")+".");
+-		    p = r.exec("convert -delay "+delay+" -loop 0 "+surfex_.tmpDir+
++		    p = r.exec("convert -delay "+delay+" -loop 0 "+surfex.tmpDir+
+ 			       "tmp_surfex_MoviePic_"+rand+"_*.jpg "+
+ 			       SaveToFileLocation.replaceAll(" ", "\\ ")+"");
+ 		}
+--- singular-4.1.1/Singular/LIB/surfex/SavePicDialog.java.orig	2018-10-24 08:27:19.000000000 -0600
++++ singular-4.1.1/Singular/LIB/surfex/SavePicDialog.java	2020-07-22 21:45:38.530513626 -0600
+@@ -72,15 +72,15 @@ public class SavePicDialog extends JFram
+     int heightvalue=0;
+     int widthvalue=0;
+ 
+-    JComboBox outputFormat;
++    JComboBox<String> outputFormat;
+ 
+-    JComboBox colorType;
++    JComboBox<String> colorType;
+ 
+-    JComboBox antialiasingQuality;
++    JComboBox<String> antialiasingQuality;
+ 
+-    JComboBox standardDim;
++    JComboBox<String> standardDim;
+ 
+-    JComboBox measure;
++    JComboBox<String> measure;
+     int oldMeasure;
+ 
+     JPanel panel = new JPanel();/*
+@@ -206,7 +206,7 @@ public class SavePicDialog extends JFram
+ 		contentPane9.add(sizePanel, BorderLayout.NORTH);
+ 	*///contentPane6.add(contentPane2,BorderLayout.CENTER);
+ 
+-	outputFormat=new JComboBox();
++	outputFormat=new JComboBox<String>();
+ 
+ 	outputFormat.insertItemAt("raytraced picture",0);
+ 
+@@ -401,7 +401,7 @@ public class SavePicDialog extends JFram
+ 		panel.add(new JLabel(""));
+ */
+ 
+-	colorType=new JComboBox();
++	colorType=new JComboBox<String>();
+ 	colorType.insertItemAt("color",0);
+ 	colorType.insertItemAt("dithered - black/white",1);
+ // 	colorType.insertItemAt("stereo - red/green",2);
+@@ -410,7 +410,7 @@ public class SavePicDialog extends JFram
+ 	panel.add(new JLabel("color type:"));
+ 	colorTypePanel.add(colorType);
+ 
+-	antialiasingQuality=new JComboBox();
++	antialiasingQuality=new JComboBox<String>();
+ 	antialiasingQuality.insertItemAt("1",0);
+ 	antialiasingQuality.insertItemAt("2",1);
+ 	antialiasingQuality.insertItemAt("3",2);
+@@ -513,7 +513,7 @@ public class SavePicDialog extends JFram
+ 	    });
+ 	p3.add(dpi);
+ 
+-	measure=new JComboBox();
++	measure=new JComboBox<String>();
+ 
+ 	measure.insertItemAt("pixel",0);
+ 	measure.insertItemAt("cm",1);
+@@ -641,7 +641,7 @@ public class SavePicDialog extends JFram
+ 	//	panel.add(new JLabel("(raytraced preview)"));
+ 
+ 
+-	standardDim=new JComboBox();
++	standardDim=new JComboBox<String>();
+ 	standardDim.insertItemAt("choose a size",0);
+  	standardDim.insertItemAt("for presentation (600x600)",1);
+  	standardDim.insertItemAt("for web (300x300)",2);
+@@ -766,7 +766,7 @@ panel2.add(new JLabel());
+ 						    ,heightvalue,
+ 						    widthvalue,
+ 						    Integer.parseInt(dpi
+-								     .getText()),surfex_.jv4sx);
++								     .getText()),surfex.jv4sx);
+ 					    } else {
+ 						if (outputFormat.getSelectedIndex()==1) {  // surfcode
+ 						    project.saveFile(filelocation, 2,
+@@ -776,14 +776,14 @@ panel2.add(new JLabel());
+ 								     heightvalue,
+ 								     widthvalue,
+ 								     Integer.parseInt(dpi
+-										      .getText()),surfex_.jv4sx);
++										      .getText()),surfex.jv4sx);
+ 						} else {
+ 						    // raytraced pic
+ 						    project.saveFile(filelocation, 3,
+ 								     (colorType.getSelectedIndex()==1),//dithered?
+ 								     (antialiasingQuality.getSelectedIndex()!=0),
+ 								     heightvalue,widthvalue,
+-								     Integer.parseInt(dpi.getText()),surfex_.jv4sx);
++								     Integer.parseInt(dpi.getText()),surfex.jv4sx);
+ 						}
+ 					    }
+ 					    //              saveFile(filelocation);
+@@ -808,10 +808,10 @@ panel2.add(new JLabel());
+ 			    tmpPanel.setLayout(new FlowLayout());
+ 			    if ((colorType.getSelectedIndex()==1)) {  // dithered!
+ 				String strFormats[] = { "tif" };
+-				tmpPanel.add(new JComboBox(strFormats));
++				tmpPanel.add(new JComboBox<String>(strFormats));
+ 			    } else {
+ 				String strFormats[] = { "jpg" };
+-				tmpPanel.add(new JComboBox(strFormats));
++				tmpPanel.add(new JComboBox<String>(strFormats));
+ 			    }
+ 			    JButton jbsave = new JButton("create and save as");
+ 			    jbsave.addActionListener(aL);
+@@ -871,7 +871,7 @@ panel2.add(new JLabel());
+ 						    ,
+ 						    heightvalue,widthvalue,
+ 						    Integer.parseInt(dpi
+-								     .getText()),surfex_.jv4sx);
++								     .getText()),surfex.jv4sx);
+ 					    } else {
+ 						if (outputFormat.getSelectedIndex()==1) {
+ 						    //surfcode
+@@ -880,7 +880,7 @@ panel2.add(new JLabel());
+ 								     ,
+ 								     heightvalue,widthvalue,
+ 								     Integer.parseInt(dpi
+-										      .getText()),surfex_.jv4sx);
++										      .getText()),surfex.jv4sx);
+ 						} else {
+ 						    //                System.out.println("saveFile...");
+ 						    project.saveFile(filelocation, 3,(colorType.getSelectedIndex()==1),//dithered?
+@@ -888,7 +888,7 @@ panel2.add(new JLabel());
+ 								     ,
+ 								     heightvalue,widthvalue,
+ 								     Integer.parseInt(dpi
+-										      .getText()),surfex_.jv4sx);
++										      .getText()),surfex.jv4sx);
+ 						}
+ 					    }
+ 					    //              saveFile(filelocation);
+@@ -913,7 +913,7 @@ panel2.add(new JLabel());
+ 				    File lastFile = new File(project.filename);
+ 				    String theName = lastFile.getName();
+ 				    fileChooser.setSelectedFile(
+-					new File(surfex_.changeFilenameExtension(theName,".pov")));
++					new File(surfex.changeFilenameExtension(theName,".pov")));
+ //	    System.out.println("name:"+theName);
+ 				} catch(Exception fileEx) {
+ 				    System.out.println("fileEx:"+fileEx.toString());
+@@ -934,7 +934,7 @@ panel2.add(new JLabel());
+ 					File lastFile = new File(project.filename);
+ 					String theName = lastFile.getName();
+ 					fileChooser.setSelectedFile(
+-					    new File(surfex_.changeFilenameExtension(theName,".pic")));
++					    new File(surfex.changeFilenameExtension(theName,".pic")));
+ //	    System.out.println("name:"+theName);
+ 				    } catch(Exception fileEx) {
+ 					System.out.println("fileEx:"+fileEx.toString());
+@@ -978,7 +978,7 @@ panel2.add(new JLabel());
+ 						File lastFile = new File(project.filename);
+ 						String theName = lastFile.getName();
+ 						fileChooser.setSelectedFile(
+-						    new File(surfex_.changeFilenameExtension(theName,".eps")));
++						    new File(surfex.changeFilenameExtension(theName,".eps")));
+ //	    System.out.println("name:"+theName);
+ 					    } catch(Exception fileEx) {
+ 						System.out.println("fileEx:"+fileEx.toString());
+@@ -1034,7 +1034,7 @@ panel2.add(new JLabel());
+ 						File lastFile = new File(project.filename);
+ 						String theName = lastFile.getName();
+ 						fileChooser.setSelectedFile(
+-						    new File(surfex_.changeFilenameExtension(theName,".jpg")));
++						    new File(surfex.changeFilenameExtension(theName,".jpg")));
+ //	    System.out.println("name:"+theName);
+ 					    } catch(Exception fileEx) {
+ 						System.out.println("fileEx:"+fileEx.toString());
+--- singular-4.1.1/Singular/LIB/surfex/SavePic.java.orig	2018-10-24 08:27:19.000000000 -0600
++++ singular-4.1.1/Singular/LIB/surfex/SavePic.java	2020-07-22 21:42:04.988289747 -0600
+@@ -82,7 +82,7 @@ public class SavePic extends Thread {
+ 
+   double[] runningParamsValue;
+ 
+-  Vector Lamps;
++  Vector<Lamp> Lamps;
+ 
+   boolean _3d=false;
+   boolean stereo_redGreen=true;
+@@ -91,7 +91,7 @@ public class SavePic extends Thread {
+       int height, int width, int dpi, surfex su, Project pro,
+       double[] CamPos, double[] viewDir, double[] upVector,
+       double[] rightVector, String[] runningParams,
+-      double[] runningParamsValue, jv4surfex jv4sx, Vector Lamps) {
++      double[] runningParamsValue, jv4surfex jv4sx, Vector<Lamp> Lamps) {
+     this.filelocation = filelocation;
+     this.dithered = dithered;
+     this.antialiasing = antialiasing;
+@@ -117,7 +117,7 @@ public class SavePic extends Thread {
+         int height, int width, int dpi, surfex su, Project pro,
+         double[] CamPos, double[] viewDir, double[] upVector,
+         double[] rightVector, String[] runningParams,
+-        double[] runningParamsValue, jv4surfex jv4sx, Vector Lamps, jv4surfex jv4sx_project) {
++        double[] runningParamsValue, jv4surfex jv4sx, Vector<Lamp> Lamps, jv4surfex jv4sx_project) {
+       this.filelocation = filelocation;
+       this.dithered = dithered;
+       this.antialiasing = antialiasing;
+@@ -212,13 +212,12 @@ public class SavePic extends Thread {
+ 	return str;
+     }
+ 
+-    public String getLampCode_surf(Vector Lamps){
++    public String getLampCode_surf(Vector<Lamp> Lamps){
+   	String str="";
+-	Lamp tempLamp;
+ 	int i=0;
+-	ListIterator li=Lamps.listIterator();
++	ListIterator<Lamp> li=Lamps.listIterator();
+ 	while(li.hasNext()){
+-	    tempLamp=(Lamp)li.next();
++	    Lamp tempLamp=li.next();
+ 	    i++;
+ 	    str+=tempLamp.getSurfCode(i, runningParams,runningParamsValue);
+ 	}
+@@ -228,7 +227,7 @@ public class SavePic extends Thread {
+ 
+     }
+ 
+-    public String getLampCode_pov(Vector Lamps){
++    public String getLampCode_pov(Vector<Lamp> Lamps){
+ 	System.out.println("ERROR: Methode muss noch geschrieben werden:getLampCode_pov(Vector Lamps)");
+ 	return null;
+     }
+@@ -253,14 +252,14 @@ public class SavePic extends Thread {
+ 
+ 	}
+ 
+-	if (filelocation != surfex_.tmpDir + "test.png") {
++	if (filelocation != surfex.tmpDir + "test.png") {
+ 	    if (surfex_.configFrame.pov.isSelected()
+ 		&& surfex_.OS == surfex_.osWINDOWS) {
+ 		// musste test.png nach filelocation hin kopieren ...
+ 		try {
+ 		    Runtime r = Runtime.getRuntime();
+ 		    Process p;
+-		    p = r.exec("iview\\i_view32.exe " + surfex_.tmpDir
++		    p = r.exec("iview\\i_view32.exe " + surfex.tmpDir
+ 			       + "test.png /convert=" + filelocation);
+ 		    p.waitFor();
+ 		} catch (Exception er) {
+@@ -335,12 +334,12 @@ public class SavePic extends Thread {
+ 	    //        System.out.println("old
+ 	    // subdir:"+surfex_.getCurrentProject().old_tmpsubdir);
+ 	    out.print("prefix=surfex_tmp" + "&filelocation="
+-		      + URLEncoder.encode(filelocation) + "&tmpsubdir="
+-		      + URLEncoder.encode(project.old_tmpsubdir)
++		      + URLEncoder.encode(filelocation, "UTF-8") + "&tmpsubdir="
++		      + URLEncoder.encode(project.old_tmpsubdir, "UTF-8")
+ 		      + "&prg=surf" + "&img_width=" + width + "&img_height="
+ 		      + height + "&prg_code_part1="
+-		      + URLEncoder.encode(surfCodePart1) + "&prg_code_part2="
+-		      + URLEncoder.encode(surfCodePart2));
++		      + URLEncoder.encode(surfCodePart1, "UTF-8") + "&prg_code_part2="
++		      + URLEncoder.encode(surfCodePart2, "UTF-8"));
+ 	    out.close();
+ 
+ 	    // read the file names
+@@ -513,7 +512,7 @@ public class SavePic extends Thread {
+ 	    //	    System.out.println("file1a:"+filelocation+".pic");
+ 	    //	    System.out.println("file1b:"+toWindows(filelocation+".pic"));
+ 	    FileOutputStream fo;
+-	    if(surfex_.cygwin==1) {
++	    if(surfex.cygwin==1) {
+ 		 fo = new FileOutputStream(surfex.toWindows(filelocation + ".pic"));
+ 	    } else {
+ 		 fo = new FileOutputStream(filelocation + ".pic");
+@@ -555,7 +554,7 @@ public class SavePic extends Thread {
+ // 	    System.out.println("sh -exec \""+surfex_.configFrame.surfPath.getText() + " "
+ //               + surfex.toLinux(filelocation + ".pic")+"\"");
+ 
+-	    if(surfex_.cygwin==1) {
++	    if(surfex.cygwin==1) {
+ 		p = r.exec("sh -exec \""+surfex_.configFrame.surfPath.getText() + " "
+ 			   + "\\\""+surfex.toLinux(filelocation + ".pic")+"\\\"\"");
+ 	    } else {
+@@ -612,7 +611,7 @@ public class SavePic extends Thread {
+          * //System.out.println("2,8" );
+          */
+         if (dithered) {
+-          project.eqAdm.img_filename = surfex_.tmpDir
++          project.eqAdm.img_filename = surfex.tmpDir
+               + project.tmp_surfex_file;
+         } else {
+           project.eqAdm.img_filename = filelocation;
+@@ -625,7 +624,7 @@ public class SavePic extends Thread {
+   } // end else
+ 
+ 
+-    public void updateLamps(Vector la){
++    public void updateLamps(Vector<Lamp> la){
+   	Lamps=la;
+     }
+ 
+@@ -654,8 +653,8 @@ public class SavePic extends Thread {
+ 	    // /etc/povray.ini"; };
+ 
+ 	    if (surfex_.OS == surfex_.osLINUX) {
+-		p = r.exec("povray +H240 +W240 +O" + surfex_.tmpDir
+-			   + "test.png +I" + surfex_.tmpDir
++		p = r.exec("povray +H240 +W240 +O" + surfex.tmpDir
++			   + "test.png +I" + surfex.tmpDir
+ 			   + "tmp_surfex.pov povray.ini");
+ 	    } else {
+ 		//if(surfex_.OS==surfex_.osWINDOWS){
+@@ -664,7 +663,7 @@ public class SavePic extends Thread {
+ 		// tmp_surfex.pov povray.ini /EXIT");
+ 		p = r.exec(surfex_.configFrame.povPath.getText() + " /NR +H"
+ 			   + height + " +W" + width + " +O" + filelocation
+-			   + " -D /RENDER " + surfex_.tmpDir
++			   + " -D /RENDER " + surfex.tmpDir
+ 			   + "tmp_surfex.pov /EXIT");
+ 		p.waitFor();
+ 	    }
+--- singular-4.1.1/Singular/LIB/surfex/SolitaryPoint.java.orig	2018-10-24 08:27:19.000000000 -0600
++++ singular-4.1.1/Singular/LIB/surfex/SolitaryPoint.java	2020-07-22 18:05:26.804547206 -0600
+@@ -105,7 +105,7 @@ public class SolitaryPoint extends JPane
+ 
+ 	public JLabel radiusLabel = new JLabel("" + radius);
+ 
+-	public JComboBox surfaces;
++	public JComboBox<Object> surfaces;
+ 
+ 	// Ende Variablen
+ 
+@@ -116,7 +116,7 @@ public class SolitaryPoint extends JPane
+ 		setLayout(new BorderLayout());
+ 		JPanel flowPanel = new JPanel(new FlowLayout());
+ 
+-		surfaces = new JComboBox(project.eqAdm.getEqNrs());
++		surfaces = new JComboBox<Object>(project.eqAdm.getEqNrs());
+ 
+ 		//  flowPanel.add(cbox);
+ 
+--- singular-4.1.1/Singular/LIB/surfex/SolitaryPointsAdmin.java.orig	2018-10-24 08:27:19.000000000 -0600
++++ singular-4.1.1/Singular/LIB/surfex/SolitaryPointsAdmin.java	2020-07-22 17:43:26.051042702 -0600
+@@ -52,7 +52,7 @@ public class SolitaryPointsAdmin extends
+ 
+ 	JPanel solPtsPanel;
+ 
+-	public Vector solPtsList = new Vector();
++	public Vector<SolitaryPoint> solPtsList = new Vector<SolitaryPoint>();
+ 
+ 	Project project;
+ 
+@@ -82,9 +82,9 @@ public class SolitaryPointsAdmin extends
+ 
+ 		// find a non-used parameter number:
+ 		int n = solPtsList.size() + 1;
+-		ListIterator li = solPtsList.listIterator();
++		ListIterator<SolitaryPoint> li = solPtsList.listIterator();
+ 		while (li.hasNext()) {
+-			if (n == ((SolitaryPoint) (li.next())).solPtNo) {
++			if (n == li.next().solPtNo) {
+ 				// if the parameter number n is already in use
+ 				n = n + 1; // try the next number
+ 				// reset the list iterator to the first element in the list:
+@@ -104,50 +104,44 @@ public class SolitaryPointsAdmin extends
+ 	}
+ 
+ 	public void equationListChanged_add(String EqName) {
+-		ListIterator li = solPtsList.listIterator();
+-		SolitaryPoint pt;
+-		int i;
++		ListIterator<SolitaryPoint> li = solPtsList.listIterator();
+ 		while (li.hasNext()) {
+ 			//       System.out.println("update pla oe" );
+-			pt = (SolitaryPoint) li.next();
++			SolitaryPoint pt = li.next();
+ 			pt.surfaces.addItem(EqName);
+ 		}
+ 	}
+ 
+ 	public String save() {
+ 		String str = "";
+-		ListIterator li = solPtsList.listIterator();
++		ListIterator<SolitaryPoint> li = solPtsList.listIterator();
+ 		str += "////////////////// SOLITARY POINTS: /////////////////////////"
+ 				+ "\n";
+ 		str += solPtsList.size() + "\n";
+ 		while (li.hasNext()) {
+-			str += ((SolitaryPoint) li.next()).saveYourself();
++			str += li.next().saveYourself();
+ 		}
+ 		return (str);
+ 	}
+ 
+ 	public void copyRadiusToAll(double from, double to, double rad) {
+ 		int i;
+-		SolitaryPoint tmp;
+ 		for (i = 0; i < solPtsList.size(); i++) {
+ 			try {
+ 				//    System.out.println("i:"+i);
+-				tmp = ((SolitaryPoint) (solPtsList.elementAt(i)));
+-				((SolitaryPoint) (solPtsList.elementAt(i))).newFrom = from;
+-				((SolitaryPoint) (solPtsList.elementAt(i))).oldFrom = from;
+-				((SolitaryPoint) (solPtsList.elementAt(i))).newTo = to;
+-				((SolitaryPoint) (solPtsList.elementAt(i))).oldTo = to;
+-				((SolitaryPoint) (solPtsList.elementAt(i))).radiusSlider
+-						.setValue((int) (rad / (to - from) * 1000.0));
+-				((SolitaryPoint) (solPtsList.elementAt(i))).radiusSlider
+-						.repaint();
++				SolitaryPoint tmp = solPtsList.elementAt(i);
++				tmp.newFrom = from;
++				tmp.oldFrom = from;
++				tmp.newTo = to;
++				tmp.oldTo = to;
++				tmp.radiusSlider.setValue((int) (rad / (to - from) * 1000.0));
++				tmp.radiusSlider.repaint();
+ 				String str = "" + rad;
+ 				int end = 6;
+ 				if (str.length() <= 6) {
+ 					end = str.length();
+ 				}
+-				((SolitaryPoint) (solPtsList.elementAt(i))).radiusLabel
+-						.setText(str.substring(0, end));
++				tmp.radiusLabel.setText(str.substring(0, end));
+ 			} catch (Exception ex) {
+ 				System.out.println("error:" + ex.toString());
+ 			}
+@@ -177,7 +171,7 @@ public class SolitaryPointsAdmin extends
+ 								|| (strline.equals("coords:"))) {
+ 							//          System.out.println("strline:"+strline);
+ 							if (strline.equals("solPtNo:")) {
+-								((SolitaryPoint) solPtsList.lastElement())
++								solPtsList.lastElement()
+ 										.setSolPtNo(Integer.parseInt(bs
+ 												.readLine()));
+ 							}
+@@ -185,56 +179,56 @@ public class SolitaryPointsAdmin extends
+ 								//        System.out.println("set surface...");
+ 								tmpline = bs.readLine();
+ 								if (tmpline.equals("-")) {
+-									((SolitaryPoint) solPtsList.lastElement())
++									solPtsList.lastElement()
+ 											.setSurfNo(0);
+ 								} else {
+ 									//            System.out.println("set surface:"+(Integer.parseInt(tmpline)));
+-									((SolitaryPoint) solPtsList.lastElement())
++									solPtsList.lastElement()
+ 											.setSurfNo(Integer
+ 													.parseInt(tmpline));
+ 								}
+ 							}
+ 							if (strline.equals("coords:")) {
+-								((SolitaryPoint) solPtsList.lastElement()).x
++								solPtsList.lastElement().x
+ 										.setText(bs.readLine());
+-								((SolitaryPoint) solPtsList.lastElement()).newX = Double
+-										.parseDouble(((SolitaryPoint) solPtsList
+-												.lastElement()).x.getText());
+-								((SolitaryPoint) solPtsList.lastElement()).oldX = Double
+-										.parseDouble(((SolitaryPoint) solPtsList
+-												.lastElement()).x.getText());
+-								((SolitaryPoint) solPtsList.lastElement()).y
++								solPtsList.lastElement().newX = Double
++										.parseDouble(solPtsList
++												.lastElement().x.getText());
++								solPtsList.lastElement().oldX = Double
++										.parseDouble(solPtsList
++												.lastElement().x.getText());
++								solPtsList.lastElement().y
+ 										.setText(bs.readLine());
+-								((SolitaryPoint) solPtsList.lastElement()).newY = Double
+-										.parseDouble(((SolitaryPoint) solPtsList
+-												.lastElement()).y.getText());
+-								((SolitaryPoint) solPtsList.lastElement()).oldY = Double
+-										.parseDouble(((SolitaryPoint) solPtsList
+-												.lastElement()).y.getText());
+-								((SolitaryPoint) solPtsList.lastElement()).z
++								solPtsList.lastElement().newY = Double
++										.parseDouble(solPtsList
++												.lastElement().y.getText());
++								solPtsList.lastElement().oldY = Double
++										.parseDouble(solPtsList
++												.lastElement().y.getText());
++								solPtsList.lastElement().z
+ 										.setText(bs.readLine());
+-								((SolitaryPoint) solPtsList.lastElement()).newZ = Double
+-										.parseDouble(((SolitaryPoint) solPtsList
+-												.lastElement()).z.getText());
+-								((SolitaryPoint) solPtsList.lastElement()).oldZ = Double
+-										.parseDouble(((SolitaryPoint) solPtsList
+-												.lastElement()).z.getText());
++								solPtsList.lastElement().newZ = Double
++										.parseDouble(solPtsList
++												.lastElement().z.getText());
++								solPtsList.lastElement().oldZ = Double
++										.parseDouble(solPtsList
++												.lastElement().z.getText());
+ 							}
+ 							if (strline.equals("fromtoval:")) {
+-								((SolitaryPoint) solPtsList.lastElement()).oldFrom = Double
++								solPtsList.lastElement().oldFrom = Double
+ 										.parseDouble(bs.readLine());
+-								((SolitaryPoint) solPtsList.lastElement()).newFrom = ((SolitaryPoint) solPtsList
+-										.lastElement()).oldFrom;
++								solPtsList.lastElement().newFrom = solPtsList
++										.lastElement().oldFrom;
+ 
+-								((SolitaryPoint) solPtsList.lastElement()).oldTo = Double
++								solPtsList.lastElement().oldTo = Double
+ 										.parseDouble(bs.readLine());
+-								((SolitaryPoint) solPtsList.lastElement()).newTo = ((SolitaryPoint) solPtsList
+-										.lastElement()).oldTo;
++								solPtsList.lastElement().newTo = solPtsList
++										.lastElement().oldTo;
+ 
+-								((SolitaryPoint) solPtsList.lastElement()).radiusSlider
++								solPtsList.lastElement().radiusSlider
+ 										.setValue(Integer.parseInt(bs
+ 												.readLine()));
+-								((SolitaryPoint) solPtsList.lastElement())
++								solPtsList.lastElement()
+ 										.updateradiusSliderLabel();
+ 							}
+ 							bs.mark(255);
+@@ -247,47 +241,47 @@ public class SolitaryPointsAdmin extends
+ 				}
+ 				if (datatype.equals("complete") || datatype.equals("onlyeqns")
+ 						|| datatype.equals("eqnsvis")) {
+-					((SolitaryPoint) solPtsList.lastElement())
++					solPtsList.lastElement()
+ 							.setSolPtNo(Integer.parseInt(bs.readLine()));
+-					((SolitaryPoint) solPtsList.lastElement())
++					solPtsList.lastElement()
+ 							.setSurfNo(Integer.parseInt(bs.readLine()));
+-					((SolitaryPoint) solPtsList.lastElement()).x.setText(bs
++					solPtsList.lastElement().x.setText(bs
+ 							.readLine());
+-					((SolitaryPoint) solPtsList.lastElement()).newX = Double
+-							.parseDouble(((SolitaryPoint) solPtsList
+-									.lastElement()).x.getText());
+-					((SolitaryPoint) solPtsList.lastElement()).oldX = Double
+-							.parseDouble(((SolitaryPoint) solPtsList
+-									.lastElement()).x.getText());
+-					((SolitaryPoint) solPtsList.lastElement()).y.setText(bs
++					solPtsList.lastElement().newX = Double
++							.parseDouble(solPtsList
++									.lastElement().x.getText());
++					solPtsList.lastElement().oldX = Double
++							.parseDouble(solPtsList
++									.lastElement().x.getText());
++					solPtsList.lastElement().y.setText(bs
+ 							.readLine());
+-					((SolitaryPoint) solPtsList.lastElement()).newY = Double
+-							.parseDouble(((SolitaryPoint) solPtsList
+-									.lastElement()).y.getText());
+-					((SolitaryPoint) solPtsList.lastElement()).oldY = Double
+-							.parseDouble(((SolitaryPoint) solPtsList
+-									.lastElement()).y.getText());
+-					((SolitaryPoint) solPtsList.lastElement()).z.setText(bs
++					solPtsList.lastElement().newY = Double
++							.parseDouble(solPtsList
++									.lastElement().y.getText());
++					solPtsList.lastElement().oldY = Double
++							.parseDouble(solPtsList
++									.lastElement().y.getText());
++					solPtsList.lastElement().z.setText(bs
+ 							.readLine());
+-					((SolitaryPoint) solPtsList.lastElement()).newZ = Double
+-							.parseDouble(((SolitaryPoint) solPtsList
+-									.lastElement()).z.getText());
+-					((SolitaryPoint) solPtsList.lastElement()).oldZ = Double
+-							.parseDouble(((SolitaryPoint) solPtsList
+-									.lastElement()).z.getText());
+-					((SolitaryPoint) solPtsList.lastElement()).oldFrom = Double
++					solPtsList.lastElement().newZ = Double
++							.parseDouble(solPtsList
++									.lastElement().z.getText());
++					solPtsList.lastElement().oldZ = Double
++							.parseDouble(solPtsList
++									.lastElement().z.getText());
++					solPtsList.lastElement().oldFrom = Double
+ 							.parseDouble(bs.readLine());
+-					((SolitaryPoint) solPtsList.lastElement()).newFrom = ((SolitaryPoint) solPtsList
+-							.lastElement()).oldFrom;
+-					((SolitaryPoint) solPtsList.lastElement()).oldTo = Double
++					solPtsList.lastElement().newFrom = solPtsList
++							.lastElement().oldFrom;
++					solPtsList.lastElement().oldTo = Double
+ 							.parseDouble(bs.readLine());
+-					((SolitaryPoint) solPtsList.lastElement()).newTo = ((SolitaryPoint) solPtsList
+-							.lastElement()).oldTo;
+-					((SolitaryPoint) solPtsList.lastElement()).radiusSlider
++					solPtsList.lastElement().newTo = solPtsList
++							.lastElement().oldTo;
++					solPtsList.lastElement().radiusSlider
+ 							.setValue(Integer.parseInt(bs.readLine()));
+-					((SolitaryPoint) solPtsList.lastElement())
++					solPtsList.lastElement()
+ 							.updateradiusSliderLabel();
+-					((SolitaryPoint) solPtsList.lastElement()).repaint();
++					solPtsList.lastElement().repaint();
+ 				}
+ 				if (datatype.equals("complete") || datatype.equals("onlystyle")) {
+ 					//        ((SolitaryPoint) solPtsList.lastElement()).cbox.setSelected((Boolean.valueOf(bs.readLine())).booleanValue());
+--- singular-4.1.1/Singular/LIB/surfex/surfex.java.orig	2018-10-24 08:27:19.000000000 -0600
++++ singular-4.1.1/Singular/LIB/surfex/surfex.java	2020-07-22 21:31:49.416596085 -0600
+@@ -180,7 +180,7 @@ class surfex extends JFrame implements A
+     RayFrame rayFrame;
+ 
+     // Projects
+-    Vector openProjects = new Vector();
++    Vector<Project> openProjects = new Vector<Project>();
+ 
+     int projectCounter = 0;
+ 
+@@ -281,7 +281,7 @@ class surfex extends JFrame implements A
+ 		try {
+ 		    Runtime r = Runtime.getRuntime();
+ 		    Process p;
+-		    if(surfex_.cygwin==1) {
++		    if(surfex.cygwin==1) {
+ 			p = r.exec(defaultBrowser + " " + surfexDirectory + File.separator +
+ 				   "doc" + File.separator + "surfex_doc_linux.pdf");
+ 		    } else {
+@@ -307,7 +307,7 @@ class surfex extends JFrame implements A
+ 		try {
+ 		    Runtime r = Runtime.getRuntime();
+ 		    Process p;
+-		    if(surfex_.cygwin==1) {
++		    if(surfex.cygwin==1) {
+ 			p = r.exec(defaultBrowser + " http://www.surfex.algebraicsurface.net");
+ 		    } else {
+ //			System.out.println("cb:"+util.getCodebase(this.getClass()));
+@@ -404,7 +404,7 @@ class surfex extends JFrame implements A
+     public Project getCurrentProject() {
+ 	int pi = pane.getSelectedIndex();
+ 	if(pi!=-1){
+-	    return ((Project) openProjects.get(pi));
++	    return openProjects.get(pi);
+ 	}
+ 	return null;
+     }
+@@ -578,10 +578,10 @@ class surfex extends JFrame implements A
+ 
+     public void closeProject(int ProjectNumber) {
+ 	if (openProjects.size() >= 2) {
+-	    ListIterator li = openProjects.listIterator();
++	    ListIterator<Project> li = openProjects.listIterator();
+ 	    int i = 1;
+ 	    while (li.hasNext()) {
+-		if (((Project) li.next()).ProjectNumber == ProjectNumber) {
++		if (li.next().ProjectNumber == ProjectNumber) {
+ 		    openProjects.removeElementAt(i);
+ 		    break;
+ 		}
+@@ -595,10 +595,10 @@ class surfex extends JFrame implements A
+ 
+     public void updateProjectPane() {
+ 	pane.removeAll();
+-	ListIterator li = openProjects.listIterator();
++	ListIterator<Project> li = openProjects.listIterator();
+ 	Project pro;
+ 	while (li.hasNext()) {
+-	    pro = (Project) li.next();
++	    pro = li.next();
+ 	    JScrollPane mainpane = new JScrollPane(pro);
+ 	    pane.add(mainpane, pro.projectName);
+ 	}
+@@ -612,7 +612,7 @@ class surfex extends JFrame implements A
+ 	    if(inAnApplet) {
+ 		// stop the raytracer-frame, if it runs:
+ 		try {
+-		    updateRayframeImmediatlyThread.stop();
++		    updateRayframeImmediatlyThread.stopThread();
+ 		} catch (Exception ex) {
+ 		    //        System.out.println("stop thread:"+ex.toString());
+ 		}
+@@ -638,7 +638,7 @@ class surfex extends JFrame implements A
+ 		    //        System.out.println("remove tmpdir:"+surfex_.getCurrentProject().old_tmpsubdir);
+ 		    out.print("tmpsubdir="
+ 			      + URLEncoder
+-			      .encode(getCurrentProject().old_tmpsubdir)
++			      .encode(getCurrentProject().old_tmpsubdir, "UTF-8")
+ 			      + "&prg=rmtmp");
+ 		    out.close();
+ 
+@@ -884,9 +884,9 @@ class surfex extends JFrame implements A
+ 	//  if(!noWindow){
+ 	//     System.out.println("s3c "+jv4sx.getScale());
+ 	updateRayframeImmediatlyThread = new UpdateRayframeImmediatlyThread(
+-	    rayFrame, this, (Project) openProjects.lastElement(),jv4sx);
++	    rayFrame, this, openProjects.lastElement(), jv4sx);
+ 	//     System.out.println("s3d "+jv4sx.getScale());
+-	lastProject = (Project) openProjects.lastElement();
++	lastProject = openProjects.lastElement();
+ 	progressFrame.refresh(1000, "started.");
+ 
+ 	//     progressFrame.refresh(900,"        - lamp Admin");
+@@ -956,7 +956,7 @@ class surfex extends JFrame implements A
+ 	System.out.println("tabChanged()");
+ 
+ 	surfex_.configFrame.last[4] = false;
+-	surfex_.updateRayframeImmediatlyThread.stop();
++	surfex_.updateRayframeImmediatlyThread.stopThread();
+ //     surfex_.updateRayframeImmediatlyThread.t=t;
+ 
+ 	lastProject.eqAdm.lastUpVector = PdVector.copyNew(jv4sx.disp
+@@ -997,7 +997,7 @@ class surfex extends JFrame implements A
+     }
+ 
+     public void newUpdateRayframeImmediatlyThread() {
+-	updateRayframeImmediatlyThread.stop();
++	updateRayframeImmediatlyThread.stopThread();
+ 	updateRayframeImmediatlyThread.t=new Thread();
+ //     System.out.println(updateRayframeImmediatlyThread.rand+":::::::::::::::::::::::::::::");
+ 	updateRayframeImmediatlyThread = new UpdateRayframeImmediatlyThread(
+@@ -1103,7 +1103,7 @@ class surfex extends JFrame implements A
+ 	String rootFinder = "bezier_all_roots";
+ 	String epsilon = "0.00000000000001";
+ 
+-	Vector runningParameters=new Vector();
++	Vector<String> runningParameters=new Vector<String>();
+ 
+ 	///////////////////////////////
+ 	// create a new surfex object:
+@@ -1158,17 +1158,17 @@ class surfex extends JFrame implements A
+ 	   } else if ((args[i].equals("-t") || args[i].equals("--tempdir"))
+ 		      && args.length >= i + 1) {
+ 	       if(cygwin<=1) {
+-		   t.tmpDir = args[i + 1];
+-		   if (!(t.tmpDir.endsWith("/"))) {
+-		       t.tmpDir = t.tmpDir + "/";
++		   surfex.tmpDir = args[i + 1];
++		   if (!(surfex.tmpDir.endsWith("/"))) {
++		       surfex.tmpDir = surfex.tmpDir + "/";
+ 		   }
+ 	       }
+ 	       i++;
+ 	   } else if ((args[i].equals("-cyg") || args[i].equals("--cygdir"))
+ 		      && args.length >= i + 1) {
+-	       t.cygdrivedir = args[i + 1];
+-	       if (!(t.cygdrivedir.endsWith("/"))) {
+-		   t.cygdrivedir = t.cygdrivedir + "/";
++	       surfex.cygdrivedir = args[i + 1];
++	       if (!(surfex.cygdrivedir.endsWith("/"))) {
++		   surfex.cygdrivedir = surfex.cygdrivedir + "/";
+ 	       }
+ 	       i++;
+ 	   } else if ((args[i].equals("-i") || args[i].equals("--infile"))
+@@ -1288,8 +1288,8 @@ class surfex extends JFrame implements A
+ 	   done = true;
+        } else {
+ 	   if (!startEqnString.equals("")) {
+-	       ((Equation) ((t.getCurrentProject()).eqAdm.eqnList
+-			    .lastElement())).text.setText(startEqnString);
++	       t.getCurrentProject().eqAdm.eqnList
++			    .lastElement().text.setText(startEqnString);
+ 	       t.raytrace();
+ 	       done = true;
+ 	   }
+@@ -1400,15 +1400,9 @@ class surfex extends JFrame implements A
+ 	}
+     }
+ 
+-    public static String[] paramsToString(Vector v){
++    public static String[] paramsToString(Vector<String> v){
+    	String[] s=new String[v.size()];
+-   	ListIterator li=v.listIterator();
+-   	int i=0;
+-   	while(li.hasNext()){
+-	    s[i++]=(String)li.next();
+-   	}
+-
+-   	return s;
++	return v.toArray(s);
+     }
+ 
+ 
+--- singular-4.1.1/Singular/LIB/surfex/UpdateRayframeImmediatlyThread.java.orig	2018-10-24 08:27:19.000000000 -0600
++++ singular-4.1.1/Singular/LIB/surfex/UpdateRayframeImmediatlyThread.java	2020-07-22 21:32:45.248660715 -0600
+@@ -54,7 +54,7 @@ public class UpdateRayframeImmediatlyThr
+ 
+ 	int rand;
+ 
+-	Vector Lamps;
++	Vector<Lamp> Lamps;
+ 
+ 	//boolean only
+ 	Lamp selectedLamp;
+@@ -72,7 +72,7 @@ public class UpdateRayframeImmediatlyThr
+ 	}
+ 
+ 	UpdateRayframeImmediatlyThread(RayFrame ray, surfex su, Project pro,
+-			jv4surfex jv4sx,jv4surfex jv4sx_project, Vector Lamps, boolean showOnlySelectedLamp,
++			jv4surfex jv4sx,jv4surfex jv4sx_project, Vector<Lamp> Lamps, boolean showOnlySelectedLamp,
+ 			Lamp selectedLamp) {
+ //		System.out.println("pla2");
+ 		rayFrame = ray;
+@@ -99,6 +99,12 @@ public class UpdateRayframeImmediatlyThr
+ 		}
+ 	}
+ 
++	public void stopThread() throws SecurityException {
++		Thread me = t;
++		t = null;
++		me.interrupt();
++	}
++
+ 	/*
+ 	 * public void stop() { killMe = true; t = null; //
+ 	 * System.out.println("comittsuicide" ); }
+@@ -106,7 +112,7 @@ public class UpdateRayframeImmediatlyThr
+ 
+ 	public void run() {
+ 		Thread me = Thread.currentThread();
+-		String fn = surfex_.tmpDir + "uit" + rand + "test.png";
++		String fn = surfex.tmpDir + "uit" + rand + "test.png";
+ 		saveThread = new SavePic(fn, false, project.antialiasing.isSelected(),
+ 					 rayFrame.panel.getSize().height
+ 					 / project.getInterpolConst(),
+@@ -117,10 +123,10 @@ public class UpdateRayframeImmediatlyThr
+ 					 jv4sx, Lamps);
+ 		// falls nur eine Lampe angezeigt werden soll:;
+ 		if (surfex_.configFrame.surf.isSelected()) {
+-			fn = surfex_.tmpDir + project.tmp_surfex_file + "uit"
++			fn = surfex.tmpDir + project.tmp_surfex_file + "uit"
+ 					+ rand + ".jpg";
+ 		} else {
+-			fn = surfex_.tmpDir + "uit" + rand + "test.png";
++			fn = surfex.tmpDir + "uit" + rand + "test.png";
+ 		}
+ 
+ 
+@@ -220,7 +226,7 @@ public class UpdateRayframeImmediatlyThr
+ 						} catch (Exception er) {
+ 							System.out.println(er);
+ 						}
+-						if(surfex_.cygwin==1) {
++						if(surfex.cygwin==1) {
+ 						    rayFrame.changeBackground(surfex.toWindows(fn));
+ 						} else {
+ 						    rayFrame.changeBackground(fn);
