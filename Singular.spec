@@ -60,6 +60,7 @@ BuildRequires:	javapackages-tools
 BuildRequires:	libgfan-devel
 BuildRequires:	libnormaliz-devel
 BuildRequires:	libtool
+BuildRequires:	make
 BuildRequires:	ntl-devel%{?ntl8: >= 8.0}
 BuildRequires:  pkgconfig(libxml-2.0)
 BuildRequires:  pkgconfig(mathicgb)
@@ -267,15 +268,15 @@ export LDFLAGS="-Wl,-z,relro"
 	--disable-doc \
 	--with-malloc=system
 
-make %{?_smp_mflags}
-make %{?_smp_mflags} -C dox html
+%make_build
+%make_build -C dox html
 pushd Singular/LIB/surfex
 ./make_surfex
 popd
 
 
 %install
-make DESTDIR=%{buildroot} install
+%make_install
 
 # Do not install gfanlib; it is packaged separately
 rm -fr %{buildroot}%{_includedir}/gfanlib
