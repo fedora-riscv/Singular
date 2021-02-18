@@ -19,7 +19,7 @@
 
 Name:		Singular
 Version:	%{downstreamver}%{?patchver}
-Release:	23%{?dist}
+Release:	24%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 # License analysis:
 # - factory/readcf.cc, Singular/grammar.cc, and Singular/grammar.h are
@@ -467,6 +467,9 @@ make check
 
 
 %changelog
+* Wed Feb 17 2021 Jerry James <loganjerry@gmail.com> - 4.1.1p3-24
+- Rebuild for normaliz 3.8.10
+
 * Mon Jan 25 2021 Fedora Release Engineering <releng@fedoraproject.org> - 4.1.1p3-23
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
