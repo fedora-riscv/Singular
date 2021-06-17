@@ -1,11 +1,7 @@
 %global singulardir	%{_libdir}/Singular
-%global upstreamver	4-1-1
+%global upstreamver	4-2-0
 %global downstreamver	%(tr - . <<< %{upstreamver})
-%global patchver	p3
-
-%if 0%{?fedora}
-%global ntl8 1
-%endif
+%global patchver	p2
 
 %bcond_with python
 
@@ -14,12 +10,9 @@
 %global _python_bytecompile_extra 0
 %endif
 
-# Use this to build without polymake support if polymake is broken.
-%bcond_without polymake
-
 Name:		Singular
 Version:	%{downstreamver}%{?patchver}
-Release:	24%{?dist}
+Release:	1%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 # License analysis:
 # - factory/readcf.cc, Singular/grammar.cc, and Singular/grammar.h are
@@ -37,7 +30,7 @@ Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/%{upstrea
 # - git clone https://github.com/Singular/Sources.git
 # - cd Sources
 # - git checkout spielwiese
-# - git reset --hard c4532ad56fe482b30e500057ca76121dac774af2
+# - git reset --hard c16c74278b8eea884b0d8c0ee355b142cca167a3
 # - tar cJf surfex.tar.xz Singular/LIB/surfex
 Source1:	surfex.tar.xz
 URL:		https://www.singular.uni-kl.de/
@@ -61,15 +54,12 @@ BuildRequires:	libgfan-devel
 BuildRequires:	libnormaliz-devel
 BuildRequires:	libtool
 BuildRequires:	make
-BuildRequires:	ntl-devel%{?ntl8: >= 8.0}
+BuildRequires:	ntl-devel
 BuildRequires:  pkgconfig(libxml-2.0)
 BuildRequires:  pkgconfig(mathicgb)
 BuildRequires:  pkgconfig(ncurses)
 BuildRequires:  pkgconfig(readline)
 BuildRequires:  pkgconfig(zlib)
-%if %{with polymake}
-BuildRequires:	polymake-singular
-%endif
 %if %{with python}
 BuildRequires:	python2-devel
 %endif
@@ -81,6 +71,11 @@ Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
 Requires:	environment(modules)
 Requires:	less
 Requires:	surf-geometry
+Requires:	TOPCOM%{_isa}
+
+# This can be removed when Fedora 38 reaches EOL
+Obsoletes:      Singular-polymake < 4.2.0-1
+Provides:       Singular-polymake = %{version}-%{release}
 
 # Support ARM and S390(x) architectures
 Patch0:		%{name}-arches.patch
@@ -100,12 +95,8 @@ Patch6:		%{name}-gfanlib.patch
 Patch7:		%{name}-alias.patch
 # Let ESingular read a compressed singular.hlp file
 Patch8:		%{name}-emacs.patch
-# Adapt to polymake >= 3.3
-Patch9:		%{name}-polymake.patch
-# Adapt to flint 2.6
-Patch10:	%{name}-flint.patch
 # Adapt to Java 11
-Patch11:	%{name}-javac.patch
+Patch9:		%{name}-javac.patch
 
 %description
 Singular is a computer algebra system for polynomial computations, with
@@ -135,12 +126,12 @@ Requires:	%{name}%{?_isa} = %{version}-%{release}
 This package contains the Singular documentation files.
 
 %package	emacs
-Summary:	(X)Emacs interface to Singular
+Summary:	Emacs interface to Singular
 Requires:	emacs-common
 Requires:	%{name}%{?_isa} = %{version}-%{release}
 
 %description	emacs
-Emacs and XEmacs interface to Singular.
+Emacs interface to Singular.
 
 %package	-n factory
 Summary:	C++ class library for multivariate polynomial data
@@ -188,14 +179,6 @@ Requires:	flint-devel%{?_isa}
 %description	libpolys-devel
 Development files for libpolys.
 
-%package	polymake
-Summary:	Singular interface to polymake
-Requires:	polymake%{_isa}
-Requires:	TOPCOM%{_isa}
-
-%description	polymake
-Singular interface to polymake.
-
 %package	surfex
 Summary:	Singular java interface
 Requires:	java
@@ -206,9 +189,7 @@ This package contains the Singular java interface.
 
 
 %prep
-%setup -q -n singular-%{downstreamver}
-%setup -q -n singular-%{downstreamver} -T -D -a 1
-%autopatch -p1
+%autosetup -n singular-%{downstreamver} -a 1 -p1
 
 %if %{with python}
 # Fix the name of the boost_python library
@@ -243,16 +224,18 @@ export LDFLAGS="-Wl,-z,relro"
 	--disable-optimizationflags \
 	--disable-static \
 	--enable-p-procs-dynamic \
-	--enable-gfanlib \
+	--enable-bigintm-module \
+	--enable-gfanlib-module \
+	--enable-Order-module \
 %if %{with polymake}
-	--enable-polymake \
+	--enable-polymake-module \
 %else
-	--disable-polymake \
+	--disable-polymake-module \
 %endif
 %if %{with python}
-	--enable-python_module \
+	--enable-python-module \
 %else
-	--disable-python_module \
+	--disable-python-module \
 %endif
 	--enable-streamio \
 	--with-gmp \
@@ -302,8 +285,12 @@ rm -f %{buildroot}%{_datadir}/singular/emacs/{ChangeLog,COPYING,NEWS}
 mkdir -p %{buildroot}%{_bindir}
 mv %{buildroot}%{singulardir}/*-config %{buildroot}%{_bindir}
 
-# Move the index and help files to where sagemath wants them
-mv %{buildroot}%{_datadir}/doc/singular.idx %{buildroot}%{_datadir}/singular
+# Install documentation files
+mkdir -p %{buildroot}%{_mandir}/man1
+for cmd in ESingular Singular TSingular; do
+  cp -p doc/$cmd.man %{buildroot}%{_mandir}/man1/$cmd.1
+done
+cp -p doc/singular.idx %{buildroot}%{_datadir}/singular
 
 # remove script that calls surf; we don't ship it
 rm -f %{buildroot}%{singulardir}/singularsurf
@@ -370,6 +357,8 @@ make check
 %{_mandir}/man1/TSingular.1*
 %{_datadir}/applications/Singular.desktop
 %{_datadir}/icons/Singular.png
+%{_datadir}/ml_python/
+%{_datadir}/ml_singular/
 %{_datadir}/singular/singular.idx
 %docdir %{_datadir}/singular/html/
 %{_datadir}/singular/html/
@@ -381,17 +370,14 @@ make check
 %license COPYING
 %license GPL2
 %license GPL3
-%{_libdir}/libSingular-4.1.1.so
+%{_libdir}/libSingular-4.2.0.so
 %{_libexecdir}/singular/
-%exclude %{_libexecdir}/singular/MOD/polymake.so
 %dir %{_datadir}/singular/
 %{_datadir}/singular/LIB/
-%exclude %{_datadir}/singular/LIB/polymake.lib
 %exclude %{_datadir}/singular/LIB/surfex.lib
 %exclude %{_datadir}/singular/LIB/surfex
 
 %files		devel
-%doc kernel/ChangeLog
 %{_bindir}/libsingular-config
 %{_includedir}/singular/kernel/
 %{_includedir}/singular/Singular/
@@ -409,8 +395,7 @@ make check
 
 %files		emacs
 %license emacs/COPYING
-%doc emacs/ChangeLog
-%doc emacs/NEWS
+%doc emacs/BUGS
 %{_bindir}/ESingular
 %{_mandir}/man1/ESingular.1*
 %{_datadir}/singular/emacs/
@@ -424,13 +409,11 @@ make check
 %files		-n factory
 %license factory/COPYING
 %doc factory/README
-%doc factory/NEWS
-%{_libdir}/libfactory-4.1.1.so
+%{_libdir}/libfactory-4.2.0.so
 %{_libdir}/libomalloc-0.9.6.so
-%{_libdir}/libsingular_resources-4.1.1.so
+%{_libdir}/libsingular_resources-4.2.0.so
 
 %files		-n factory-devel
-%doc factory/ChangeLog
 %doc factory/examples
 %{_includedir}/factory/
 %{_includedir}/omalloc/
@@ -448,7 +431,7 @@ make check
 %files		libpolys
 %license libpolys/COPYING
 %doc libpolys/README
-%{_libdir}/libpolys-4.1.1.so
+%{_libdir}/libpolys-4.2.0.so
 
 %files		libpolys-devel
 %{_bindir}/libpolys-config
@@ -461,12 +444,13 @@ make check
 %{_libdir}/libpolys.so
 %{_libdir}/pkgconfig/libpolys.pc
 
-%files		polymake
-%{_libexecdir}/singular/MOD/polymake.so
-%{_datadir}/singular/LIB/polymake.lib
-
 
 %changelog
+* Thu Jun 17 2021 Jerry James <loganjerry@gmail.com> - 4.2.0p2-1
+- Version 4.2.0p2
+- Drop the -polymake subpackage; the polymake library is no longer linked
+- Drop the -polymake and -flint patches
+
 * Wed Feb 17 2021 Jerry James <loganjerry@gmail.com> - 4.1.1p3-24
 - Rebuild for normaliz 3.8.10
 

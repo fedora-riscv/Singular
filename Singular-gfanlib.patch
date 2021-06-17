@@ -1,11 +1,9 @@
---- singular-4.1.0/Singular/dyn_modules/gfanlib/Makefile.am.orig	2017-04-12 09:54:29.000000000 -0600
-+++ singular-4.1.0/Singular/dyn_modules/gfanlib/Makefile.am	2018-05-23 11:15:51.073374806 -0600
-@@ -40,7 +40,7 @@ endif
- endif
+--- singular-4.2.0/Singular/dyn_modules/gfanlib/Makefile.am.orig	2021-05-25 19:56:34.726983587 -0600
++++ singular-4.2.0/Singular/dyn_modules/gfanlib/Makefile.am	2021-05-25 19:56:56.827919382 -0600
+@@ -41,5 +41,5 @@ endif
  
  if HAVE_GFANLIB
+ # Use objects from the libtool convenience library
 - gfanlib_la_LIBADD   += ${abs_top_builddir}/gfanlib/libgfan.la ${CDDGMPLDFLAGS}
 + gfanlib_la_LIBADD   += -lgfan
  endif
- 
- #AM_COLOR_TESTS=always
