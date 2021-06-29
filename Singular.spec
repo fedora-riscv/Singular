@@ -12,7 +12,7 @@
 
 Name:		Singular
 Version:	%{downstreamver}%{?patchver}
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 # License analysis:
 # - factory/readcf.cc, Singular/grammar.cc, and Singular/grammar.h are
@@ -446,6 +446,9 @@ make check
 
 
 %changelog
+* Tue Jun 29 2021 Jerry James <loganjerry@gmail.com> - 4.2.0p2-2
+- Rebuild for ntl 11.5.1
+
 * Thu Jun 17 2021 Jerry James <loganjerry@gmail.com> - 4.2.0p2-1
 - Version 4.2.0p2
 - Drop the -polymake subpackage; the polymake library is no longer linked
