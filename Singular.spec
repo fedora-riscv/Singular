@@ -12,7 +12,7 @@
 
 Name:		Singular
 Version:	%{downstreamver}%{?patchver}
-Release:	2%{?dist}
+Release:	3%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 # License analysis:
 # - factory/readcf.cc, Singular/grammar.cc, and Singular/grammar.h are
@@ -34,6 +34,7 @@ Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/%{upstrea
 # - tar cJf surfex.tar.xz Singular/LIB/surfex
 Source1:	surfex.tar.xz
 URL:		https://www.singular.uni-kl.de/
+BuildRequires:	4ti2
 BuildRequires:	bison
 BuildRequires:	boost-devel
 %if %{with python}
@@ -47,26 +48,33 @@ BuildRequires:	environment(modules)
 BuildRequires:	flex
 BuildRequires:	flint-devel
 BuildRequires:	gcc-c++
+BuildRequires:	gfan
 BuildRequires:	gmp-devel
+BuildRequires:	graphviz
 BuildRequires:	java-devel
 BuildRequires:	javapackages-tools
 BuildRequires:	libgfan-devel
 BuildRequires:	libnormaliz-devel
 BuildRequires:	libtool
+BuildRequires:	lrcalc
 BuildRequires:	make
+BuildRequires:	normaliz
 BuildRequires:	ntl-devel
-BuildRequires:  pkgconfig(libxml-2.0)
-BuildRequires:  pkgconfig(mathicgb)
-BuildRequires:  pkgconfig(ncurses)
-BuildRequires:  pkgconfig(readline)
-BuildRequires:  pkgconfig(zlib)
+BuildRequires:	pkgconfig(libxml-2.0)
+BuildRequires:	pkgconfig(mathicgb)
+BuildRequires:	pkgconfig(ncurses)
+BuildRequires:	pkgconfig(readline)
+BuildRequires:	pkgconfig(tbb)
+BuildRequires:	pkgconfig(zlib)
 %if %{with python}
 BuildRequires:	python2-devel
 %endif
 # Need uudecode for documentation images in tarball
 BuildRequires:	sharutils
+BuildRequires:	surf-geometry
 BuildRequires:	texinfo-tex
 BuildRequires:	tex(latex)
+BuildRequires:	TOPCOM
 Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
 Requires:	environment(modules)
 Requires:	less
@@ -217,6 +225,8 @@ export CFLAGS="%{optflags} -fPIC -fno-delete-null-pointer-checks"
 export CXXFLAGS="$CFLAGS"
 # Cannot use RPM_LD_FLAGS, as -Wl,-z,now breaks lazy module loading
 export LDFLAGS="-Wl,-z,relro"
+module load 4ti2-%{_arch}
+module load lrcalc-%{_arch}
 
 %configure \
 	--bindir=%{singulardir} \
@@ -446,6 +456,10 @@ make check
 
 
 %changelog
+* Thu Jul 15 2021 Jerry James <loganjerry@gmail.com> - 4.2.0p2-3
+- Rebuild for flint 2.7.1
+- Build with support for 4ti2, gfan, graphviz, lrcal, normaliz, and TOPCOM
+
 * Tue Jun 29 2021 Jerry James <loganjerry@gmail.com> - 4.2.0p2-2
 - Rebuild for ntl 11.5.1
 
