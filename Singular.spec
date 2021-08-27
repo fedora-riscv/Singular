@@ -1,7 +1,7 @@
 %global singulardir	%{_libdir}/Singular
 %global upstreamver	4-2-0
 %global downstreamver	%(tr - . <<< %{upstreamver})
-%global patchver	p2
+%global patchver	p3
 
 %bcond_with python
 
@@ -12,7 +12,7 @@
 
 Name:		Singular
 Version:	%{downstreamver}%{?patchver}
-Release:	5%{?dist}
+Release:	1%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 # License analysis:
 # - factory/readcf.cc, Singular/grammar.cc, and Singular/grammar.h are
@@ -30,7 +30,7 @@ Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/%{upstrea
 # - git clone https://github.com/Singular/Sources.git
 # - cd Sources
 # - git checkout spielwiese
-# - git reset --hard c16c74278b8eea884b0d8c0ee355b142cca167a3
+# - git reset --hard 0dabbb616c7d95f0c9e81e9f51b857e3a0bb9e7c
 # - tar cJf surfex.tar.xz Singular/LIB/surfex
 Source1:	surfex.tar.xz
 URL:		https://www.singular.uni-kl.de/
@@ -298,7 +298,7 @@ mv %{buildroot}%{singulardir}/*-config %{buildroot}%{_bindir}
 # Install documentation files
 mkdir -p %{buildroot}%{_mandir}/man1
 for cmd in ESingular Singular TSingular; do
-  cp -p doc/$cmd.man %{buildroot}%{_mandir}/man1/$cmd.1
+  cp -p Singular/$cmd.man %{buildroot}%{_mandir}/man1/$cmd.1
 done
 cp -p doc/singular.idx %{buildroot}%{_datadir}/singular
 
@@ -456,6 +456,9 @@ make check
 
 
 %changelog
+* Fri Aug 27 2021 Jerry James <loganjerry@gmail.com> - 4.2.0p3-1
+- Version 4.2.0p3
+
 * Wed Aug 25 2021 Jerry James <loganjerry@gmail.com> - 4.2.0p2-5
 - Rebuild for flint 2.8.0
 
