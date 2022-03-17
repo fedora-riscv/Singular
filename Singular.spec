@@ -1,5 +1,5 @@
 %global singulardir	%{_libdir}/Singular
-%global upstreamver	4-2-0
+%global upstreamver	4-2-1
 %global downstreamver	%(tr - . <<< %{upstreamver})
 %global patchver	p3
 
@@ -12,7 +12,7 @@
 
 Name:		Singular
 Version:	%{downstreamver}%{?patchver}
-Release:	3%{?dist}
+Release:	1%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 # License analysis:
 # - factory/readcf.cc, Singular/grammar.cc, and Singular/grammar.h are
@@ -25,14 +25,7 @@ Summary:	Computer Algebra System for polynomial computations
 # - Everything else is marked either "GPLv2 or GPLv3" or "GPLv2 or later", with
 #   the former more strict than the latter
 License:	GPLv2 or GPLv3
-Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/%{upstreamver}/singular-%{version}.tar.gz
-# Java sources omitted from the source tarball.  To recreate this:
-# - git clone https://github.com/Singular/Sources.git
-# - cd Sources
-# - git checkout spielwiese
-# - git reset --hard 0dabbb616c7d95f0c9e81e9f51b857e3a0bb9e7c
-# - tar cJf surfex.tar.xz Singular/LIB/surfex
-Source1:	surfex.tar.xz
+Source0:	https://github.com/Singular/Singular/archive/Release-%{upstreamver}%{?patchver}.tar.gz
 URL:		https://www.singular.uni-kl.de/
 BuildRequires:	4ti2
 BuildRequires:	bison
@@ -69,6 +62,7 @@ BuildRequires:	pkgconfig(zlib)
 %if %{with python}
 BuildRequires:	python2-devel
 %endif
+BuildRequires:	qepcad-B
 # Need uudecode for documentation images in tarball
 BuildRequires:	sharutils
 BuildRequires:	surf-geometry
@@ -78,6 +72,7 @@ BuildRequires:	TOPCOM
 Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
 Requires:	environment(modules)
 Requires:	less
+Requires:	qepcad-B
 Requires:	surf-geometry
 Requires:	TOPCOM%{_isa}
 
@@ -101,10 +96,12 @@ Patch5:		%{name}-parens.patch
 Patch6:		%{name}-gfanlib.patch
 # Fix code that violates the strict aliasing rules
 Patch7:		%{name}-alias.patch
-# Let ESingular read a compressed singular.hlp file
+# Let ESingular read a compressed singular.info file
 Patch8:		%{name}-emacs.patch
 # Adapt to Java 11
 Patch9:		%{name}-javac.patch
+# Adapt to GCC 12
+Patch10:	%{name}-gcc12.patch
 
 %description
 Singular is a computer algebra system for polynomial computations, with
@@ -197,7 +194,7 @@ This package contains the Singular java interface.
 
 
 %prep
-%autosetup -n singular-%{downstreamver} -a 1 -p1
+%autosetup -n Singular-Release-%{upstreamver}%{?patchver} -p1
 
 %if %{with python}
 # Fix the name of the boost_python library
@@ -221,10 +218,10 @@ export CPPFLAGS="-I%{_includedir}/flint -I%{_includedir}/gfanlib"
 pyincdir=$(python2 -Esc "import sysconfig; print(sysconfig.get_paths()['include'])")
 CPPFLAGS="$CPPFLAGS -I$pyincdir"
 %endif
-export CFLAGS="%{optflags} -fPIC -fno-delete-null-pointer-checks"
-export CXXFLAGS="$CFLAGS"
+export CFLAGS="%{build_cflags} -fPIC -fno-delete-null-pointer-checks"
+export CXXFLAGS="%{build_cxxflags} -fPIC -fno-delete-null-pointer-checks"
 # Cannot use RPM_LD_FLAGS, as -Wl,-z,now breaks lazy module loading
-export LDFLAGS="-Wl,-z,relro"
+export LDFLAGS="-Wl,--as-needed -Wl,-z,relro"
 module load 4ti2-%{_arch}
 module load lrcalc-%{_arch}
 
@@ -258,15 +255,17 @@ module load lrcalc-%{_arch}
 	--without-python \
 %endif
 	--with-readline \
-	--disable-doc \
+	--enable-doc \
 	--with-malloc=system
 
 %make_build
 %make_build -C dox html
+make -C Singular libparse
+make -C doc -f Makefile-docbuild singular.idx
+make -C doc all-local
 pushd Singular/LIB/surfex
 ./make_surfex
 popd
-
 
 %install
 %make_install
@@ -284,6 +283,12 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/Singular.desktop
 desktop-file-validate \
   %{buildroot}%{_datadir}/applications/Singular-manual.desktop
 
+# Remove unnecessary dependencies from the pkgconfig files
+sed -i 's/ -lflint.*//;s/Libs\.private.*/& -lflint -lmpfr -lntl -lgmp/' \
+  %{buildroot}%{_libdir}/pkgconfig/factory.pc
+sed -i 's/ -lflint.*//;s/Libs\.private.*/& -lflint -lmpfr -lgmp/' \
+  %{buildroot}%{_libdir}/pkgconfig/libpolys.pc
+
 # We don't want the libtool files
 rm -f %{buildroot}%{_libdir}/*.la
 rm -f %{buildroot}%{_libexecdir}/singular/MOD/*.la
@@ -300,7 +305,9 @@ mkdir -p %{buildroot}%{_mandir}/man1
 for cmd in ESingular Singular TSingular; do
   cp -p Singular/$cmd.man %{buildroot}%{_mandir}/man1/$cmd.1
 done
-cp -p doc/singular.idx %{buildroot}%{_datadir}/singular
+cp -a doc/{html,singular.idx} %{buildroot}%{_datadir}/singular
+mkdir -p %{buildroot}%{_infodir}
+cp -p doc/singular.info %{buildroot}%{_infodir}
 
 # remove script that calls surf; we don't ship it
 rm -f %{buildroot}%{singulardir}/singularsurf
@@ -362,7 +369,7 @@ make check
 %doc README.md
 %{_bindir}/Singular
 %{_bindir}/TSingular
-%{_infodir}/singular.hlp*
+%{_infodir}/singular.info*
 %{_mandir}/man1/Singular.1*
 %{_mandir}/man1/TSingular.1*
 %{_datadir}/applications/Singular.desktop
@@ -372,6 +379,7 @@ make check
 %{_datadir}/singular/singular.idx
 %docdir %{_datadir}/singular/html/
 %{_datadir}/singular/html/
+%dir %{singulardir}
 %{singulardir}/Singular
 %{singulardir}/TSingular
 
@@ -380,7 +388,7 @@ make check
 %license COPYING
 %license GPL2
 %license GPL3
-%{_libdir}/libSingular-4.2.0.so
+%{_libdir}/libSingular-%{downstreamver}.so
 %{_libexecdir}/singular/
 %dir %{_datadir}/singular/
 %{_datadir}/singular/LIB/
@@ -419,9 +427,9 @@ make check
 %files		-n factory
 %license factory/COPYING
 %doc factory/README
-%{_libdir}/libfactory-4.2.0.so
+%{_libdir}/libfactory-%{downstreamver}.so
 %{_libdir}/libomalloc-0.9.6.so
-%{_libdir}/libsingular_resources-4.2.0.so
+%{_libdir}/libsingular_resources-%{downstreamver}.so
 
 %files		-n factory-devel
 %doc factory/examples
@@ -441,7 +449,7 @@ make check
 %files		libpolys
 %license libpolys/COPYING
 %doc libpolys/README
-%{_libdir}/libpolys-4.2.0.so
+%{_libdir}/libpolys-%{downstreamver}.so
 
 %files		libpolys-devel
 %{_bindir}/libpolys-config
@@ -456,6 +464,10 @@ make check
 
 
 %changelog
+* Thu Mar 17 2022 Jerry James <loganjerry@gmail.com> - 4.2.1p3-1
+- Version 4.2.1p3
+- Add patch for GCC 12
+
 * Sat Feb 05 2022 Jiri Vanek <jvanek@redhat.com> - 4.2.0p3-3
 - Rebuilt for java-17-openjdk as system jdk
 

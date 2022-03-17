@@ -1,34 +1,9 @@
---- singular-4.1.1/m4/cpu-check.m4.orig	2018-07-31 07:05:52.000000000 -0600
-+++ singular-4.1.1/m4/cpu-check.m4	2018-10-24 08:32:44.713629407 -0600
-@@ -37,6 +37,18 @@ if test "$ac_cv_singcpuname" = ppc; then
-   AC_DEFINE(SI_CPU_PPC,1,"PPC")
-   AC_SUBST(SI_CPU_PPC)
- fi
-+if test "$ac_cv_singcpuname" = arm -o "$ac_cv_singcpuname" = armel; then
-+  AC_DEFINE(SI_CPU_ARM,1,"ARM")
-+  AC_SUBST(SI_CPU_ARM)
-+fi
-+if test "$ac_cv_singcpuname" = aarch64; then
-+  AC_DEFINE(SI_CPU_AARCH64,1,"AARCH64")
-+  AC_SUBST(SI_CPU_AARCH64)
-+fi
-+if test "$ac_cv_singcpuname" = s390; then
-+  AC_DEFINE(SI_CPU_S390,1,"S390")
-+  AC_SUBST(SI_CPU_S390)
-+fi
- 
- # UNAME and PATH
- AC_MSG_CHECKING(uname for Singular)
-@@ -65,6 +77,14 @@ dnl testet on: ppc_Linux, 740/750 PowerM
-   [powerpc*|ppc*], [AC_DEFINE(HAVE_GENERIC_MULT,1,multiplication is fast on the cpu: a*b is with mod otherwise using tables of logartihms)],
- dnl the following settings seems to be better on arm processors
-   [arm*], [],
-+dnl FIXME: need to run some tests
-+  [aarch64*], [
-+            AC_DEFINE(HAVE_MULT_MOD,1,multiplication is fast on the cpu: a*b is with mod otherwise using tables of logartihms)
-+            AC_DEFINE(HAVE_GENERIC_ADD,1,use branch for addition in Z/p otherwise it uses a generic add)
-+            AC_DEFINE(HAVE_DIV_MOD,1,division using extend euclidian algorithm otherwise using tables of logartihms)
-+            ],
+--- Singular-Release-4-2-1p3/m4/cpu-check.m4.orig	2021-12-17 11:35:18.000000000 -0700
++++ Singular-Release-4-2-1p3/m4/cpu-check.m4	2022-03-03 15:28:43.256747747 -0700
+@@ -69,6 +69,8 @@ dnl the following settings seems to be b
+                AC_DEFINE(HAVE_INVTABLE,1,division via a table of logarithms)
+ 	       AC_DEFINE(HAVE_GENERIC_MULT,1,multiplication is fast on the cpu: a*b is with mod otherwise using tables of logartihms)
+ 	       ],
 +dnl FIXME: need to run some tests
 +  [s390*], [AC_DEFINE(HAVE_GENERIC_ADD,1,use branch for addition in Z/p otherwise it uses a generic add)],
    []
