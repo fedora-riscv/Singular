@@ -260,9 +260,9 @@ module load lrcalc-%{_arch}
 
 %make_build
 %make_build -C dox html
-make -C Singular libparse
-make -C doc -f Makefile-docbuild singular.idx
-make -C doc all-local
+%make_build -C Singular libparse
+make -C doc -j1 -f Makefile-docbuild singular.idx
+make -C doc -j1 all-local
 pushd Singular/LIB/surfex
 ./make_surfex
 popd
@@ -467,6 +467,7 @@ make check
 * Thu Mar 17 2022 Jerry James <loganjerry@gmail.com> - 4.2.1p3-1
 - Version 4.2.1p3
 - Add patch for GCC 12
+- Build documentation with -j1 to avoid OOM on the koji builders
 
 * Sat Feb 05 2022 Jiri Vanek <jvanek@redhat.com> - 4.2.0p3-3
 - Rebuilt for java-17-openjdk as system jdk
