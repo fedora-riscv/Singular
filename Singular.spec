@@ -3,6 +3,14 @@
 %global downstreamver	%(tr - . <<< %{upstreamver})
 %global patchver	p3
 
+# The ppc64le builds are no longer able to build the index without the OOM
+# killer killing kojid.
+%ifarch %{power64}
+%bcond_with index
+%else
+%bcond_without index
+%endif
+
 %bcond_with python
 
 %if %{with python}
@@ -260,9 +268,11 @@ module load lrcalc-%{_arch}
 
 %make_build
 %make_build -C dox html
+%if %{with index}
 %make_build -C Singular libparse
 make -C doc -j1 -f Makefile-docbuild singular.idx
 make -C doc -j1 all-local
+%endif
 pushd Singular/LIB/surfex
 ./make_surfex
 popd
@@ -305,9 +315,11 @@ mkdir -p %{buildroot}%{_mandir}/man1
 for cmd in ESingular Singular TSingular; do
   cp -p Singular/$cmd.man %{buildroot}%{_mandir}/man1/$cmd.1
 done
+%if %{with index}
 cp -a doc/{html,singular.idx} %{buildroot}%{_datadir}/singular
 mkdir -p %{buildroot}%{_infodir}
 cp -p doc/singular.info %{buildroot}%{_infodir}
+%endif
 
 # remove script that calls surf; we don't ship it
 rm -f %{buildroot}%{singulardir}/singularsurf
@@ -369,16 +381,20 @@ make check
 %doc README.md
 %{_bindir}/Singular
 %{_bindir}/TSingular
+%if %{with index}
 %{_infodir}/singular.info*
+%endif
 %{_mandir}/man1/Singular.1*
 %{_mandir}/man1/TSingular.1*
 %{_datadir}/applications/Singular.desktop
 %{_datadir}/icons/Singular.png
 %{_datadir}/ml_python/
 %{_datadir}/ml_singular/
+%if %{with index}
 %{_datadir}/singular/singular.idx
 %docdir %{_datadir}/singular/html/
 %{_datadir}/singular/html/
+%endif
 %dir %{singulardir}
 %{singulardir}/Singular
 %{singulardir}/TSingular
@@ -468,6 +484,7 @@ make check
 - Version 4.2.1p3
 - Add patch for GCC 12
 - Build documentation with -j1 to avoid OOM on the koji builders
+- Do not build the index on ppc64le due to lack of memory
 
 * Sat Feb 05 2022 Jiri Vanek <jvanek@redhat.com> - 4.2.0p3-3
 - Rebuilt for java-17-openjdk as system jdk
