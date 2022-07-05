@@ -18,9 +18,13 @@
 %global _python_bytecompile_extra 0
 %endif
 
+# Since qepcad-B requires this package, use this to build when the old version
+# of Singular cannot be installed.
+%bcond_without bootstrap
+
 Name:		Singular
 Version:	%{downstreamver}%{?patchver}
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 # License analysis:
 # - factory/readcf.cc, Singular/grammar.cc, and Singular/grammar.h are
@@ -70,7 +74,9 @@ BuildRequires:	pkgconfig(zlib)
 %if %{with python}
 BuildRequires:	python2-devel
 %endif
+%if %{without bootstrap}
 BuildRequires:	qepcad-B
+%endif
 # Need uudecode for documentation images in tarball
 BuildRequires:	sharutils
 BuildRequires:	surf-geometry
@@ -480,6 +486,10 @@ make check
 
 
 %changelog
+* Tue Jul  5 2022 Jerry James <loganjerry@gmail.com> - 4.2.1p3-2
+- Rebuild for flint 2.9.0
+- Add bootstrap build mode that excludes qepcad-B
+
 * Thu Mar 17 2022 Jerry James <loganjerry@gmail.com> - 4.2.1p3-1
 - Version 4.2.1p3
 - Add patch for GCC 12
