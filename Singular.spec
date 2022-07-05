@@ -20,7 +20,7 @@
 
 # Since qepcad-B requires this package, use this to build when the old version
 # of Singular cannot be installed.
-%bcond_without bootstrap
+%bcond_with bootstrap
 
 Name:		Singular
 Version:	%{downstreamver}%{?patchver}
