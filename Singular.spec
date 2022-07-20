@@ -24,7 +24,7 @@
 
 Name:		Singular
 Version:	%{downstreamver}%{?patchver}
-Release:	2%{?dist}
+Release:	3%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 # License analysis:
 # - factory/readcf.cc, Singular/grammar.cc, and Singular/grammar.h are
@@ -486,6 +486,9 @@ make check
 
 
 %changelog
+* Wed Jul 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 4.2.1p3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
 * Tue Jul  5 2022 Jerry James <loganjerry@gmail.com> - 4.2.1p3-2
 - Rebuild for flint 2.9.0
 - Add bootstrap build mode that excludes qepcad-B
