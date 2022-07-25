@@ -1,0 +1,160 @@
+Keep an object from being deallocated while pointers to or into it are in use.
+Fixes warnings like these:
+
+longrat.cc: In function 'nlMapC(snumber*, n_Procs_s*, n_Procs_s*)':
+longrat.cc:599:13: warning: dangling pointer to an unnamed temporary may be used [-Wdangling-pointer=]
+  599 |   e=(*f)[0]._mp_exp-size;
+      |     ~~~~~~~~^~~~~~~
+longrat.cc:573:40: note: unnamed temporary defined here
+  573 |   mpf_t *f = ((gmp_complex*)from)->real()._mpfp();
+      |              ~~~~~~~~~~~~~~~~~~~~~~~~~~^~
+longrat.cc:581:8: warning: using dangling pointer 'size_113' to an unnamed temporary [-Wdangling-pointer=]
+  581 |   size = (*f)[0]._mp_size;
+      |   ~~~~~^~~~~~~~~~~~~~~~~~
+longrat.cc:573:40: note: unnamed temporary defined here
+  573 |   mpf_t *f = ((gmp_complex*)from)->real()._mpfp();
+      |              ~~~~~~~~~~~~~~~~~~~~~~~~~~^~
+longrat.cc:592:6: warning: dangling pointer 'qp_115' to an unnamed temporary may be used [-Wdangling-pointer=]
+  592 |   qp = (*f)[0]._mp_d;
+      |   ~~~^~~~~~~~~~~~~~~
+longrat.cc:573:40: note: unnamed temporary defined here
+  573 |   mpf_t *f = ((gmp_complex*)from)->real()._mpfp();
+      |              ~~~~~~~~~~~~~~~~~~~~~~~~~~^~
+
+--- Singular-Release-4-2-1p3/factory/cfModGcd.cc.orig	2021-12-17 11:35:18.000000000 -0700
++++ Singular-Release-4-2-1p3/factory/cfModGcd.cc	2022-07-25 14:53:41.944360644 -0600
+@@ -1825,7 +1825,6 @@ gaussianElimFq (CFMatrix& M, CFArray& L,
+   #else
+   factoryError("NTL/FLINT missing: gaussianElimFq");
+   #endif
+-  delete N;
+ 
+   M= (*N) (1, M.rows(), 1, M.columns());
+   L= CFArray (M.rows());
+--- Singular-Release-4-2-1p3/libpolys/coeffs/longrat.cc.orig	2021-12-17 11:35:18.000000000 -0700
++++ Singular-Release-4-2-1p3/libpolys/coeffs/longrat.cc	2022-07-25 10:59:58.720085578 -0600
+@@ -570,7 +570,8 @@ static number nlMapC(number from, const
+     return INT_TO_SR(0);
+   }
+       
+-  mpf_t *f = ((gmp_complex*)from)->real()._mpfp();
++  gmp_float gfl = ((gmp_complex*)from)->real();
++  mpf_t *f = gfl._mpfp();
+ 
+   number res;
+   mpz_ptr dest,ndest;
+--- Singular-Release-4-2-1p3/Singular/countedref.cc.orig	2021-12-17 11:35:18.000000000 -0700
++++ Singular-Release-4-2-1p3/Singular/countedref.cc	2022-07-25 14:51:02.519890787 -0600
+@@ -317,13 +317,17 @@ public:
+   /// Recover the actual object from Singular interpreter object
+   static self cast(leftv arg) {
+     assume(arg != NULL); assume(is_ref(arg));
+-    return self::cast(arg->Data());
++    auto d = arg->Data();
++    return self::cast(d);
+   }
+ 
+   /// If necessary dereference.
+   static BOOLEAN resolve(leftv arg) {
+     assume(arg != NULL);
+-    while (is_ref(arg)) { if(CountedRef::cast(arg).dereference(arg)) return TRUE; };
++    while (is_ref(arg)) {
++      CountedRef ref = CountedRef::cast(arg);
++      if (ref.dereference(arg)) return TRUE;
++    }
+     return (arg->next != NULL) && resolve(arg->next);
+   }
+ 
+@@ -369,8 +373,9 @@ char* countedref_String(blackbox */*b*/,
+ /// blackbox support - copy element
+ void* countedref_Copy(blackbox*/*b*/, void* ptr)
+ {
+-  if (ptr) return CountedRef::cast(ptr).outcast();
+-  return NULL;
++  if (!ptr) return NULL;
++  CountedRef ref = CountedRef::cast(ptr);
++  return ref.outcast();
+ }
+ 
+ /// blackbox support - assign element
+@@ -383,12 +388,16 @@ BOOLEAN countedref_Assign(leftv result,
+   }
+ 
+   // Case: copy reference
+-  if (result->Typ() == arg->Typ())
+-    return CountedRef::cast(arg).outcast(result);
++  if (result->Typ() == arg->Typ()) {
++    CountedRef ref = CountedRef::cast(arg);
++    return ref.outcast(result);
++  }
+ 
+   // Case: new reference
+-  if ((arg->rtyp == IDHDL) || CountedRef::is_ref(arg))
+-    return CountedRef(arg).outcast(result);
++  if ((arg->rtyp == IDHDL) || CountedRef::is_ref(arg)) {
++    CountedRef ref(arg);
++    return ref.outcast(result);
++  }
+ 
+   WerrorS("Can only take reference from identifier");
+   return TRUE;
+@@ -483,7 +492,10 @@ BOOLEAN countedref_Op3(int op, leftv res
+ /// blackbox support - destruction
+ void countedref_destroy(blackbox */*b*/, void* ptr)
+ {
+-  if (ptr) CountedRef::cast(ptr).destruct();
++  if (ptr) {
++    CountedRef ref = CountedRef::cast(ptr);
++    ref.destruct();
++  }
+ }
+ 
+ 
+@@ -539,7 +551,8 @@ public:
+ /// Blackbox support - generate initialized, but all-zero - shared data
+ void* countedref_InitShared(blackbox*)
+ {
+-  return CountedRefShared().outcast();
++  auto ref = CountedRefShared();
++  return ref.outcast();
+ }
+ 
+ /// Blackbox support - unary operation for shared data
+@@ -656,23 +669,31 @@ BOOLEAN countedref_AssignShared(leftv re
+   /// Case: new reference to already shared data
+   if (result->Typ() == arg->Typ())
+   {
+-    if (result->Data() != NULL)
+-      CountedRefShared::cast(result).destruct();
+-    return CountedRefShared::cast(arg).outcast(result);
++    if (result->Data() != NULL) {
++      CountedRefShared ref = CountedRefShared::cast(result);
++      ref.destruct();
++    }
++    CountedRefShared ref = CountedRefShared::cast(arg);
++    return ref.outcast(result);
+   }
+   if(CountedRefShared::cast(result).unassigned())
+   {
+-    return CountedRefShared::cast(result).assign(result, arg);
++    CountedRefShared ref = CountedRefShared::cast(result);
++    return ref.assign(result, arg);
+   }
+ 
+   /// Case: new shared data
+-  return CountedRefShared(arg).outcast(result);
++  CountedRefShared ref(arg);
++  return ref.outcast(result);
+ }
+ 
+ /// blackbox support - destruction
+ void countedref_destroyShared(blackbox */*b*/, void* ptr)
+ {
+-  if (ptr) CountedRefShared::cast(ptr).destruct();
++  if (ptr) {
++    CountedRefShared ref = CountedRefShared::cast(ptr);
++    ref.destruct();
++  }
+ }
+ 
+ 

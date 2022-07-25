@@ -56,8 +56,10 @@ BuildRequires:	gcc-c++
 BuildRequires:	gfan
 BuildRequires:	gmp-devel
 BuildRequires:	graphviz
+%ifarch %{java_arches}
 BuildRequires:	java-devel
 BuildRequires:	javapackages-tools
+%endif
 BuildRequires:	libgfan-devel
 BuildRequires:	libnormaliz-devel
 BuildRequires:	libtool
@@ -116,6 +118,18 @@ Patch8:		%{name}-emacs.patch
 Patch9:		%{name}-javac.patch
 # Adapt to GCC 12
 Patch10:	%{name}-gcc12.patch
+# Fix a sequence point error
+Patch11:	%{name}-sequence-point.patch
+# Avoid an unnecessary array comparison
+Patch12:	%{name}-array-compare.patch
+# Fix several "use after free" scenarios due to temporary objects
+Patch13:	%{name}-use-after-free.patch
+# Fix some incorrect format specifiers
+Patch14:	%{name}-format-specifier.patch
+# Fix mismatched type declarations
+Patch15:	%{name}-type-mismatch.patch
+# Change little-endian-specific code to endian-agnostic code
+Patch16:	%{name}-endian.patch
 
 %description
 Singular is a computer algebra system for polynomial computations, with
@@ -198,6 +212,7 @@ Requires:	flint-devel%{?_isa}
 %description	libpolys-devel
 Development files for libpolys.
 
+%ifarch %{java_arches}
 %package	surfex
 Summary:	Singular java interface
 Requires:	java
@@ -205,6 +220,7 @@ Requires:	%{name}%{?_isa} = %{version}-%{release}
 
 %description	surfex
 This package contains the Singular java interface.
+%endif
 
 
 %prep
@@ -222,20 +238,23 @@ sed -i 's/-std=c++11//' m4/ntl-check.m4
 # Regenerate configure due to patches 0, 1, and 6
 autoreconf -fi
 
+# The file countedref.cc needs to be built without strict aliasing
+sed -i '/countedref\.cc/s/\$(CXXFLAGS)/& -fno-strict-aliasing/g' Singular/Makefile.in
+
 # Do not use the prebuilt surfex.jar
 rm -f Singular/LIB/surfex/surfex.jar
 
 
 %build
-export CPPFLAGS="-I%{_includedir}/flint -I%{_includedir}/gfanlib"
+export CPPFLAGS='-I%{_includedir}/flint -I%{_includedir}/gfanlib'
 %if %{with python}
 pyincdir=$(python2 -Esc "import sysconfig; print(sysconfig.get_paths()['include'])")
 CPPFLAGS="$CPPFLAGS -I$pyincdir"
 %endif
-export CFLAGS="%{build_cflags} -fPIC -fno-delete-null-pointer-checks"
-export CXXFLAGS="%{build_cxxflags} -fPIC -fno-delete-null-pointer-checks"
+export CFLAGS='%{build_cflags} -fPIC'
+export CXXFLAGS='%{build_cxxflags} -fPIC'
 # Cannot use RPM_LD_FLAGS, as -Wl,-z,now breaks lazy module loading
-export LDFLAGS="-Wl,--as-needed -Wl,-z,relro"
+export LDFLAGS='-Wl,--as-needed -Wl,-z,relro'
 module load 4ti2-%{_arch}
 module load lrcalc-%{_arch}
 
@@ -279,9 +298,12 @@ module load lrcalc-%{_arch}
 make -C doc -j1 -f Makefile-docbuild singular.idx
 make -C doc -j1 all-local
 %endif
+%ifarch %{java_arches}
 pushd Singular/LIB/surfex
 ./make_surfex
 popd
+%endif
+
 
 %install
 %make_install
@@ -290,9 +312,11 @@ popd
 rm -fr %{buildroot}%{_includedir}/gfanlib
 rm -f %{buildroot}%{_libdir}/libgfan*
 
+%ifarch %{java_arches}
 # Install surfex.jar
 mkdir %{buildroot}%{_datadir}/singular/LIB/surfex
 cp -p Singular/LIB/surfex/surfex.jar %{buildroot}%{_datadir}/singular/LIB/surfex
+%endif
 
 # Validate the desktop files
 desktop-file-validate %{buildroot}%{_datadir}/applications/Singular.desktop
@@ -351,6 +375,7 @@ exec %{singulardir}/TSingular --singular %{_bindir}/Singular "\$@"
 EOF
 chmod 0755 %{buildroot}%{_bindir}/TSingular
 
+%ifarch %{java_arches}
 # surfex
 cat > %{buildroot}%{_bindir}/surfex << EOF
 #!/bin/sh
@@ -360,6 +385,7 @@ module load surf-geometry-%{_arch}
 exec %{singulardir}/surfex %{singulardir}/LIB/surfex "\$@"
 EOF
 chmod 0755 %{buildroot}%{_bindir}/surfex
+%endif
 
 # ESingular
 cat > %{buildroot}%{_bindir}/ESingular << EOF
@@ -414,8 +440,10 @@ make check
 %{_libexecdir}/singular/
 %dir %{_datadir}/singular/
 %{_datadir}/singular/LIB/
+%ifarch %{java_arches}
 %exclude %{_datadir}/singular/LIB/surfex.lib
 %exclude %{_datadir}/singular/LIB/surfex
+%endif
 
 %files		devel
 %{_bindir}/libsingular-config
@@ -441,10 +469,12 @@ make check
 %{_datadir}/singular/emacs/
 %{singulardir}/ESingular
 
+%ifarch %{java_arches}
 %files		surfex
 %{_bindir}/surfex
 %{_datadir}/singular/LIB/surfex.lib
 %{_datadir}/singular/LIB/surfex/
+%endif
 
 %files		-n factory
 %license factory/COPYING
@@ -486,6 +516,12 @@ make check
 
 
 %changelog
+* Mon Jul 25 2022 Jerry James <loganjerry@gmail.com> - 4.2.1p3-3
+- Do not build surfex for i686 (rhbz#2104103)
+- Add patches to fix code errors: -sequence-point, -array-compare,
+  -use-after-free, -format-specifier, -type-mismatch
+- Add -endian patch to fix oddities on s390x
+
 * Wed Jul 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 4.2.1p3-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
 

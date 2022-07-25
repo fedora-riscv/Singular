@@ -1,0 +1,63 @@
+Fix these warnings:
+
+In file included from mpr_complex.cc:18:
+../coeffs/longrat.h: In function 'BOOLEAN nlIsInteger(number, coeffs)':
+../coeffs/coeffs.h:714:22: warning: statement has no effect [-Wunused-value]
+  714 | #define n_Test(a,r)  1
+      |                      ^
+../coeffs/longrat.h:97:3: note: in expansion of macro 'n_Test'
+   97 |   n_Test(q, r);
+      |   ^~~~~~
+mpr_complex.cc: In function 'bool operator>(const gmp_float&, const gmp_float&)':
+mpr_complex.cc:290:11: warning: comparison between two arrays [-Warray-compare]
+  290 |   if (a.t == b.t)
+      |       ~~~~^~~~~~
+mpr_complex.cc:290:11: note: use unary '+' which decays operands to pointers or '&'component_ref' not supported by dump_decl<declaration error>[0] == &'component_ref' not supported by dump_decl<declaration error>[0]' to compare the addresses
+mpr_complex.cc: In function 'bool operator<(const gmp_float&, const gmp_float&)':
+mpr_complex.cc:296:11: warning: comparison between two arrays [-Warray-compare]
+  296 |   if (a.t == b.t)
+      |       ~~~~^~~~~~
+mpr_complex.cc:296:11: note: use unary '+' which decays operands to pointers or '&'component_ref' not supported by dump_decl<declaration error>[0] == &'component_ref' not supported by dump_decl<declaration error>[0]' to compare the addresses
+mpr_complex.cc: In function 'bool operator>=(const gmp_float&, const gmp_float&)':
+mpr_complex.cc:302:11: warning: comparison between two arrays [-Warray-compare]
+  302 |   if (a.t == b.t)
+      |       ~~~~^~~~~~
+mpr_complex.cc:302:11: note: use unary '+' which decays operands to pointers or '&'component_ref' not supported by dump_decl<declaration error>[0] == &'component_ref' not supported by dump_decl<declaration error>[0]' to compare the addresses
+mpr_complex.cc: In function 'bool operator<=(const gmp_float&, const gmp_float&)':
+mpr_complex.cc:308:11: warning: comparison between two arrays [-Warray-compare]
+  308 |   if (a.t == b.t)
+      |       ~~~~^~~~~~
+mpr_complex.cc:308:11: note: use unary '+' which decays operands to pointers or '&'component_ref' not supported by dump_decl<declaration error>[0] == &'component_ref' not supported by dump_decl<declaration error>[0]' to compare the addresses
+
+--- Singular-Release-4-2-1p3/libpolys/coeffs/mpr_complex.cc.orig	2021-12-17 11:35:18.000000000 -0700
++++ Singular-Release-4-2-1p3/libpolys/coeffs/mpr_complex.cc	2022-07-25 10:49:45.733632538 -0600
+@@ -287,25 +287,25 @@ bool gmp_float::isMOne() const
+ }
+ bool operator > ( const gmp_float & a, const gmp_float & b )
+ {
+-  if (a.t == b.t)
++  if (&a.t == &b.t)
+     return false;
+   return mpf_cmp( a.t, b.t ) > 0;
+ }
+ bool operator < ( const gmp_float & a, const gmp_float & b )
+ {
+-  if (a.t == b.t)
++  if (&a.t == &b.t)
+     return false;
+   return mpf_cmp( a.t, b.t ) < 0;
+ }
+ bool operator >= ( const gmp_float & a, const gmp_float & b )
+ {
+-  if (a.t == b.t)
++  if (&a.t == &b.t)
+     return true;
+   return mpf_cmp( a.t, b.t ) >= 0;
+ }
+ bool operator <= ( const gmp_float & a, const gmp_float & b )
+ {
+-  if (a.t == b.t)
++  if (&a.t == &b.t)
+     return true;
+   return mpf_cmp( a.t, b.t ) <= 0;
+ }

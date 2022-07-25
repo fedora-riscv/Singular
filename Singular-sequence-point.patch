@@ -1,0 +1,17 @@
+Fix this warning:
+
+gfanlib_tropicalhomotopy.h:457:83: warning: operation on 'numberToDrop' may be undefined [-Wsequence-point]
+  457 |                         int numberToDrop=(subconfigurationIndex!=0) ? numberToDrop=k+1 : 0;
+      |                                                                       ~~~~~~~~~~~~^~~~
+
+--- Singular-Release-4-2-1p3/gfanlib/gfanlib_tropicalhomotopy.h.orig	2021-12-17 11:35:18.000000000 -0700
++++ Singular-Release-4-2-1p3/gfanlib/gfanlib_tropicalhomotopy.h	2022-07-25 10:34:15.834633612 -0600
+@@ -454,7 +454,7 @@ template<class mvtyp, class mvtypDouble,
+                         //chioices are "relative" so no update is needed.
+ 
+                         choices=parent.choices;
+-                        int numberToDrop=(subconfigurationIndex!=0) ? numberToDrop=k+1 : 0;
++                        int numberToDrop=(subconfigurationIndex!=0) ? k+1 : 0;
+ 
+                         choices[subconfigurationIndex-1].first-=numberToDrop;
+                         choices[subconfigurationIndex-1].second-=numberToDrop;

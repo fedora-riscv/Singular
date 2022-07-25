@@ -1,0 +1,92 @@
+--- Singular-Release-4-2-1p3/Singular/idrec.h.orig	2021-12-17 11:35:18.000000000 -0700
++++ Singular-Release-4-2-1p3/Singular/idrec.h	2022-07-23 08:10:08.908714052 -0600
+@@ -44,7 +44,6 @@ class idrec
+ 
+   short      lev;
+   short      ref;
+-  unsigned long id_i;
+ 
+   idrec() { memset(this,0,sizeof(*this)); }
+   inline void Init() { memset(this,0,sizeof(*this)); }
+--- Singular-Release-4-2-1p3/Singular/ipid.cc.orig	2021-12-17 11:35:18.000000000 -0700
++++ Singular-Release-4-2-1p3/Singular/ipid.cc	2022-07-23 08:55:42.510852256 -0600
+@@ -62,38 +62,23 @@ void paCleanUp(package pack);
+ 
+ /*0 implementation*/
+ 
+-static inline long iiS2I(const char *s)
+-{
+-  long l;
+-  strncpy((char*)&l,s,SIZEOF_LONG);
+-  return l;
+-}
+-
+ idhdl idrec::get(const char * s, int level)
+ {
+   assume(s!=NULL);
+   assume((level>=0) && (level<=1000)); //not really, but if it isnt in that bounds..
+   idhdl h = this;
+   idhdl found=NULL;
+-  int l;
+-  const char *id_;
+-  unsigned long i=iiS2I(s);
+-  char *dummy=(char*)&i;
+-  BOOLEAN less4=(dummy[SIZEOF_LONG-1]=='\0');
+   while (h!=NULL)
+   {
+-    omCheckAddr((ADDRESS)IDID(h));
+-    l=IDLEV(h);
++    const char *id_=IDID(h);
++    omCheckAddr((ADDRESS)id_);
++    int l=IDLEV(h);
+     if ((l==0)||(l==level))
+     {
+-      if (i==h->id_i)
++      if (0 == strcmp(s, id_))
+       {
+-        id_=IDID(h);
+-        if (less4 || (0 == strcmp(s+SIZEOF_LONG,id_+SIZEOF_LONG)))
+-        {
+-          if(l==level) return h;
+-          found=h;
+-        }
++        if(l==level) return h;
++        found=h;
+       }
+     }
+     h = IDNEXT(h);
+@@ -106,21 +91,14 @@ idhdl idrec::get_level(const char * s, i
+   assume(s!=NULL);
+   assume((level>=0) && (level<=1000)); //not really, but if it isnt in that bounds..
+   idhdl h = this;
+-  int l;
+-  const char *id_;
+-  unsigned long i=iiS2I(s);
+-  int less4=(i < (1L<<((SIZEOF_LONG-1)*8)));
+   while (h!=NULL)
+   {
+-    omCheckAddr((ADDRESS)IDID(h));
+-    l=IDLEV(h);
+-    if ((l==level)&&(i==h->id_i))
++    const char *id_=IDID(h);
++    omCheckAddr((ADDRESS)id_);
++    int l=IDLEV(h);
++    if ((l==level)&&(0 == strcmp(s, id_)))
+     {
+-      id_=IDID(h);
+-      if (less4 || (0 == strcmp(s+SIZEOF_LONG,id_+SIZEOF_LONG)))
+-      {
+-        return h;
+-      }
++      return h;
+     }
+     h = IDNEXT(h);
+   }
+@@ -243,7 +221,6 @@ idhdl idrec::set(const char * s, int lev
+   IDLEV(h)  = level;
+   IDNEXT(h) = this;
+   BOOLEAN at_start=(this==IDROOT);
+-  h->id_i=iiS2I(s);
+   if (t==BUCKET_CMD) WarnS("defining polyBucket");
+   if (init)
+   {

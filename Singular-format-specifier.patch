@@ -1,0 +1,28 @@
+--- Singular-Release-4-2-1p3/kernel/oswrapper/vspace.cc.orig	2022-03-03 16:09:04.971209163 -0700
++++ Singular-Release-4-2-1p3/kernel/oswrapper/vspace.cc	2022-07-25 13:13:02.041950315 -0600
+@@ -725,10 +725,10 @@ static void print_freelists() {
+   for (int i = 0; i <= LOG2_SEGMENT_SIZE; i++) {
+     vaddr_t vaddr = vmem.freelist[i];
+     if (vaddr != VADDR_NULL) {
+-      std::printf("%2d: %ld", i, vaddr);
++      std::printf("%2d: %zu", i, vaddr);
+       vaddr_t prev = block_ptr(vaddr)->prev;
+       if (prev != VADDR_NULL) {
+-        std::printf("(%ld)", prev);
++        std::printf("(%zu)", prev);
+       }
+       assert(block_ptr(vaddr)->prev == VADDR_NULL);
+       for (;;) {
+@@ -737,10 +737,10 @@ static void print_freelists() {
+         vaddr = block->next;
+         if (vaddr == VADDR_NULL)
+           break;
+-        std::printf(" -> %ld", vaddr);
++        std::printf(" -> %zu", vaddr);
+         vaddr_t prev = block_ptr(vaddr)->prev;
+         if (prev != last_vaddr) {
+-          std::printf("(%ld)", prev);
++          std::printf("(%zu)", prev);
+         }
+       }
+       std::printf("\n");

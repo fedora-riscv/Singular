@@ -1,0 +1,11 @@
+--- Singular-Release-4-2-1p3/kernel/groebner_walk/walkSupport.cc.orig	2021-12-17 11:35:18.000000000 -0700
++++ Singular-Release-4-2-1p3/kernel/groebner_walk/walkSupport.cc	2022-07-25 13:16:57.297425786 -0600
+@@ -12,7 +12,7 @@
+ #include "kernel/groebner_walk/walkSupport.h"
+ #include "kernel/GBEngine/kstd1.h"
+ 
+-EXTERN_VAR BOOLEAN overflow_error;
++EXTERN_VAR int overflow_error;
+ 
+ ///////////////////////////////////////////////////////////////////
+ //Support functions for Groebner Walk and Fractal Walk
