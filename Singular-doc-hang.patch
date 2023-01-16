@@ -1,0 +1,148 @@
+--- singular-4.3.1/doc/general.doc.orig	2022-07-06 03:32:37.000000000 -0600
++++ singular-4.3.1/doc/general.doc	2023-01-14 10:06:48.967336259 -0700
+@@ -3100,7 +3100,7 @@ programs or for parallel computations (s
+ 
+ @strong{Example:}
+ @smallexample
+-@c example
++@c example no_comp
+   ring r;
+   link l = "ssi:tcp localhost:"+system("Singular"); // declare a link explicitly
+   open(l);  // needs an open, launches another SINGULAR as a server
+--- singular-4.3.1/doc/pl2doc.pl.orig	2022-07-06 03:32:37.000000000 -0600
++++ singular-4.3.1/doc/pl2doc.pl	2023-01-14 20:44:58.342822717 -0700
+@@ -117,10 +117,10 @@ unless ($no_fun)
+     }
+     # print example
+     if ($example{$procs[$i]} &&
+-	($ex = &CleanUpExample($lib, $example{$procs[$i]})))
++	(($ex, $exec) = &CleanUpExample($lib, $example{$procs[$i]})))
+     {
+       print LDOC "\@strong{Example:}\n";
+-      print LDOC "\@smallexample\n\@c example$tag\n";
++      print LDOC "\@smallexample\n\@c example$tag$exec\n";
+       print LDOC $ex;
+       print LDOC "\n\@c example\n\@end smallexample\n";
+     }
+@@ -495,17 +495,18 @@ sub OutKeywords
+ sub CleanUpExample
+ {
+   local($lib, $example) = @_;
++  my $exec;
+ 
+   # find portion in {}
+   $example =~ s/^[^{]*{(.*)}[^}]*$/$1/s;
+ 
+   if ($example =~ /EXAMPLE: \(not executed\)/)
+   {
+-    # erase first three lines
+-    $example =~ s/^.*\n.*\n.*\n/\n/;
+-    # erase enclosing " " in every line
+-    $example =~ s/\n\s*"/\n/g;
+-    $example =~  s/";\n/\n/g;
++    $exec = " no_comp";
++  }
++  else
++  {
++    $exec = "";
+   }
+   # erase EXAMPLE, echo and pause statements
+   $example =~ s/"EXAMPLE.*"[^;]*;//g;
+@@ -535,7 +536,7 @@ sub CleanUpExample
+   # erase spaces from beginning of lines
+   $example =~ s/\n\s*/\n/g;
+   $example =~ s/\s*$//g;
+-  return $example;
++  return ($example, $exec);
+ }
+ 
+ sub print_doc_header
+--- singular-4.3.1/Singular/LIB/ffmodstd.lib.orig	2022-07-06 03:32:37.000000000 -0600
++++ singular-4.3.1/Singular/LIB/ffmodstd.lib	2023-01-14 21:31:27.896097910 -0700
+@@ -1958,7 +1958,7 @@ EXAMPLE: example ffmodStd; shows an exam
+     }
+ }
+ example
+-{   "EXAMPLE:"; echo = 2;
++{   "EXAMPLE: (not executed)"; echo = 2;
+     ring Ra=(0,a),(x,y,z),dp;
+     ideal I = (a^2+2)*x^2*y+a*y*z^2, x*z^2+(a+1)*x^2-a*y^2;
+     ffmodStd(I);
+--- singular-4.3.1/Singular/LIB/moddiq.lib.orig	2022-07-06 03:32:37.000000000 -0600
++++ singular-4.3.1/Singular/LIB/moddiq.lib	2023-01-14 21:34:17.397946953 -0700
+@@ -170,7 +170,7 @@ EXAMPLE:  example modSat; shows an examp
+ }
+ example
+ {
+-    "EXAMPLE:";
++    "EXAMPLE: (not executed)";
+     echo=2;
+     ring r=0,x(1..6),dp;
+     ideal i=cyclic(6);
+--- singular-4.3.1/Singular/LIB/parallel.lib.orig	2022-07-06 03:32:37.000000000 -0600
++++ singular-4.3.1/Singular/LIB/parallel.lib	2023-01-14 20:53:17.070588749 -0700
+@@ -142,7 +142,7 @@ EXAMPLE:  example parallelWaitFirst; sho
+ }
+ example
+ {
+-    "EXAMPLE:";
++    "EXAMPLE: (not executed)";
+     echo = 2;
+     ring R = 0, (x,y,z), lp;
+     ideal I = 3x3y+x3+xy3+y2z2, 2x3z-xy-xz3-y4-z2, 2x2yz-2xy2+xz2-y4;
+@@ -182,7 +182,7 @@ EXAMPLE:  example parallelWaitAll; shows
+ }
+ example
+ {
+-    "EXAMPLE:";
++    "EXAMPLE: (not executed)";
+     echo = 2;
+     ring R = 0, (x,y,z), dp;
+     ideal I1 = z8+z6+4z5+4z3+4z2+4, -z2+y;
+@@ -232,7 +232,7 @@ EXAMPLE:  example parallelTestAND; shows
+ }
+ example
+ {
+-    "EXAMPLE:";
++    "EXAMPLE: (not executed)";
+     echo = 2;
+     ring R = 0, (x,y,z), dp;
+     ideal I = x, y, z;
+@@ -287,7 +287,7 @@ EXAMPLE:  example parallelTestAND; shows
+ }
+ example
+ {
+-    "EXAMPLE:";
++    "EXAMPLE: (not executed)";
+     echo = 2;
+     ring R = 0, (x,y,z), dp;
+     ideal I;
+--- singular-4.3.1/Singular/LIB/tasks.lib.orig	2022-07-06 03:32:37.000000000 -0600
++++ singular-4.3.1/Singular/LIB/tasks.lib	2023-01-14 21:12:17.103467631 -0700
+@@ -241,7 +241,7 @@ EXAMPLE:  example killTask; shows an exa
+ }
+ example
+ {
+-    "EXAMPLE:";
++    "EXAMPLE: (not executed)";
+     echo = 2;
+     ring R = 0, (x,y), dp;
+     ideal I = x9y2+x10, x2y7-y8;
+@@ -282,7 +282,7 @@ EXAMPLE:  example copyTask; shows an exa
+ }
+ example
+ {
+-    "EXAMPLE:";
++    "EXAMPLE: (not executed)";
+     echo = 2;
+     ring R = 0, (x,y), dp;
+     ideal I = x9y2+x10, x2y7-y8;
+@@ -1078,7 +1078,7 @@ EXAMPLE:  example waitTasks; shows an ex
+ }
+ example
+ {
+-    "EXAMPLE:";
++    "EXAMPLE: (not executed)";
+     echo = 2;
+     ring R = 0, (x,y), dp;
+     ideal I = x9y2+x10, x2y7-y8;

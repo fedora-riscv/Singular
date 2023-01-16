@@ -1,5 +1,5 @@
---- Singular-Release-4-2-1p3/emacs/.emacs-singular.orig	2021-12-17 11:35:18.000000000 -0700
-+++ Singular-Release-4-2-1p3/emacs/.emacs-singular	2022-03-03 15:36:50.506016980 -0700
+--- singular-4.3.1/emacs/.emacs-singular.orig	2022-07-06 03:32:37.000000000 -0600
++++ singular-4.3.1/emacs/.emacs-singular	2022-09-20 17:41:04.430333595 -0600
 @@ -185,7 +185,7 @@
  		  "" "/")))
  
@@ -18,8 +18,8 @@
    (add-submenu nil
  	       '("Singular"
  		 ["Start default" singular t]
---- Singular-Release-4-2-1p3/resources/feResource.cc.orig	2022-03-03 15:36:50.506016980 -0700
-+++ Singular-Release-4-2-1p3/resources/feResource.cc	2022-03-03 15:37:33.897043556 -0700
+--- singular-4.3.1/resources/feResource.cc.orig	2022-07-06 03:32:37.000000000 -0600
++++ singular-4.3.1/resources/feResource.cc	2022-09-20 17:41:04.430333595 -0600
 @@ -76,7 +76,7 @@ VAR feResourceConfig_s feResourceConfigs
    {"RootDir",   'r',    feResDir,   "SINGULAR_ROOT_DIR",    "%b/..",                (char *)""},
    {"DataDir",   'D',    feResDir,   "SINGULAR_DATA_DIR",    "%b/../share/",          (char *)""},
@@ -27,5 +27,5 @@
 -  {"InfoFile",  'i',    feResFile,  "SINGULAR_INFO_FILE",   "%D/info/singular.info", (char *)""},
 +  {"InfoFile",  'i',    feResFile,  "SINGULAR_INFO_FILE",   "%D/info/singular.info.gz", (char *)""},
    {"IdxFile",   'x',    feResFile,  "SINGULAR_IDX_FILE",    "%D/singular/singular.idx",  (char *)""},
-   {"HtmlDir",   'h',    feResDir,   "SINGULAR_HTML_DIR",    "%D/singular/html",              (char *)""},
+   {"HtmlDir",   'h',    feResDir,   "SINGULAR_HTML_DIR",    DATA_TO_HTML_DIR,       (char *)""},
    {"ManualUrl", 'u',    feResUrl,   "SINGULAR_URL",         "https://www.singular.uni-kl.de/Manual/",    (char *)""},
