@@ -3,14 +3,6 @@
 %global downstreamver	%(tr - . <<< %{upstreamver})
 %global patchver	p1
 
-# The ppc64le builds are no longer able to build the index without the OOM
-# killer killing kojid.
-%ifarch %{power64}
-%bcond_with index
-%else
-%bcond_without index
-%endif
-
 %bcond_with python
 
 %if %{with python}
@@ -281,11 +273,9 @@ module load lrcalc-%{_arch}
 
 %make_build
 %make_build -C dox html
-%if %{with index}
 %make_build -C Singular libparse
 make -C doc -j1 -f Makefile-docbuild singular.idx
 make -C doc -j1 all-local
-%endif
 
 
 %install
@@ -323,11 +313,9 @@ mkdir -p %{buildroot}%{_mandir}/man1
 for cmd in ESingular Singular TSingular; do
   cp -p Singular/$cmd.man %{buildroot}%{_mandir}/man1/$cmd.1
 done
-%if %{with index}
 cp -a doc/{html,singular.idx} %{buildroot}%{_datadir}/singular
 mkdir -p %{buildroot}%{_infodir}
 cp -p doc/singular.info %{buildroot}%{_infodir}
-%endif
 
 # remove script that calls surf; we don't ship it
 rm -f %{buildroot}%{singulardir}/singularsurf
@@ -379,20 +367,16 @@ make check
 %doc README.md
 %{_bindir}/Singular
 %{_bindir}/TSingular
-%if %{with index}
 %{_infodir}/singular.info*
-%endif
 %{_mandir}/man1/Singular.1*
 %{_mandir}/man1/TSingular.1*
 %{_datadir}/applications/Singular.desktop
 %{_datadir}/icons/Singular.png
 %{_datadir}/ml_python/
 %{_datadir}/ml_singular/
-%if %{with index}
 %{_datadir}/singular/singular.idx
 %docdir %{_datadir}/singular/html/
 %{_datadir}/singular/html/
-%endif
 %dir %{singulardir}
 %{singulardir}/Singular
 %{singulardir}/TSingular
@@ -479,6 +463,7 @@ make check
 - Drop upstreamed -format-specifier and -gcc12 patches
 - Drop obsolete -javac patch
 - Convert License tags to SPDX
+- Reenable building the index on ppc64le
 
 * Mon Jul 25 2022 Jerry James <loganjerry@gmail.com> - 4.2.1p3-3
 - Do not build surfex for i686 (rhbz#2104103)
