@@ -1,0 +1,41 @@
+commit b6647a741b9091b82021ff46d4c112099d175d57
+Author: Michael Orlitzky <michael@orlitzky.com>
+Date:   Thu Nov 10 20:59:00 2022 -0500
+
+    omalloc/omAllocSystem.c: add another include for malloc.h.
+    
+    There are two branches in this file, one for HAVE_MALLOC_SIZE and one
+    for HAVE_MALLOC_USABLE_SIZE. The former includes malloc.h, and the
+    latter needs to too; otherwise, malloc_usable_size() is undefined.
+    
+    This is caught by -Werror=implicit-function-declaration, which is
+    likely to be enabled by default in future versions of GCC and clang.
+
+diff --git a/omalloc/omAllocSystem.c b/omalloc/omAllocSystem.c
+index b70a6292acf8ed80..62e20a57b8b53472 100644
+--- a/omalloc/omAllocSystem.c
++++ b/omalloc/omAllocSystem.c
+@@ -30,15 +30,19 @@
+  *
+  *******************************************************************/
+ /* allocation of large addr */
+-#if defined(HAVE_MALLOC_SIZE)
++
++#if defined(HAVE_MALLOC_SIZE) || defined(HAVE_MALLOC_USABLE_SIZE)
++  #include <stdlib.h>
+   #ifdef HAVE_MALLOC_H
+-  #include <malloc.h>
++    #include <malloc.h>
+   #elif defined(HAVE_MALLOC_MALLOC_H)
+-  #include <malloc/malloc.h>
++    #include <malloc/malloc.h>
+   #endif
++#endif
++
++#if defined(HAVE_MALLOC_SIZE)
+   #define _omSizeOfLargeAddr(addr) (malloc_size(addr))
+ #elif defined(HAVE_MALLOC_USABLE_SIZE)
+-  #include <stdlib.h>
+   #define _omSizeOfLargeAddr(addr) (malloc_usable_size(addr))
+ #else
+ void* omAllocLarge(size_t size)
