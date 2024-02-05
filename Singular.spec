@@ -16,7 +16,7 @@
 
 Name:		Singular
 Version:	%{downstreamver}%{?patchver}
-Release:	3%{?dist}
+Release:	3.rv64%{?dist}
 Summary:	Computer Algebra System for polynomial computations
 # License analysis:
 # - The project as a whole is GPL-2.0-only OR GPL-3.0-only
@@ -269,14 +269,20 @@ module load lrcalc-%{_arch}
 	--without-python \
 %endif
 	--with-readline \
+%ifnarch riscv64
 	--enable-doc \
+%else
+	--disable-doc \
+%endif
 	--with-malloc=system
 
 %make_build
 %make_build -C dox html
 %make_build -C Singular libparse
+%ifnarch riscv64
 make -C doc -j1 -f Makefile-docbuild singular.idx
 make -C doc -j1 all-local
+%endif
 
 
 %install
@@ -314,9 +320,11 @@ mkdir -p %{buildroot}%{_mandir}/man1
 for cmd in ESingular Singular TSingular; do
   cp -p Singular/$cmd.man %{buildroot}%{_mandir}/man1/$cmd.1
 done
+%ifnarch riscv64
 cp -a doc/{html,singular.idx} %{buildroot}%{_datadir}/singular
 mkdir -p %{buildroot}%{_infodir}
 cp -p doc/singular.info %{buildroot}%{_infodir}
+%endif
 
 # remove script that calls surf; we don't ship it
 rm -f %{buildroot}%{singulardir}/singularsurf
@@ -376,8 +384,10 @@ make check
 %{_datadir}/ml_python/
 %{_datadir}/ml_singular/
 %{_datadir}/singular/singular.idx
+%ifnarch riscv64
 %docdir %{_datadir}/singular/html/
 %{_datadir}/singular/html/
+%endif
 %dir %{singulardir}
 %{singulardir}/Singular
 %{singulardir}/TSingular
@@ -458,6 +468,9 @@ make check
 
 
 %changelog
+* Mon Feb 05 2024 Songsong Zhang <U2FsdGVkX1@gmail.com> - 4.3.1p1-3.rv64
+- Add riscv64 support
+
 * Mon Apr 17 2023 Florian Weimer <fweimer@redhat.com> - 4.3.1p1-3
 - Backport upstream patch to fix C99 compatibility issue
 
